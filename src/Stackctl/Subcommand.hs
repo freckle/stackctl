@@ -6,9 +6,9 @@ module Stackctl.Subcommand
 
 import Stackctl.Prelude
 
+import Options.Applicative
 import qualified Stackctl.CLI as CLI
 import Stackctl.Options
-import Options.Applicative
 
 data Subcommand options env = Subcommand
   { name :: Text
@@ -25,7 +25,7 @@ runSubcommand :: Mod CommandFields (RIO CLI.App ()) -> IO ()
 runSubcommand x = do
   (options, act) <-
     execParser
-    $ withInfo "Deploy and manage Apps on the Freckle Platform"
+    $ withInfo "Work with Stack specifications"
     $ (,)
     <$> optionsParser
     <*> subparser x

@@ -6,16 +6,15 @@ module Stackctl.Spec.Discover
 import Stackctl.Prelude
 
 import Data.Semigroup (sconcat)
+import RIO.FilePath (isPathSeparator)
+import RIO.List (dropPrefix)
+import qualified RIO.NonEmpty as NE
+import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.FilterOption
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
-import RIO.FilePath (isPathSeparator)
-import RIO.List (dropPrefix)
-import qualified RIO.NonEmpty as NE
-import qualified RIO.Text as T
-import System.Environment (lookupEnv)
 import System.FilePath.Glob
 
 discoverSpecs
@@ -111,11 +110,7 @@ buildSpecPath accountName stackName stackPath =
 fetchCurrentAccountId
   :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
   => m AccountId
-fetchCurrentAccountId = do
-  mTestAccountId <- liftIO $ lookupEnv "_PLATFORM_TEST_AWS_ACCOUNT_ID"
-  case mTestAccountId of
-    Nothing -> awsGetCallerIdentityAccount
-    Just testAccountId -> pure $ AccountId $ pack testAccountId
+fetchCurrentAccountId = awsGetCallerIdentityAccount
 
 -- | Fetch the discovered region for @aws@ calls made
 --
@@ -127,13 +122,7 @@ fetchCurrentAccountId = do
 fetchCurrentRegion
   :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
   => m Region
-fetchCurrentRegion = do
-  mTestRegion <- liftIO $ lookupEnv "_PLATFORM_TEST_AWS_REGION"
-  maybe awsEc2DescribeFirstAvailabilityZoneRegionName pure
-    $ hush
-    . fromText
-    . pack
-    =<< mTestRegion
+fetchCurrentRegion = awsEc2DescribeFirstAvailabilityZoneRegionName
 
 globRelativeTo :: MonadIO m => FilePath -> Pattern -> m [FilePath]
 globRelativeTo dir p = liftIO $ do
