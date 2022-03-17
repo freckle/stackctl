@@ -146,12 +146,12 @@ stackDeleteResult = \case
   AcceptFailure -> StackDeleteFailure False
   AcceptRetry -> StackDeleteFailure True
 
--- | @platform-cli-{timestamp}-{uuid}@
+-- | @stackctl-{timestamp}-{uuid}@
 newChangeSetName :: MonadIO m => m ChangeSetName
 newChangeSetName = do
   timestamp <- formatTime defaultTimeLocale "%Y%m%d%H%M" <$> getCurrentTime
   uuid <- liftIO $ UUID.toString <$> UUID.nextRandom
-  let parts = ["platform", "cli", timestamp, uuid]
+  let parts = ["stackctl", timestamp, uuid]
   pure $ ChangeSetName $ T.intercalate "-" $ map pack parts
 
 awsCloudFormationDescribeStack
