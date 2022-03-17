@@ -68,8 +68,8 @@ optionsParser = Options
       (  short 'd'
       <> long "directory"
       <> metavar "PATH"
-      <> help "Discover specifications in PATH"
+      <> help "Operate on specifications in PATH"
       <> value "."
       <> showDefault
       )
-    <*> optional (filterOption "discovered specs")
+    <*> optional (filterOption "specifications")
