@@ -14,8 +14,8 @@ import Stackctl.FilterOption
 data Options = Options
   { oColor :: ColorOption
   , oVerbose :: Bool
-  , oFilterOption :: Maybe FilterOption
   , oDirectory :: FilePath
+  , oFilterOption :: Maybe FilterOption
   }
 
 class HasOptions env where
@@ -64,10 +64,12 @@ optionsParser = Options
       <> long "verbose"
       <> help "Log verbosely"
       )
-    <*> optional (filterOption "discovered specs")
-    <*> argument str
-      (  metavar "DIRECTORY"
-      <> help "Discover specifications in DIRECTORY"
+    <*> option str
+      (  short 'd'
+      <> long "directory"
+      <> metavar "PATH"
+      <> help "Discover specifications in PATH"
       <> value "."
       <> showDefault
       )
+    <*> optional (filterOption "discovered specs")
