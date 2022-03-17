@@ -1,0 +1,5 @@
+.stack-work
+dist/
+example-apps/**/.platform/specs
+example-apps/**/*.zip
+integration/**/*.t.err

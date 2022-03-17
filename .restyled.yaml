@@ -1,0 +1,10 @@
+restylers:
+  - brittany
+  - prettier-markdown:
+      enabled: false
+  - whitespace:
+      include:
+        - "**/*"
+        - "!**/*.t" # cram tests have whitespace in assertions
+        - "!README.md" # help code blocks have trailing whitespace
+  - "*"

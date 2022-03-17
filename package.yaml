@@ -1,0 +1,110 @@
+name: stackctl
+version: 0.0.0.0
+github: freckle/stackctl
+license: MIT
+author: Freckle Engineering
+maintainer: freckle-engineering@renaissance.com
+copyright: 2022 Renaissance Learning Inc
+
+extra-doc-files:
+  - README.md
+  - CHANGELOG.md
+
+description: Please see <https://github.com/freckle/stackctl#readme>
+
+dependencies:
+  - base >= 4 && < 5
+
+ghc-options:
+  - -fwrite-ide-info
+  - -Weverything
+  - -Wno-all-missed-specialisations
+  - -Wno-missing-import-lists
+  - -Wno-missing-local-signatures
+  - -Wno-missing-safe-haskell-mode
+  - -Wno-prepositive-qualified-module
+  - -Wno-unsafe
+
+default-extensions:
+  - BangPatterns
+  - DataKinds
+  - DeriveAnyClass
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - DerivingVia
+  - FlexibleContexts
+  - FlexibleInstances
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - LambdaCase
+  - MultiParamTypeClasses
+  - NoImplicitPrelude
+  - NoMonomorphismRestriction
+  - OverloadedStrings
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TypeApplications
+  - TypeFamilies
+
+library:
+  source-dirs: src
+  dependencies:
+    - Glob
+    - aeson
+    - aeson-casing
+    - aeson-pretty
+    - amazonka
+    - amazonka-certificatemanager
+    - amazonka-cloudformation
+    - amazonka-core
+    - amazonka-ec2
+    - amazonka-ecr
+    - amazonka-s3
+    - amazonka-sts
+    - base64-bytestring
+    - bytestring
+    - cfn-flip
+    - conduit
+    - containers
+    - errors
+    - extra
+    - filepath
+    - lens
+    - lens-aeson
+    - mtl
+    - optparse-applicative
+    - resourcet
+    - rio
+    - rio-orphans
+    - text
+    - time
+    - unliftio
+    - unliftio-core
+    - uuid
+    - vector
+    - yaml
+
+executables:
+  stackctl:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - stackctl
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+
+tests:
+  spec:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - hspec
+      - stackctl
