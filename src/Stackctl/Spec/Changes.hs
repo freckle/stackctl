@@ -1,7 +1,7 @@
 module Stackctl.Spec.Changes
-  ( SpecChangesOptions(..)
-  , parseSpecChangesOptions
-  , runSpecChanges
+  ( ChangesOptions(..)
+  , runChangesOptions
+  , runChanges
   ) where
 
 import Stackctl.Prelude
@@ -17,7 +17,7 @@ import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Options.Applicative
 
-data SpecChangesOptions = SpecChangesOptions
+data ChangesOptions = ChangesOptions
   { scoFilterOption :: Maybe FilterOption
   , scoFormat :: Format
   , scoDirectory :: FilePath
@@ -25,8 +25,8 @@ data SpecChangesOptions = SpecChangesOptions
 
 -- brittany-disable-next-binding
 
-parseSpecChangesOptions :: Parser SpecChangesOptions
-parseSpecChangesOptions = SpecChangesOptions
+runChangesOptions :: Parser ChangesOptions
+runChangesOptions = ChangesOptions
   <$> optional (filterOption "discovered specs")
   <*> formatOption
   <*> argument str
@@ -36,7 +36,7 @@ parseSpecChangesOptions = SpecChangesOptions
     <> showDefault
     )
 
-runSpecChanges
+runChanges
   :: ( MonadUnliftIO m
      , MonadResource m
      , MonadReader env m
@@ -44,9 +44,9 @@ runSpecChanges
      , HasAwsEnv env
      , HasOptions env
      )
-  => SpecChangesOptions
+  => ChangesOptions
   -> m ()
-runSpecChanges SpecChangesOptions {..} = do
+runChanges ChangesOptions {..} = do
   colors <- getColorsStdout
   specs <- discoverSpecs scoDirectory scoFilterOption
 

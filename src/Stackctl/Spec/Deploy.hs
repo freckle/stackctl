@@ -1,8 +1,8 @@
 module Stackctl.Spec.Deploy
-  ( SpecDeployOptions(..)
+  ( DeployOptions(..)
   , DeployConfirmation(..)
-  , parseSpecDeployOptions
-  , runSpecDeploy
+  , runDeployOptions
+  , runDeploy
   ) where
 
 import Stackctl.Prelude
@@ -21,7 +21,7 @@ import RIO.List (headMaybe)
 import qualified RIO.Text as T
 import RIO.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 
-data SpecDeployOptions = SpecDeployOptions
+data DeployOptions = DeployOptions
   { sdoFilterOption :: Maybe FilterOption
   , sdoSaveChangeSets :: Maybe FilePath
   , sdoDeployConfirmation :: DeployConfirmation
@@ -31,8 +31,8 @@ data SpecDeployOptions = SpecDeployOptions
 
 -- brittany-disable-next-binding
 
-parseSpecDeployOptions :: Parser SpecDeployOptions
-parseSpecDeployOptions = SpecDeployOptions
+runDeployOptions :: Parser DeployOptions
+runDeployOptions = DeployOptions
   <$> optional (filterOption "discovered specs")
   <*> optional (strOption
     (  long "save-change-sets"
@@ -54,16 +54,16 @@ parseSpecDeployOptions = SpecDeployOptions
     <> showDefault
     )
 
-runSpecDeploy
+runDeploy
   :: ( MonadUnliftIO m
      , MonadResource m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
      )
-  => SpecDeployOptions
+  => DeployOptions
   -> m ()
-runSpecDeploy SpecDeployOptions {..} = do
+runDeploy DeployOptions {..} = do
   logInfo $ "Deploying specifications in " <> fromString sdoDirectory
   specs <- discoverSpecs sdoDirectory sdoFilterOption
 

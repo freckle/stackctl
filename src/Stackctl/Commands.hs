@@ -17,42 +17,42 @@ import Stackctl.Version
 
 cat
   :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
-  => Subcommand SpecCatOptions env
+  => Subcommand CatOptions env
 cat = Subcommand
   { name = "cat"
   , description = "Pretty-print specifications"
-  , parse = parseSpecCatOptions
-  , run = runSpecCat
+  , parse = runCatOptions
+  , run = runCat
   }
 
 capture
   :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env)
-  => Subcommand SpecCaptureOptions env
+  => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
   , description = "Capture deployed Stacks as specifications"
-  , parse = parseSpecCaptureOptions
-  , run = runSpecCapture
+  , parse = runCaptureOptions
+  , run = runCapture
   }
 
 changes
   :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
-  => Subcommand SpecChangesOptions env
+  => Subcommand ChangesOptions env
 changes = Subcommand
   { name = "changes"
   , description = "Review changes between specification and deployed state"
-  , parse = parseSpecChangesOptions
-  , run = runSpecChanges
+  , parse = runChangesOptions
+  , run = runChanges
   }
 
 deploy
   :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env)
-  => Subcommand SpecDeployOptions env
+  => Subcommand DeployOptions env
 deploy = Subcommand
   { name = "deploy"
   , description = "Deploy specifications"
-  , parse = parseSpecDeployOptions
-  , run = runSpecDeploy
+  , parse = runDeployOptions
+  , run = runDeploy
   }
 
 version :: HasLogFunc env => Subcommand () env

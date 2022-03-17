@@ -1,7 +1,7 @@
 module Stackctl.Spec.Cat
-  ( SpecCatOptions(..)
-  , parseSpecCatOptions
-  , runSpecCat
+  ( CatOptions(..)
+  , runCatOptions
+  , runCat
   ) where
 
 import Stackctl.Prelude
@@ -25,7 +25,7 @@ import RIO.List (sort, sortOn)
 import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
 
-data SpecCatOptions = SpecCatOptions
+data CatOptions = CatOptions
   { sctoFilterOption :: Maybe FilterOption
   , sctoNoStacks :: Bool
   , sctoNoTemplates :: Bool
@@ -35,8 +35,8 @@ data SpecCatOptions = SpecCatOptions
 
 -- brittany-disable-next-binding
 
-parseSpecCatOptions :: Parser SpecCatOptions
-parseSpecCatOptions = SpecCatOptions
+runCatOptions :: Parser CatOptions
+runCatOptions = CatOptions
   <$> optional (filterOption "discovered specs")
   <*> switch
     (  long "no-stacks"
@@ -58,16 +58,16 @@ parseSpecCatOptions = SpecCatOptions
     <> showDefault
     )
 
-runSpecCat
+runCat
   :: ( MonadResource m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
      , HasOptions env
      )
-  => SpecCatOptions
+  => CatOptions
   -> m ()
-runSpecCat SpecCatOptions {..} = do
+runCat CatOptions {..} = do
   colors@Colors {..} <- getColorsStdout
   tree <- specTree <$> discoverSpecs sctoDirectory sctoFilterOption
 

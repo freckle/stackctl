@@ -1,7 +1,7 @@
 module Stackctl.Spec.Capture
-  ( SpecCaptureOptions(..)
-  , parseSpecCaptureOptions
-  , runSpecCapture
+  ( CaptureOptions(..)
+  , runCaptureOptions
+  , runCapture
   ) where
 
 import Stackctl.Prelude
@@ -11,7 +11,7 @@ import qualified Stackctl.Paths as Paths
 import Stackctl.Spec.Generate
 import Options.Applicative
 
-data SpecCaptureOptions = SpecCaptureOptions
+data CaptureOptions = CaptureOptions
   { scoOutputDirectory :: FilePath
   , scoAccountName :: Maybe Text
   , scoTemplatePath :: Maybe FilePath
@@ -22,8 +22,8 @@ data SpecCaptureOptions = SpecCaptureOptions
 
 -- brittany-disable-next-binding
 
-parseSpecCaptureOptions :: Parser SpecCaptureOptions
-parseSpecCaptureOptions = SpecCaptureOptions
+runCaptureOptions :: Parser CaptureOptions
+runCaptureOptions = CaptureOptions
     <$> strOption
       (  short 'd'
       <> long "output-directory"
@@ -60,16 +60,16 @@ parseSpecCaptureOptions = SpecCaptureOptions
       <> help "Name of deployed Stack to capture"
       ))
 
-runSpecCapture
+runCapture
   :: ( MonadUnliftIO m
      , MonadResource m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
      )
-  => SpecCaptureOptions
+  => CaptureOptions
   -> m ()
-runSpecCapture SpecCaptureOptions {..} = do
+runCapture CaptureOptions {..} = do
   stack <- awsCloudFormationDescribeStack scoStackName
   template <- awsCloudFormationGetTemplate scoStackName
   void $ generate Generate
