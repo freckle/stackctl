@@ -12,10 +12,10 @@ import Options.Applicative
 import Stackctl.FilterOption
 
 data Options = Options
-  { oColor :: ColorOption
-  , oVerbose :: Bool
-  , oDirectory :: FilePath
+  { oDirectory :: FilePath
   , oFilterOption :: Maybe FilterOption
+  , oColor :: ColorOption
+  , oVerbose :: Bool
   }
 
 class HasOptions env where
@@ -52,7 +52,16 @@ colorHandle h = \case
 
 optionsParser :: Parser Options
 optionsParser = Options
-    <$> option (eitherReader readColorOption)
+    <$> option str
+      (  short 'd'
+      <> long "directory"
+      <> metavar "PATH"
+      <> help "Operate on specifications in PATH"
+      <> value "."
+      <> showDefault
+      )
+    <*> optional (filterOption "specifications")
+    <*> option (eitherReader readColorOption)
       (  long "color"
       <> help "When to colorize output"
       <> metavar "auto|always|never"
@@ -64,12 +73,3 @@ optionsParser = Options
       <> long "verbose"
       <> help "Log verbosely"
       )
-    <*> option str
-      (  short 'd'
-      <> long "directory"
-      <> metavar "PATH"
-      <> help "Operate on specifications in PATH"
-      <> value "."
-      <> showDefault
-      )
-    <*> optional (filterOption "specifications")
