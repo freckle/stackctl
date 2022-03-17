@@ -14,27 +14,23 @@ import qualified RIO.Text as T
 import RIO.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Stackctl.AWS
 import Stackctl.Colors
-import Stackctl.FilterOption
-import qualified Stackctl.Paths as Paths
+import Stackctl.Options
 import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 
 data DeployOptions = DeployOptions
-  { sdoFilterOption :: Maybe FilterOption
-  , sdoSaveChangeSets :: Maybe FilePath
+  { sdoSaveChangeSets :: Maybe FilePath
   , sdoDeployConfirmation :: DeployConfirmation
   , sdoClean :: Bool
-  , sdoDirectory :: FilePath
   }
 
 -- brittany-disable-next-binding
 
 runDeployOptions :: Parser DeployOptions
 runDeployOptions = DeployOptions
-  <$> optional (filterOption "discovered specs")
-  <*> optional (strOption
+  <$> optional (strOption
     (  long "save-change-sets"
     <> metavar "DIRECTORY"
     <> help "Save executed changesets to DIRECTORY"
@@ -47,12 +43,6 @@ runDeployOptions = DeployOptions
     (  long "clean"
     <> help "Remove all changesets from Stack after deploy"
     )
-  <*> argument str
-    (  metavar "DIRECTORY"
-    <> help "Read specifications in DIRECTORY"
-    <> value Paths.defaultSpecs
-    <> showDefault
-    )
 
 runDeploy
   :: ( MonadUnliftIO m
@@ -60,12 +50,12 @@ runDeploy
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
+     , HasOptions env
      )
   => DeployOptions
   -> m ()
 runDeploy DeployOptions {..} = do
-  logInfo $ "Deploying specifications in " <> fromString sdoDirectory
-  specs <- discoverSpecs sdoDirectory sdoFilterOption
+  specs <- discoverSpecs
 
   for_ specs $ \spec -> do
     logStackSpec spec

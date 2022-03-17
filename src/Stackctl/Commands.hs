@@ -30,7 +30,7 @@ cat = Subcommand
   }
 
 capture
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env)
+  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
   => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
@@ -50,7 +50,7 @@ changes = Subcommand
   }
 
 deploy
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env)
+  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
   => Subcommand DeployOptions env
 deploy = Subcommand
   { name = "deploy"

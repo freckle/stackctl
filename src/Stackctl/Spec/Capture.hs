@@ -8,12 +8,11 @@ import Stackctl.Prelude
 
 import Options.Applicative
 import Stackctl.AWS
-import qualified Stackctl.Paths as Paths
+import Stackctl.Options
 import Stackctl.Spec.Generate
 
 data CaptureOptions = CaptureOptions
-  { scoOutputDirectory :: FilePath
-  , scoAccountName :: Maybe Text
+  { scoAccountName :: Maybe Text
   , scoTemplatePath :: Maybe FilePath
   , scoStackPath :: Maybe FilePath
   , scoDepends :: Maybe [StackName]
@@ -24,15 +23,7 @@ data CaptureOptions = CaptureOptions
 
 runCaptureOptions :: Parser CaptureOptions
 runCaptureOptions = CaptureOptions
-    <$> strOption
-      (  short 'd'
-      <> long "output-directory"
-      <> metavar "PATH"
-      <> help "Directory within which to generate"
-      <> value Paths.defaultSpecs
-      <> showDefault
-      )
-    <*> optional (strOption
+    <$> optional (strOption
       (  short 'n'
       <> long "account-name"
       <> metavar "NAME"
@@ -66,14 +57,16 @@ runCapture
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
+     , HasOptions env
      )
   => CaptureOptions
   -> m ()
 runCapture CaptureOptions {..} = do
+  dir <- oDirectory <$> view optionsL
   stack <- awsCloudFormationDescribeStack scoStackName
   template <- awsCloudFormationGetTemplate scoStackName
   void $ generate Generate
-    { gOutputDirectory = scoOutputDirectory
+    { gOutputDirectory = dir
     , gAccountName = scoAccountName
     , gTemplatePath = scoTemplatePath
     , gStackPath = scoStackPath

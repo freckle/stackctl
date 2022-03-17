@@ -17,28 +17,23 @@ import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
-import Stackctl.FilterOption
 import Stackctl.Options
-import qualified Stackctl.Paths as Paths
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
 
 data CatOptions = CatOptions
-  { sctoFilterOption :: Maybe FilterOption
-  , sctoNoStacks :: Bool
+  { sctoNoStacks :: Bool
   , sctoNoTemplates :: Bool
   , sctoBrief :: Bool
-  , sctoDirectory :: FilePath
   }
 
 -- brittany-disable-next-binding
 
 runCatOptions :: Parser CatOptions
 runCatOptions = CatOptions
-  <$> optional (filterOption "discovered specs")
-  <*> switch
+  <$> switch
     (  long "no-stacks"
     <> help "Only show templates/"
     )
@@ -51,12 +46,6 @@ runCatOptions = CatOptions
     <> long "brief"
     <> help "Don't show file contents, only paths"
     )
-  <*> argument str
-    (  metavar "DIRECTORY"
-    <> help "Read specifications in DIRECTORY"
-    <> value Paths.defaultSpecs
-    <> showDefault
-    )
 
 runCat
   :: ( MonadResource m
@@ -68,8 +57,9 @@ runCat
   => CatOptions
   -> m ()
 runCat CatOptions {..} = do
+  dir <- oDirectory <$> view optionsL
   colors@Colors {..} <- getColorsStdout
-  tree <- specTree <$> discoverSpecs sctoDirectory sctoFilterOption
+  tree <- specTree <$> discoverSpecs
 
   let
     putStack n x = if sctoNoStacks then pure () else put n x
@@ -79,7 +69,7 @@ runCat CatOptions {..} = do
     putTemplateBody n x =
       if sctoNoTemplates || sctoBrief then pure () else putBoxed n x
 
-  put 0 $ fromString sctoDirectory <> "/"
+  put 0 $ fromString dir <> "/"
   putStack 2 "stacks/"
   templates <- for tree $ \((accountId, accountName), regions) -> do
     putStack 4
@@ -105,11 +95,7 @@ runCat CatOptions {..} = do
 
   putTemplate 2 "templates/"
   for_ (sort $ concat $ concat templates) $ \template -> do
-    val <-
-      Yaml.decodeFileThrow @_ @Value
-      $ sctoDirectory
-      </> "templates"
-      </> template
+    val <- Yaml.decodeFileThrow @_ @Value $ dir </> "templates" </> template
 
     putTemplate 4 $ green $ fromString template
     putTemplateBody 6 $ prettyPrintTemplate colors val

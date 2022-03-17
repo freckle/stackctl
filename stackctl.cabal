@@ -36,7 +36,6 @@ library
       Stackctl.Commands
       Stackctl.FilterOption
       Stackctl.Options
-      Stackctl.Paths
       Stackctl.Prelude
       Stackctl.Prompt
       Stackctl.Spec.Capture

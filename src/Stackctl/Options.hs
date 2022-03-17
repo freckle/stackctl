@@ -9,10 +9,13 @@ module Stackctl.Options
 import Stackctl.Prelude
 
 import Options.Applicative
+import Stackctl.FilterOption
 
 data Options = Options
   { oColor :: ColorOption
   , oVerbose :: Bool
+  , oFilterOption :: Maybe FilterOption
+  , oDirectory :: FilePath
   }
 
 class HasOptions env where
@@ -60,4 +63,11 @@ optionsParser = Options
       (  short 'v'
       <> long "verbose"
       <> help "Log verbosely"
+      )
+    <*> optional (filterOption "discovered specs")
+    <*> argument str
+      (  metavar "DIRECTORY"
+      <> help "Discover specifications in DIRECTORY"
+      <> value "."
+      <> showDefault
       )

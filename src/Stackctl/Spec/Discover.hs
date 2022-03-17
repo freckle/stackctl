@@ -13,16 +13,21 @@ import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.FilterOption
+import Stackctl.Options
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import System.FilePath.Glob
 
 discoverSpecs
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
-  => FilePath
-  -> Maybe FilterOption
-  -> m [StackSpec]
-discoverSpecs dir mFilterOption = do
+  :: ( MonadResource m
+     , MonadReader env m
+     , HasLogFunc env
+     , HasAwsEnv env
+     , HasOptions env
+     )
+  => m [StackSpec]
+discoverSpecs = do
+  dir <- oDirectory <$> view optionsL
   accountId <- fetchCurrentAccountId
   region <- fetchCurrentRegion
   discovered <-
@@ -35,6 +40,8 @@ discoverSpecs dir mFilterOption = do
     <> "**"
     </> "*"
     <.> "yaml"
+
+  mFilterOption <- oFilterOption <$> view optionsL
 
   let
     filtered = maybe id filterFilePaths mFilterOption discovered
