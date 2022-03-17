@@ -160,6 +160,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Stackctl.AWS.CloudFormationSpec
+      Stackctl.FilterOptionSpec
       Stackctl.StackSpecSpec
       Paths_stackctl
   hs-source-dirs:
