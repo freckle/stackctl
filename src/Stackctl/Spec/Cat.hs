@@ -10,6 +10,11 @@ import Data.Aeson
 import Data.Aeson.Lens
 import qualified Data.Text.IO as T
 import qualified Data.Yaml as Yaml
+import Options.Applicative
+import qualified RIO.HashMap as HashMap
+import RIO.List (sort, sortOn)
+import qualified RIO.NonEmpty as NE
+import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.FilterOption
@@ -19,11 +24,6 @@ import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
-import Options.Applicative
-import qualified RIO.HashMap as HashMap
-import RIO.List (sort, sortOn)
-import qualified RIO.NonEmpty as NE
-import qualified RIO.Text as T
 
 data CatOptions = CatOptions
   { sctoFilterOption :: Maybe FilterOption
@@ -54,7 +54,7 @@ runCatOptions = CatOptions
   <*> argument str
     (  metavar "DIRECTORY"
     <> help "Read specifications in DIRECTORY"
-    <> value Paths.platformSpecs
+    <> value Paths.defaultSpecs
     <> showDefault
     )
 

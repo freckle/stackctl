@@ -7,6 +7,11 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude
 
+import Options.Applicative
+import RIO.Directory (createDirectoryIfMissing)
+import RIO.List (headMaybe)
+import qualified RIO.Text as T
+import RIO.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.FilterOption
@@ -15,11 +20,6 @@ import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
-import Options.Applicative
-import RIO.Directory (createDirectoryIfMissing)
-import RIO.List (headMaybe)
-import qualified RIO.Text as T
-import RIO.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 
 data DeployOptions = DeployOptions
   { sdoFilterOption :: Maybe FilterOption
@@ -50,7 +50,7 @@ runDeployOptions = DeployOptions
   <*> argument str
     (  metavar "DIRECTORY"
     <> help "Read specifications in DIRECTORY"
-    <> value Paths.platformSpecs
+    <> value Paths.defaultSpecs
     <> showDefault
     )
 

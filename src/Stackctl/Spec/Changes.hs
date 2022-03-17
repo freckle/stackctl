@@ -7,6 +7,7 @@ module Stackctl.Spec.Changes
 import Stackctl.Prelude
 
 import qualified Data.Text.IO as T
+import Options.Applicative
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.FilterOption
@@ -15,7 +16,6 @@ import qualified Stackctl.Paths as Paths
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
-import Options.Applicative
 
 data ChangesOptions = ChangesOptions
   { scoFilterOption :: Maybe FilterOption
@@ -32,7 +32,7 @@ runChangesOptions = ChangesOptions
   <*> argument str
     (  metavar "DIRECTORY"
     <> help "Read specifications in DIRECTORY"
-    <> value Paths.platformSpecs
+    <> value Paths.defaultSpecs
     <> showDefault
     )
 

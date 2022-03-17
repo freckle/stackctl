@@ -8,15 +8,11 @@ module Stackctl.Options
 
 import Stackctl.Prelude
 
-import Stackctl.Environment
-import qualified Stackctl.Paths as Paths
 import Options.Applicative
 
 data Options = Options
   { oColor :: ColorOption
   , oVerbose :: Bool
-  , oEnvironment :: Maybe Environment
-  , oResource :: Maybe Text
   }
 
 class HasOptions env where
@@ -65,15 +61,3 @@ optionsParser = Options
       <> long "verbose"
       <> help "Log verbosely"
       )
-    <*> optional (Environment <$> strOption
-      (  short 'e'
-      <> long "environment"
-      <> metavar "ENVIRONMENT"
-      <> help "Set Environment Parameter, for namespacing purposes"
-      ))
-    <*> optional (strOption
-      (  short 'r'
-      <> long "resource"
-      <> metavar "NAME"
-      <> help ("Only process " <> Paths.platformYaml "NAME")
-      ))

@@ -6,10 +6,10 @@ module Stackctl.Spec.Capture
 
 import Stackctl.Prelude
 
+import Options.Applicative
 import Stackctl.AWS
 import qualified Stackctl.Paths as Paths
 import Stackctl.Spec.Generate
-import Options.Applicative
 
 data CaptureOptions = CaptureOptions
   { scoOutputDirectory :: FilePath
@@ -29,7 +29,7 @@ runCaptureOptions = CaptureOptions
       <> long "output-directory"
       <> metavar "PATH"
       <> help "Directory within which to generate"
-      <> value Paths.platformSpecs
+      <> value Paths.defaultSpecs
       <> showDefault
       )
     <*> optional (strOption
