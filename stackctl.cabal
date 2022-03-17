@@ -25,26 +25,18 @@ source-repository head
 
 library
   exposed-modules:
-      Stackctl.App.Domain
-      Stackctl.AppResourceSettings
       Stackctl.AWS
-      Stackctl.AWS.CertificateManager
       Stackctl.AWS.CloudFormation
       Stackctl.AWS.Core
       Stackctl.AWS.EC2
-      Stackctl.AWS.ECR
       Stackctl.AWS.Orphans
-      Stackctl.AWS.S3
       Stackctl.AWS.STS
       Stackctl.CLI
       Stackctl.Colors
       Stackctl.Commands
-      Stackctl.Datadog
-      Stackctl.Docker
       Stackctl.Environment
       Stackctl.FilterOption
       Stackctl.Options
-      Stackctl.Parameters
       Stackctl.Paths
       Stackctl.Prelude
       Stackctl.Prompt
@@ -59,7 +51,6 @@ library
       Stackctl.StackSpecPath
       Stackctl.StackSpecYaml
       Stackctl.Subcommand
-      Stackctl.Tag
       Stackctl.Version
       UnliftIO.Exception.Lens
   other-modules:
@@ -99,21 +90,17 @@ library
     , aeson-casing
     , aeson-pretty
     , amazonka
-    , amazonka-certificatemanager
     , amazonka-cloudformation
     , amazonka-core
     , amazonka-ec2
-    , amazonka-ecr
     , amazonka-s3
     , amazonka-sts
     , base ==4.*
-    , base64-bytestring
     , bytestring
     , cfn-flip
     , conduit
     , containers
     , errors
-    , extra
     , filepath
     , lens
     , lens-aeson
@@ -127,7 +114,6 @@ library
     , unliftio
     , unliftio-core
     , uuid
-    , vector
     , yaml
   default-language: Haskell2010
 
@@ -173,6 +159,7 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Stackctl.AWS.CloudFormationSpec
       Stackctl.StackSpecSpec
       Paths_stackctl
   hs-source-dirs:

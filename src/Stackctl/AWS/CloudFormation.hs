@@ -32,7 +32,6 @@ module Stackctl.AWS.CloudFormation
   , awsCloudFormationDescribeStack
   , awsCloudFormationDescribeStackMaybe
   , awsCloudFormationDescribeStackEvents
-  , awsCloudFormationDescribeStackOutputs
   , awsCloudFormationDeleteStack
   , awsCloudFormationWait
   , awsCloudFormationGetTemplate
@@ -80,11 +79,11 @@ import Data.Aeson.Encode.Pretty
 import Data.Monoid (First)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
-import Stackctl.AWS.Core
 import qualified RIO.ByteString.Lazy as BSL
 import qualified RIO.Text as T
 import qualified RIO.Text.Partial as T (breakOn)
 import RIO.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
+import Stackctl.AWS.Core
 import UnliftIO.Exception.Lens (handling_, trying)
 
 newtype StackId = StackId
@@ -200,14 +199,6 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
     .| concatC
     .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
     .| sinkList
-
-awsCloudFormationDescribeStackOutputs
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
-  => StackName
-  -> m [Output]
-awsCloudFormationDescribeStackOutputs stackName = do
-  stack <- awsCloudFormationDescribeStack stackName
-  pure $ fromMaybe [] $ outputs stack
 
 awsCloudFormationDeleteStack
   :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)

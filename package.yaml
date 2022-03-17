@@ -60,20 +60,16 @@ library:
     - aeson-casing
     - aeson-pretty
     - amazonka
-    - amazonka-certificatemanager
     - amazonka-cloudformation
     - amazonka-core
     - amazonka-ec2
-    - amazonka-ecr
     - amazonka-s3
     - amazonka-sts
-    - base64-bytestring
     - bytestring
     - cfn-flip
     - conduit
     - containers
     - errors
-    - extra
     - filepath
     - lens
     - lens-aeson
@@ -87,7 +83,6 @@ library:
     - unliftio
     - unliftio-core
     - uuid
-    - vector
     - yaml
 
 executables:

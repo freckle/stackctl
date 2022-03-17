@@ -5,9 +5,7 @@ module Stackctl.AWS.Core
   , HasAwsEnv(..)
   , awsEnvDiscover
   , awsSimple
-  , awsSimpleWithin
   , awsSend
-  , awsSendWithin
   , awsPaginate
   , awsAwait
 
@@ -22,11 +20,6 @@ module Stackctl.AWS.Core
   , HasResourceMap(..)
   , ResourceMap
   , withResourceMap
-
-  -- * Values
-  , devAccountId
-  , prodAccountId
-  , usEast1
   ) where
 
 import Stackctl.Prelude
@@ -34,8 +27,8 @@ import Stackctl.Prelude
 import Amazonka
 import Conduit (ConduitM)
 import Control.Monad.Trans.Resource (MonadResource)
-import Stackctl.AWS.Orphans ()
 import RIO.Orphans as X (HasResourceMap(..), ResourceMap, withResourceMap)
+import Stackctl.AWS.Orphans ()
 
 newtype AwsEnv = AwsEnv Env
 
@@ -59,21 +52,6 @@ awsSimple
   -> m b
 awsSimple = simplify awsSend
 
-awsSimpleWithin
-  :: ( MonadResource m
-     , MonadReader env m
-     , HasLogFunc env
-     , HasAwsEnv env
-     , AWSRequest a
-     , Show (AWSResponse a)
-     )
-  => Region
-  -> Text
-  -> a
-  -> (AWSResponse a -> Maybe b)
-  -> m b
-awsSimpleWithin region = simplify $ awsSendWithin region
-
 simplify
   :: (MonadIO m, MonadReader env m, HasLogFunc env, Show (AWSResponse a))
   => (a -> m (AWSResponse a))
@@ -95,15 +73,6 @@ awsSend
 awsSend req = do
   AwsEnv env <- view awsEnvL
   send env req
-
-awsSendWithin
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSRequest a)
-  => Region
-  -> a
-  -> m (AWSResponse a)
-awsSendWithin r req = do
-  AwsEnv env <- view awsEnvL
-  send (within r env) req
 
 awsPaginate
   :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSPager a)
@@ -129,12 +98,3 @@ newtype AccountId = AccountId
   { unAccountId :: Text
   }
   deriving newtype (Eq, Ord, Display)
-
-devAccountId :: AccountId
-devAccountId = AccountId "539282909833"
-
-prodAccountId :: AccountId
-prodAccountId = AccountId "853032795538"
-
-usEast1 :: Region
-usEast1 = Region' "us-east-1"
