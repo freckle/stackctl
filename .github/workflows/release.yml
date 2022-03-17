@@ -1,0 +1,66 @@
+name: Release executables
+
+on:
+  push:
+    branches: main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: tag
+        uses: freckle/haskell-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+
+  create-release:
+    needs: tag
+    if: needs.tag.outputs.tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-release@v1
+        id: create-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.tag.outputs.tag }}
+          release_name: Release ${{ needs.tag.outputs.tag }}
+          draft: false
+          prerelease: false
+    outputs:
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+
+  upload-assets:
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            suffix: x86_64-linux
+          - os: macOS-latest
+            suffix: x86_64-osx
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      # Caching is broken on OSX, we'll just let it be slow
+      - if: ${{ matrix.os != 'macOS-latest' }}
+        uses: freckle/stack-cache-action@v2
+
+      - run: |
+          stack install --copy-compiler-tool pandoc
+          make dist/platform.tar.gz
+      - uses: actions/upload-release-asset@v1
+        id: upload-release-asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./dist/platform.tar.gz
+          asset_name: platform-${{ matrix.suffix }}.tar.gz
+          asset_content_type: application/gzip

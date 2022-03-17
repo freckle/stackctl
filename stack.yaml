@@ -1,0 +1,23 @@
+resolver: lts-18.24
+
+extra-deps:
+  - github: brendanhay/amazonka
+    commit: f73a957d05f64863e867cf39d0db260718f0fadd # main, as of SSO support
+    subdirs:
+      - lib/amazonka
+      - lib/amazonka-core
+      - lib/services/amazonka-cloudformation
+      - lib/services/amazonka-certificatemanager
+      - lib/services/amazonka-ec2
+      - lib/services/amazonka-ecr
+      - lib/services/amazonka-s3
+      - lib/services/amazonka-sso
+      - lib/services/amazonka-sts
+
+  - github: freckle/cfn-flip
+    commit: 49b7b2e0fcc4fd85f37cdb234bb64a4578b85f00
+
+  # for weeder
+  - dhall-1.40.2@sha256:81c161bde08bc1fa71f70d0b1f3356c7fbcb6d05d7f0c6a4d1fbf2f0ed1cb857,35550
+  - generic-lens-2.2.1.0@sha256:6843380740d66cb6bf8ebaaf29d307d2610580eb8303222ee51ada033eca273f,3895
+  - generic-lens-core-2.2.1.0@sha256:a7ee35db4a6e9ed736f6f772f7c05929c9f95995bcbcdc16d5c48daa8835a455,2941

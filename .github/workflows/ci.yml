@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: freckle/stack-cache-action@v2
+
+      - id: stack
+        uses: freckle/stack-action@v3
+        with:
+          stack-arguments: --copy-bins
+
+      - uses: freckle/weeder-action@v1
+        with:
+          weeder-version: 2.2.0
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: platform-cli
+          path: |
+            ${{ steps.stack.outputs.local-bin }}/platform
+
+  integration-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: development
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: platform-cli
+          path: /usr/local/bin
+      - run: sudo chmod +x /usr/local/bin/platform
+      - run: pip install cram
+      - run: cram -v integration/tests
+
+  hlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: rwe/actions-hlint-setup@v1
+      - uses: rwe/actions-hlint-run@v2
+        with:
+          fail-on: warning
