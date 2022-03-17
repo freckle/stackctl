@@ -11,7 +11,11 @@ import Stackctl.Prelude
 
 import Stackctl.AWS
 import Stackctl.Options
-import Stackctl.Spec
+import Stackctl.Spec.Capture
+import Stackctl.Spec.Cat
+import Stackctl.Spec.Changes
+import Stackctl.Spec.Deploy
+import Stackctl.Spec.Generate
 import Stackctl.Subcommand
 import Stackctl.Version
 

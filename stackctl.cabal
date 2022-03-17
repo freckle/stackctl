@@ -48,7 +48,6 @@ library
       Stackctl.Paths
       Stackctl.Prelude
       Stackctl.Prompt
-      Stackctl.Spec
       Stackctl.Spec.Capture
       Stackctl.Spec.Cat
       Stackctl.Spec.Changes
