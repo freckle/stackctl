@@ -34,7 +34,6 @@ library
       Stackctl.CLI
       Stackctl.Colors
       Stackctl.Commands
-      Stackctl.Environment
       Stackctl.FilterOption
       Stackctl.Options
       Stackctl.Paths
