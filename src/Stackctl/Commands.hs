@@ -1,7 +1,6 @@
 module Stackctl.Commands
   ( cat
   , capture
-  , generate
   , changes
   , deploy
   , version
@@ -15,7 +14,6 @@ import Stackctl.Spec.Capture
 import Stackctl.Spec.Cat
 import Stackctl.Spec.Changes
 import Stackctl.Spec.Deploy
-import Stackctl.Spec.Generate
 import Stackctl.Subcommand
 import Stackctl.Version
 
