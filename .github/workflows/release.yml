@@ -54,13 +54,13 @@ jobs:
 
       - run: |
           stack install --copy-compiler-tool pandoc
-          make dist/platform.tar.gz
+          make dist/stackctl.tar.gz
       - uses: actions/upload-release-asset@v1
         id: upload-release-asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./dist/platform.tar.gz
-          asset_name: platform-${{ matrix.suffix }}.tar.gz
+          asset_path: ./dist/stackctl.tar.gz
+          asset_name: stackctl-${{ matrix.suffix }}.tar.gz
           asset_content_type: application/gzip
