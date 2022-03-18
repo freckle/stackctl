@@ -5,11 +5,12 @@ module Stackctl.AWS.Core
   , HasAwsEnv(..)
   , awsEnvDiscover
   , awsSimple
-  , awsSimpleWithin
   , awsSend
-  , awsSendWithin
   , awsPaginate
   , awsAwait
+
+  -- * Modifiers on 'AwsEnv'
+  , awsWithin
 
   -- * 'Amazonka' extensions
   , AccountId(..)
@@ -32,7 +33,12 @@ import Control.Monad.Trans.Resource (MonadResource)
 import RIO.Orphans as X (HasResourceMap(..), ResourceMap, withResourceMap)
 import Stackctl.AWS.Orphans ()
 
-newtype AwsEnv = AwsEnv Env
+newtype AwsEnv = AwsEnv
+  { unAwsEnv :: Env
+  }
+
+unL :: Lens' AwsEnv Env
+unL = lens unAwsEnv $ \x y -> x { unAwsEnv = y }
 
 awsEnvDiscover :: MonadIO m => m AwsEnv
 awsEnvDiscover = liftIO $ AwsEnv <$> newEnv discover
@@ -52,33 +58,9 @@ awsSimple
   -> a
   -> (AWSResponse a -> Maybe b)
   -> m b
-awsSimple = simplify awsSend
-
-awsSimpleWithin
-  :: ( MonadResource m
-     , MonadReader env m
-     , HasLogFunc env
-     , HasAwsEnv env
-     , AWSRequest a
-     , Show (AWSResponse a)
-     )
-  => Region
-  -> Text
-  -> a
-  -> (AWSResponse a -> Maybe b)
-  -> m b
-awsSimpleWithin region = simplify $ awsSendWithin region
-
-simplify
-  :: (MonadIO m, MonadReader env m, HasLogFunc env, Show (AWSResponse a))
-  => (a -> m (AWSResponse a))
-  -> Text
-  -> a
-  -> (AWSResponse a -> Maybe b)
-  -> m b
-simplify with name req post = do
+awsSimple name req post = do
   logDebug $ display name
-  resp <- with req
+  resp <- awsSend req
   logDebug $ display name <> "Response:\n" <> displayShow resp
   maybe (throwString err) pure $ post resp
   where err = unpack name <> " successful, but processing the response failed"
@@ -90,15 +72,6 @@ awsSend
 awsSend req = do
   AwsEnv env <- view awsEnvL
   send env req
-
-awsSendWithin
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSRequest a)
-  => Region
-  -> a
-  -> m (AWSResponse a)
-awsSendWithin r req = do
-  AwsEnv env <- view awsEnvL
-  send (within r env) req
 
 awsPaginate
   :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSPager a)
@@ -119,6 +92,9 @@ awsAwait
 awsAwait w req = do
   AwsEnv env <- view awsEnvL
   await env w req
+
+awsWithin :: (MonadReader env m, HasAwsEnv env) => Region -> m a -> m a
+awsWithin r = local $ over (awsEnvL . unL) (within r)
 
 newtype AccountId = AccountId
   { unAccountId :: Text
