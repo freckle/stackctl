@@ -9,7 +9,9 @@ module Stackctl.Commands
 import Stackctl.Prelude
 
 import Stackctl.AWS
-import Stackctl.Options
+import Stackctl.ColorOption
+import Stackctl.DirectoryOption
+import Stackctl.FilterOption
 import Stackctl.Spec.Capture
 import Stackctl.Spec.Cat
 import Stackctl.Spec.Changes
@@ -18,7 +20,13 @@ import Stackctl.Subcommand
 import Stackctl.Version
 
 cat
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
+  :: ( HasLogFunc env
+     , HasResourceMap env
+     , HasAwsEnv env
+     , HasDirectoryOption env
+     , HasFilterOption env
+     , HasColorOption env
+     )
   => Subcommand CatOptions env
 cat = Subcommand
   { name = "cat"
@@ -28,7 +36,7 @@ cat = Subcommand
   }
 
 capture
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
+  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasDirectoryOption env)
   => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
@@ -38,7 +46,13 @@ capture = Subcommand
   }
 
 changes
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
+  :: ( HasLogFunc env
+     , HasResourceMap env
+     , HasAwsEnv env
+     , HasDirectoryOption env
+     , HasFilterOption env
+     , HasColorOption env
+     )
   => Subcommand ChangesOptions env
 changes = Subcommand
   { name = "changes"
@@ -48,7 +62,12 @@ changes = Subcommand
   }
 
 deploy
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasOptions env)
+  :: ( HasLogFunc env
+     , HasResourceMap env
+     , HasAwsEnv env
+     , HasDirectoryOption env
+     , HasFilterOption env
+     )
   => Subcommand DeployOptions env
 deploy = Subcommand
   { name = "deploy"

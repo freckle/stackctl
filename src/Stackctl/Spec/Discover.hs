@@ -12,8 +12,8 @@ import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
-import Stackctl.FilterOption
-import Stackctl.Options
+import Stackctl.DirectoryOption (HasDirectoryOption(..))
+import Stackctl.FilterOption (HasFilterOption(..), filterFilePaths)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import System.FilePath.Glob
@@ -23,11 +23,12 @@ discoverSpecs
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
-     , HasOptions env
+     , HasDirectoryOption env
+     , HasFilterOption env
      )
   => m [StackSpec]
 discoverSpecs = do
-  dir <- oDirectory <$> view optionsL
+  dir <- view directoryOptionL
   accountId <- fetchCurrentAccountId
   region <- fetchCurrentRegion
   discovered <-
@@ -41,10 +42,10 @@ discoverSpecs = do
     </> "*"
     <.> "yaml"
 
-  mFilterOption <- oFilterOption <$> view optionsL
+  filterOption <- view filterOptionL
 
   let
-    filtered = maybe id filterFilePaths mFilterOption discovered
+    filtered = filterFilePaths filterOption discovered
     toSpecPath = stackSpecPathFromFilePath accountId region
     (errs, specPaths) = partitionEithers $ map toSpecPath filtered
 
@@ -62,7 +63,8 @@ discoverSpecs = do
     <> cyan (display accountId)
     <> "/"
     <> cyan (display region)
-    <> maybe "" ((" matching " <>) . green . display) mFilterOption
+    <> " matching "
+    <> green (display filterOption)
     <> " ("
     <> display (length discovered)
     <> " discovered but not matched, "

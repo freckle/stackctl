@@ -8,7 +8,7 @@ import Stackctl.Prelude
 
 import Options.Applicative
 import Stackctl.AWS
-import Stackctl.Options
+import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.Spec.Generate
 
 data CaptureOptions = CaptureOptions
@@ -57,12 +57,12 @@ runCapture
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
-     , HasOptions env
+     , HasDirectoryOption env
      )
   => CaptureOptions
   -> m ()
 runCapture CaptureOptions {..} = do
-  dir <- oDirectory <$> view optionsL
+  dir <- view directoryOptionL
   stack <- awsCloudFormationDescribeStack scoStackName
   template <- awsCloudFormationGetTemplate scoStackName
   void $ generate Generate

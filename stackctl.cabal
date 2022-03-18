@@ -32,8 +32,10 @@ library
       Stackctl.AWS.Orphans
       Stackctl.AWS.STS
       Stackctl.CLI
+      Stackctl.ColorOption
       Stackctl.Colors
       Stackctl.Commands
+      Stackctl.DirectoryOption
       Stackctl.FilterOption
       Stackctl.Options
       Stackctl.Prelude
@@ -49,6 +51,7 @@ library
       Stackctl.StackSpecPath
       Stackctl.StackSpecYaml
       Stackctl.Subcommand
+      Stackctl.VerboseOption
       Stackctl.Version
       UnliftIO.Exception.Lens
   other-modules:

@@ -1,5 +1,6 @@
 module Stackctl.FilterOption
   ( FilterOption
+  , HasFilterOption(..)
   , filterOption
   , filterOptionFromPaths
   , filterFilePaths
@@ -25,11 +26,19 @@ instance Display FilterOption where
       . NE.toList
       . unFilterOption
 
+class HasFilterOption env where
+  filterOptionL :: Lens' env FilterOption
+
+instance HasFilterOption FilterOption where
+  filterOptionL = id
+
 filterOption :: String -> Parser FilterOption
 filterOption items = option (eitherReader readFilterOption) $ mconcat
   [ long "filter"
   , metavar "PATTERN[,PATTERN]"
   , help $ "Filter " <> items <> " to match PATTERN(s)"
+  , value defaultFilterOption
+  , showDefaultWith showFilterOption
   ]
 
 filterOptionFromPaths :: NonEmpty FilePath -> FilterOption
@@ -45,6 +54,17 @@ readFilterOption =
     . T.splitOn ","
     . pack
   where err = "Must be non-empty, comma-separated list of non-empty patterns"
+
+showFilterOption :: FilterOption -> String
+showFilterOption =
+  unpack
+    . T.intercalate ","
+    . map (pack . decompile)
+    . NE.toList
+    . unFilterOption
+
+defaultFilterOption :: FilterOption
+defaultFilterOption = filterOptionFromPaths $ pure "**/*"
 
 filterFilePaths :: FilterOption -> [FilePath] -> [FilePath]
 filterFilePaths fo = filter $ \path -> any (`match` path) $ unFilterOption fo

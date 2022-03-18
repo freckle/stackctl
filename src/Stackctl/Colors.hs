@@ -9,7 +9,7 @@ module Stackctl.Colors
 
 import Stackctl.Prelude
 
-import Stackctl.Options
+import Stackctl.ColorOption (HasColorOption(..), colorHandle)
 
 data Colors = Colors
   { cyan :: Utf8Builder -> Utf8Builder
@@ -53,13 +53,14 @@ getColorsLogFunc = do
   pure $ if c then colors else noColors
 
 -- | Return 'Colors' based on options and 'stdout'
-getColorsStdout :: (MonadIO m, MonadReader env m, HasOptions env) => m Colors
+getColorsStdout
+  :: (MonadIO m, MonadReader env m, HasColorOption env) => m Colors
 getColorsStdout = getColorsHandle stdout
 
 -- | Return 'Colors' based on options given 'Handle'
 getColorsHandle
-  :: (MonadIO m, MonadReader env m, HasOptions env) => Handle -> m Colors
+  :: (MonadIO m, MonadReader env m, HasColorOption env) => Handle -> m Colors
 getColorsHandle h = do
-  colorOption <- oColor <$> view optionsL
+  colorOption <- view colorOptionL
   c <- colorHandle h colorOption
   pure $ if c then colors else noColors

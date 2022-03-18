@@ -21,7 +21,7 @@ subcommand :: Subcommand options env -> Mod CommandFields (RIO env ())
 subcommand Subcommand {..} =
   command (unpack name) (run <$> withInfo description parse)
 
-runSubcommand :: Mod CommandFields (RIO CLI.App ()) -> IO ()
+runSubcommand :: Mod CommandFields (RIO (CLI.App Options) ()) -> IO ()
 runSubcommand x = do
   (options, act) <-
     execParser

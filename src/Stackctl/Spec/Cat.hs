@@ -16,8 +16,10 @@ import RIO.List (sort, sortOn)
 import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
 import Stackctl.AWS
+import Stackctl.ColorOption (HasColorOption)
 import Stackctl.Colors
-import Stackctl.Options
+import Stackctl.DirectoryOption (HasDirectoryOption(..))
+import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -52,12 +54,14 @@ runCat
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
-     , HasOptions env
+     , HasDirectoryOption env
+     , HasFilterOption env
+     , HasColorOption env
      )
   => CatOptions
   -> m ()
 runCat CatOptions {..} = do
-  dir <- oDirectory <$> view optionsL
+  dir <- view directoryOptionL
   colors@Colors {..} <- getColorsStdout
   tree <- specTree <$> discoverSpecs
 

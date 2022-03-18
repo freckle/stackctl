@@ -14,7 +14,8 @@ import qualified RIO.Text as T
 import RIO.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Stackctl.AWS
 import Stackctl.Colors
-import Stackctl.Options
+import Stackctl.DirectoryOption (HasDirectoryOption)
+import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
@@ -50,7 +51,8 @@ runDeploy
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
-     , HasOptions env
+     , HasDirectoryOption env
+     , HasFilterOption env
      )
   => DeployOptions
   -> m ()
