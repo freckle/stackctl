@@ -23,32 +23,33 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: platform-cli
+          name: stackctl
           path: |
-            ${{ steps.stack.outputs.local-bin }}/platform
+            ${{ steps.stack.outputs.local-bin }}/stackctl
 
-  integration-tests:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: development
-    permissions:
-      id-token: write
-      contents: read
+  # TODO
+  # integration-tests:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment: development
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-    steps:
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: platform-cli
-          path: /usr/local/bin
-      - run: sudo chmod +x /usr/local/bin/platform
-      - run: pip install cram
-      - run: cram -v integration/tests
+  #   steps:
+  #     - uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+  #         aws-region: us-east-1
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-python@v2
+  #     - uses: actions/download-artifact@v2
+  #       with:
+  #         name: stackctl
+  #         path: /usr/local/bin
+  #     - run: sudo chmod +x /usr/local/bin/stackctl
+  #     - run: pip install cram
+  #     - run: cram -v integration/tests
 
   hlint:
     runs-on: ubuntu-latest
