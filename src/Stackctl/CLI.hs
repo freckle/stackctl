@@ -1,5 +1,6 @@
 module Stackctl.CLI
   ( App
+  , optionsL
   , runApp
   ) where
 
@@ -19,6 +20,9 @@ data App options = App
   , appOptions :: options
   }
 
+optionsL :: Lens' (App options) options
+optionsL = lens appOptions $ \x y -> x { appOptions = y }
+
 instance HasLogFunc (App options) where
   logFuncL = lens appLogFunc $ \x y -> x { appLogFunc = y }
 
@@ -31,9 +35,6 @@ instance HasResourceMap (App options) where
 
 instance HasAwsEnv (App options) where
   awsEnvL = lens appAwsEnv $ \x y -> x { appAwsEnv = y }
-
-optionsL :: Lens' (App options) options
-optionsL = lens appOptions $ \x y -> x { appOptions = y }
 
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
