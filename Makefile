@@ -6,6 +6,11 @@ ARCHIVE_TARGETS := \
   dist/stackctl/completion/fish \
   dist/stackctl/completion/zsh \
   dist/stackctl/doc/stackctl.1 \
+  dist/stackctl/doc/stackctl-cat.1 \
+  dist/stackctl/doc/stackctl-capture.1 \
+  dist/stackctl/doc/stackctl-changes.1 \
+  dist/stackctl/doc/stackctl-deploy.1 \
+  dist/stackctl/doc/stackctl-version.1 \
   dist/stackctl/Makefile
 
 dist/stackctl.tar.gz: $(ARCHIVE_TARGETS)
@@ -49,6 +54,11 @@ install:
 	install -Dm644 completion/fish $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d/stackctl.fish
 	install -Dm644 completion/zsh $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_stackctl
 	install -Dm644 doc/stackctl.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl.1
+	install -Dm644 doc/stackctl-cat.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-cat.1
+	install -Dm644 doc/stackctl-capture.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-capture.1
+	install -Dm644 doc/stackctl-changes.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-changes.1
+	install -Dm644 doc/stackctl-deploy.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-deploy.1
+	install -Dm644 doc/stackctl-version.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-version.1
 
 .PHONY: uninstall
 uninstall:
