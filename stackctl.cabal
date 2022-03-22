@@ -84,7 +84,7 @@ library
       StandaloneDeriving
       TypeApplications
       TypeFamilies
-  ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe
+  ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
       Glob
     , aeson
@@ -150,7 +150,7 @@ executable stackctl
       StandaloneDeriving
       TypeApplications
       TypeFamilies
-  ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base ==4.*
     , stackctl
@@ -192,7 +192,7 @@ test-suite spec
       StandaloneDeriving
       TypeApplications
       TypeFamilies
-  ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe
+  ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
       base ==4.*
     , hspec
