@@ -1,0 +1,35 @@
+% STACKCTL-CAT(1) User Manual
+%
+% March 2022
+
+# NAME
+
+stackctl cat - Pretty-print stack specifications and templates
+
+# SYNOPSIS
+
+*stackctl cat* \[options]
+
+# DESCRIPTION
+
+This command locates **stacks/** for the currently-authorized AWS Account and
+Region and lists them in a tree-like display along with abbreviated contents. It
+then lists any **templates/** files used by those stacks in a similar fashion.
+
+# OPTIONS
+
+**\--no-stacks**\
+
+> Don't print **stacks/**.
+
+**\--no-templates**\
+
+> Don't print **templates/**.
+
+**\-b**, **\--brief**\
+
+> Don't print file contents, only paths.
+
+# STACKCTL
+
+Part of the **stackctl(1)** suite
