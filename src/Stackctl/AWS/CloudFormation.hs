@@ -31,8 +31,8 @@ module Stackctl.AWS.CloudFormation
   , output_outputValue
   , awsCloudFormationDescribeStack
   , awsCloudFormationDescribeStackMaybe
-  , awsCloudFormationDescribeStackLastEventId
-  , awsCloudFormationDescribeStackEventsSince
+  , awsCloudFormationDescribeStackEvents
+  , awsCloudFormationGetMostRecentStackEventId
   , awsCloudFormationDeleteStack
   , awsCloudFormationWait
   , awsCloudFormationGetTemplate
@@ -81,7 +81,6 @@ import Data.Monoid (First)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
 import qualified RIO.ByteString.Lazy as BSL
-import RIO.List (headMaybe)
 import qualified RIO.Text as T
 import qualified RIO.Text.Partial as T (breakOn)
 import RIO.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
@@ -183,28 +182,12 @@ awsCloudFormationDescribeStackMaybe stackName =
   handling_ _ValidationError (pure Nothing) $ do
     Just <$> awsCloudFormationDescribeStack stackName
 
-awsCloudFormationDescribeStackLastEventId
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
-  => StackName
-  -> m Text
-awsCloudFormationDescribeStackLastEventId stackName = do
-  let
-    req =
-      newDescribeStackEvents
-        & describeStackEvents_stackName
-        ?~ unStackName stackName
-
-  awsSimple "DescribeStackEvents" req $ \resp -> do
-    events <- resp ^. describeStackEventsResponse_stackEvents
-    event <- headMaybe events
-    pure $ event ^. stackEvent_eventId
-
-awsCloudFormationDescribeStackEventsSince
+awsCloudFormationDescribeStackEvents
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => StackName
-  -> Text -- ^ Last-seen Id
+  -> Maybe Text -- ^ Last-seen Id
   -> m [StackEvent]
-awsCloudFormationDescribeStackEventsSince stackName lastId = do
+awsCloudFormationDescribeStackEvents stackName mLastId = do
   let
     req =
       newDescribeStackEvents
@@ -215,8 +198,31 @@ awsCloudFormationDescribeStackEventsSince stackName lastId = do
     $ awsPaginate req
     .| mapC (fromMaybe [] . (^. describeStackEventsResponse_stackEvents))
     .| concatC
-    .| takeWhileC (\e -> e ^. stackEvent_eventId /= lastId)
+    .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
     .| sinkList
+
+awsCloudFormationGetMostRecentStackEventId
+  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  => StackName
+  -> m (Maybe Text)
+awsCloudFormationGetMostRecentStackEventId stackName = do
+  let
+    req =
+      newDescribeStackEvents
+        & describeStackEvents_stackName
+        ?~ unStackName stackName
+
+    -- Events are returned most-recent first, so "last" is "first" here
+    getFirstEventId :: [StackEvent] -> Maybe Text
+    getFirstEventId = \case
+      [] -> Nothing
+      (e : _) -> Just $ e ^. stackEvent_eventId
+
+  awsSimple "DescribeStackEvents" req
+    $ pure
+    . getFirstEventId
+    . fromMaybe []
+    . (^. describeStackEventsResponse_stackEvents)
 
 awsCloudFormationDeleteStack
   :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
