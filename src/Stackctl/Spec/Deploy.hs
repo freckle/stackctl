@@ -140,8 +140,8 @@ deployChangeSet confirmation changeSet = do
 
   -- It can take a minute to get this batch of events to work out where we're
   -- tailing from, so do that part synchronously
-  lastId <- awsCloudFormationDescribeStackLastEventId stackName
-  asyncTail <- async $ tailStackEventsSince stackName lastId
+  mLastId <- awsCloudFormationGetMostRecentStackEventId stackName
+  asyncTail <- async $ tailStackEventsSince stackName mLastId
 
   logInfo $ "Executing ChangeSet " <> display changeSetId
   result <- do
@@ -168,11 +168,11 @@ deployChangeSet confirmation changeSet = do
 tailStackEventsSince
   :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
   => StackName
-  -> Text
+  -> Maybe Text -- ^ StackEventId
   -> m a
-tailStackEventsSince stackName lastId = do
+tailStackEventsSince stackName mLastId = do
   colors <- getColorsLogFunc
-  events <- awsCloudFormationDescribeStackEventsSince stackName lastId
+  events <- awsCloudFormationDescribeStackEvents stackName mLastId
   traverse_ (logInfo <=< formatStackEvent colors) $ reverse events
 
   -- Without this small delay before looping, our requests seem to hang
@@ -181,7 +181,7 @@ tailStackEventsSince stackName lastId = do
 
   -- Tail from the next "last id". If we got no events, be sure to pass along
   -- any last-id we were given
-  tailStackEventsSince stackName $ fromMaybe lastId $ getLastEventId events
+  tailStackEventsSince stackName $ getLastEventId events <|> mLastId
 
 formatStackEvent :: MonadIO m => Colors -> StackEvent -> m Utf8Builder
 formatStackEvent Colors {..} e = do
