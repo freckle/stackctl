@@ -31,7 +31,8 @@ module Stackctl.AWS.CloudFormation
   , output_outputValue
   , awsCloudFormationDescribeStack
   , awsCloudFormationDescribeStackMaybe
-  , awsCloudFormationDescribeStackEvents
+  , awsCloudFormationDescribeStackLastEventId
+  , awsCloudFormationDescribeStackEventsSince
   , awsCloudFormationDeleteStack
   , awsCloudFormationWait
   , awsCloudFormationGetTemplate
@@ -80,6 +81,7 @@ import Data.Monoid (First)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
 import qualified RIO.ByteString.Lazy as BSL
+import RIO.List (headMaybe)
 import qualified RIO.Text as T
 import qualified RIO.Text.Partial as T (breakOn)
 import RIO.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
@@ -181,12 +183,28 @@ awsCloudFormationDescribeStackMaybe stackName =
   handling_ _ValidationError (pure Nothing) $ do
     Just <$> awsCloudFormationDescribeStack stackName
 
-awsCloudFormationDescribeStackEvents
+awsCloudFormationDescribeStackLastEventId
+  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  => StackName
+  -> m Text
+awsCloudFormationDescribeStackLastEventId stackName = do
+  let
+    req =
+      newDescribeStackEvents
+        & describeStackEvents_stackName
+        ?~ unStackName stackName
+
+  awsSimple "DescribeStackEvents" req $ \resp -> do
+    events <- resp ^. describeStackEventsResponse_stackEvents
+    event <- headMaybe events
+    pure $ event ^. stackEvent_eventId
+
+awsCloudFormationDescribeStackEventsSince
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => StackName
-  -> Maybe Text -- ^ Last-seen Id
+  -> Text -- ^ Last-seen Id
   -> m [StackEvent]
-awsCloudFormationDescribeStackEvents stackName mLastId = do
+awsCloudFormationDescribeStackEventsSince stackName lastId = do
   let
     req =
       newDescribeStackEvents
@@ -197,7 +215,7 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
     $ awsPaginate req
     .| mapC (fromMaybe [] . (^. describeStackEventsResponse_stackEvents))
     .| concatC
-    .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
+    .| takeWhileC (\e -> e ^. stackEvent_eventId /= lastId)
     .| sinkList
 
 awsCloudFormationDeleteStack
