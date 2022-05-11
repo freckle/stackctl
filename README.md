@@ -2,6 +2,16 @@
 
 Manage CloudFormation Stacks through specifications.
 
+## About
+
+`stackctl` is a command-line tool for working with Stack Specifications. A Stack
+Specification is a file-system format for describing deployed (or
+to-be-deployed) CloudFormation Stacks including the Template, Parameters, and
+Tags. `stackctl` can be used to pretty-print, diff, and deploy these
+specifications.
+
+This project also contains a Haskell library for doing the same.
+
 ## Install
 
 ### Binary install
