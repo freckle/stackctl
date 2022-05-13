@@ -31,9 +31,9 @@ discoverSpecs = do
   dir <- view directoryOptionL
   accountId <- fetchCurrentAccountId
   region <- fetchCurrentRegion
-  discovered <-
-    globRelativeTo dir
-    $ compile
+  discovered <- globRelativeTo
+    dir
+    [ compile
     $ "stacks"
     </> unpack (unAccountId accountId)
     <> ".*"
@@ -41,6 +41,15 @@ discoverSpecs = do
     <> "**"
     </> "*"
     <.> "yaml"
+    , compile
+    $ "stacks"
+    </> "*."
+    <> unpack (unAccountId accountId)
+    </> unpack (fromRegion region)
+    <> "**"
+    </> "*"
+    <.> "yaml"
+    ]
 
   filterOption <- view filterOptionL
 
@@ -133,6 +142,6 @@ fetchCurrentRegion
   => m Region
 fetchCurrentRegion = awsEc2DescribeFirstAvailabilityZoneRegionName
 
-globRelativeTo :: MonadIO m => FilePath -> Pattern -> m [FilePath]
-globRelativeTo dir p = liftIO $ do
-  map (dropWhile isPathSeparator . dropPrefix dir) <$> globDir1 p dir
+globRelativeTo :: MonadIO m => FilePath -> [Pattern] -> m [FilePath]
+globRelativeTo dir ps = liftIO $ do
+  map (dropWhile isPathSeparator . dropPrefix dir) . concat <$> globDir ps dir
