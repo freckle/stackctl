@@ -49,8 +49,9 @@ newtype ParameterYaml = ParameterYaml
   }
 
 instance FromJSON ParameterYaml where
-  parseJSON = withObject "Parameter"
-    $ \o -> build <$> o .: "ParameterKey" <*> o .: "ParameterValue"
+  parseJSON = withObject "Parameter" $ \o ->
+    (build <$> o .: "Name" <*> o .: "Value")
+      <|> (build <$> o .: "ParameterKey" <*> o .: "ParameterValue")
    where
     build k v = ParameterYaml $ makeParameter k $ Just $ unParameterValue v
 
