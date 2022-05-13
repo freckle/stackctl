@@ -104,3 +104,4 @@ tests:
     dependencies:
       - hspec
       - stackctl
+      - yaml
