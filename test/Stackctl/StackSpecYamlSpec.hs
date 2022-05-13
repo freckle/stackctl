@@ -61,3 +61,15 @@ spec = do
 
       show ex
         `shouldBe` "AesonException \"Error in $.Parameters[0].ParameterValue: Expected String or Number, got: Bool False\""
+
+    it "also accepts CloudGenesis formatted values" $ do
+      StackSpecYaml {..} <- Yaml.decodeThrow $ mconcat
+        [ "Template: foo.yaml\n"
+        , "Parameters:\n"
+        , "  - Name: Foo\n"
+        , "    Value: Bar\n"
+        ]
+
+      let Just [ParameterYaml param] = ssyParameters
+      param ^. parameter_parameterKey `shouldBe` Just "Foo"
+      param ^. parameter_parameterValue `shouldBe` Just "Bar"
