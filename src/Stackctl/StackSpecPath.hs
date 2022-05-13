@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module Stackctl.StackSpecPath
   ( StackSpecPath
 
@@ -16,14 +18,16 @@ module Stackctl.StackSpecPath
 
 import Stackctl.Prelude
 
-import Stackctl.AWS
+import RIO.Char (isDigit)
 import RIO.FilePath (joinPath, splitDirectories)
 import qualified RIO.Text as T
-import System.FilePath.Glob
+import qualified RIO.Text.Partial as T (breakOn)
+import Stackctl.AWS
 
 data StackSpecPath = StackSpecPath
   { sspAccountId :: AccountId
   , sspAccountName :: Text
+  , sspAccountPathPart :: FilePath
   , sspRegion :: Region
   , sspStackName :: StackName
   , sspPath :: FilePath
@@ -41,7 +45,18 @@ instance Display StackSpecPath where
 
 stackSpecPath
   :: AccountId -> Text -> Region -> StackName -> FilePath -> StackSpecPath
-stackSpecPath = StackSpecPath
+stackSpecPath sspAccountId sspAccountName sspRegion sspStackName sspPath =
+  StackSpecPath
+    { sspAccountId
+    , sspAccountName
+    , sspAccountPathPart
+    , sspRegion
+    , sspStackName
+    , sspPath
+    }
+ where
+  sspAccountPathPart =
+    unpack $ unAccountId sspAccountId <> "." <> sspAccountName
 
 stackSpecPathAccountId :: StackSpecPath -> AccountId
 stackSpecPathAccountId = sspAccountId
@@ -61,10 +76,7 @@ stackSpecPathStackName = sspStackName
 -- | Render the (relative) 'StackSpecPath'
 stackSpecPathFilePath :: StackSpecPath -> FilePath
 stackSpecPathFilePath StackSpecPath {..} =
-  "stacks"
-    </> unpack (unAccountId sspAccountId <> "." <> sspAccountName)
-    </> unpack (fromRegion sspRegion)
-    </> sspPath
+  "stacks" </> sspAccountPathPart </> unpack (fromRegion sspRegion) </> sspPath
 
 stackSpecPathFromFilePath
   :: AccountId
@@ -73,16 +85,14 @@ stackSpecPathFromFilePath
   -> Either String StackSpecPath
 stackSpecPathFromFilePath accountId region path = case splitDirectories path of
   ("stacks" : pathAccount : pathRegion : rest) -> do
-    let
-      accountName = T.drop 1 $ T.dropWhile (/= '.') $ pack pathAccount
-      accountPattern = compile $ unpack (unAccountId accountId) <> ".*"
+    (accountName, pathAccountId) <- parseAccountPath pathAccount
 
-    unless (accountPattern `match` pathAccount)
+    unless (pathAccountId == accountId)
       $ Left
       $ "Unexpected account: "
-      <> pathAccount
-      <> " !=~ "
-      <> decompile accountPattern
+      <> unpack (unAccountId pathAccountId)
+      <> " != "
+      <> unpack (unAccountId accountId)
 
     unless (unpack (fromRegion region) == pathRegion)
       $ Left
@@ -100,9 +110,21 @@ stackSpecPathFromFilePath accountId region path = case splitDirectories path of
     Right $ StackSpecPath
       { sspAccountId = accountId
       , sspAccountName = accountName
+      , sspAccountPathPart = pathAccount
       , sspRegion = region
       , sspStackName = stackName
       , sspPath = joinPath rest
       }
 
   _ -> Left $ "Path is not stacks/././.: " <> path
+
+-- | Handle @{account-name}.{account-id}@ or @{account-id}.{account-name}@
+parseAccountPath :: FilePath -> Either String (Text, AccountId)
+parseAccountPath path = case second (T.drop 1) $ T.breakOn "." $ pack path of
+  (a, b) | isAccountId a -> Right (b, AccountId a)
+  (a, b) | isAccountId b -> Right (a, AccountId b)
+  _ ->
+    Left
+      $ "Path matches neither {account-id}.{account-name}, nor {account-name}.{account-id}: "
+      <> path
+  where isAccountId x = T.length x == 12 && T.all isDigit x
