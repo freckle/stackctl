@@ -107,14 +107,17 @@ writeStackSpec parent stackSpec@StackSpec {..} templateBody = do
 
 readStackSpec :: MonadIO m => FilePath -> StackSpecPath -> m StackSpec
 readStackSpec dir specPath = do
-  specBody <-
-    liftIO $ Yaml.decodeFileThrow $ dir </> stackSpecPathFilePath specPath
+  specBody <- liftIO $ either err pure =<< Yaml.decodeFileEither path
 
   pure StackSpec
     { ssSpecRoot = dir
     , ssSpecPath = specPath
     , ssSpecBody = specBody
     }
+ where
+  path = dir </> stackSpecPathFilePath specPath
+  err e =
+    throwString $ path <> " is invalid: " <> Yaml.prettyPrintParseException e
 
 -- | Create a Change Set between a Stack Specification and deployed state
 --
