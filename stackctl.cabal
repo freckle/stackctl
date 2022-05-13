@@ -163,6 +163,7 @@ test-suite spec
       Stackctl.AWS.CloudFormationSpec
       Stackctl.FilterOptionSpec
       Stackctl.StackSpecSpec
+      Stackctl.StackSpecYamlSpec
       Paths_stackctl
   hs-source-dirs:
       test
@@ -197,4 +198,5 @@ test-suite spec
       base ==4.*
     , hspec
     , stackctl
+    , yaml
   default-language: Haskell2010

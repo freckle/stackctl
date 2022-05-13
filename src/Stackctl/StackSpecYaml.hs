@@ -25,6 +25,7 @@ import Stackctl.Prelude
 
 import Data.Aeson
 import Data.Aeson.Casing
+import qualified RIO.Text as T
 import Stackctl.AWS
 
 data StackSpecYaml = StackSpecYaml
@@ -48,9 +49,20 @@ newtype ParameterYaml = ParameterYaml
   }
 
 instance FromJSON ParameterYaml where
-  parseJSON = withObject "Parameter" $ \o -> do
-    p <- makeParameter <$> o .: "ParameterKey" <*> o .: "ParameterValue"
-    pure $ ParameterYaml p
+  parseJSON = withObject "Parameter"
+    $ \o -> build <$> o .: "ParameterKey" <*> o .: "ParameterValue"
+   where
+    build k v = ParameterYaml $ makeParameter k $ Just $ unParameterValue v
+
+newtype ParameterValue = ParameterValue
+  { unParameterValue :: Text
+  }
+
+instance FromJSON ParameterValue where
+  parseJSON = \case
+    String x -> pure $ ParameterValue x
+    Number x -> pure $ ParameterValue $ T.dropSuffix ".0" $ pack $ show x
+    x -> fail $ "Expected String or Number, got: " <> show x
 
 instance ToJSON ParameterYaml where
   toJSON = object . parameterPairs
