@@ -55,6 +55,34 @@ Once installed, see:
 The man pages are also available [in-repository](./doc), but contain
 documentation as of `main`, and not your installed version.
 
+## Relationship to CloudGenesis
+
+[CloudGenesis][] is a project that also takes a directory of Stack
+Specifications and deploys them when changed. Its on-disk format inspired ours
+and, in fact, directories built for CloudGenesis can be managed by `stackctl`
+(not necessarily the other way around).
+
+[cloudgenesis]: https://github.com/LifeWay/CloudGenesis
+
+The key differences are:
+
+- CloudGenesis supplies AWS CodeBuild tooling for handling changes to your
+  GitOps repository; Stackctl expects you to implement a GitHub Action that
+  installs and executes `stackctl` commands as appropriate
+
+  This makes Stackctl better if you need or want to also run the same tooling in
+  a local context, but it makes CloudGenesis better if you need or want this
+  activity to remain within the boundaries of your AWS VPC.
+
+- CloudGenesis reacts to file-change events in S3, which only happens when you
+  synchronize from `main`; Stackctl can run on any branch and easily be scoped
+  to files changed in the PR or push.
+
+  This enables Stackctl features like commenting with ChangeSet details on PRs,
+  which are not possible in CloudGenesis as it's currently implemented.
+
+- Stackctl adds the `Depends` key, for ordering multi-Stack processing
+
 ---
 
 [CHANGELOG](./CHANGELOG.md) | [LICENSE](./LICENSE)
