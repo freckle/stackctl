@@ -71,7 +71,14 @@ import Amazonka.CloudFormation.Types
 import qualified Amazonka.CloudFormation.Types.ChangeSetSummary as Summary
 import Amazonka.CloudFormation.Waiters
 import Amazonka.Core
-  (AsError, ServiceError, _MatchServiceError, hasStatus, serviceMessage)
+  ( AsError
+  , ServiceError
+  , _MatchServiceError
+  , _ServiceError
+  , hasStatus
+  , serviceCode
+  , serviceMessage
+  )
 import Amazonka.Waiter (Accept(..))
 import Conduit
 import Control.Lens ((?~))
@@ -328,8 +335,8 @@ awsCloudFormationCreateChangeSet
   -> [Tag]
   -> m (Either Text (Maybe ChangeSet))
 awsCloudFormationCreateChangeSet stackName stackTemplate parameters capabilities tags
-  = fmap (first $ maybe "Unknown validation error" toText . view serviceMessage)
-    $ trying _ValidationError
+  = fmap (first formatServiceError)
+    $ trying (_ServiceError . hasStatus 400)
     $ do
         name <- newChangeSetName
         templateBody <- readFileUtf8 $ unStackTemplate stackTemplate
@@ -432,3 +439,9 @@ stackIsRollbackComplete stack =
 _ValidationError :: AsError a => Getting (First ServiceError) a ServiceError
 _ValidationError =
   _MatchServiceError defaultService "ValidationError" . hasStatus 400
+
+formatServiceError :: ServiceError -> Text
+formatServiceError e = mconcat
+  [ toText $ e ^. serviceCode
+  , maybe "" ((": " <>) . toText) $ e ^. serviceMessage
+  ]
