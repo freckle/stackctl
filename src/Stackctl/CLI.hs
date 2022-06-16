@@ -73,4 +73,7 @@ runAppT options f = do
   runResourceT $ runLoggerLoggingT app $ runReaderT (unAppT f) app
 
 adjustLogSettings :: LogColor -> Verbosity -> LogSettings -> LogSettings
-adjustLogSettings lc v = setLogSettingsColor lc . verbositySetLogLevels v
+adjustLogSettings lc v =
+  setLogSettingsDestination LogDestinationStderr
+    . setLogSettingsColor lc
+    . verbositySetLogLevels v

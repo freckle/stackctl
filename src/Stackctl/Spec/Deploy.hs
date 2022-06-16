@@ -182,9 +182,9 @@ tailStackEventsSince
   -> Maybe Text -- ^ StackEventId
   -> m a
 tailStackEventsSince stackName mLastId = do
-  colors <- getColorsStderr
+  colors <- getColorsStdout
   events <- awsCloudFormationDescribeStackEvents stackName mLastId
-  traverse_ (logInfo . (:# []) <=< formatStackEvent colors) $ reverse events
+  traverse_ (liftIO . T.putStrLn <=< formatStackEvent colors) $ reverse events
 
   -- Without this small delay before looping, our requests seem to hang
   -- intermittently (without errors) and often we miss events.
