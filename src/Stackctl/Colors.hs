@@ -3,8 +3,6 @@ module Stackctl.Colors
   ( Colors(..)
   , HasColorOption
   , getColorsStdout
-  , getColorsStderr
-  , getColorsHandle
   , noColors
   ) where
 
@@ -17,10 +15,6 @@ import Stackctl.ColorOption (HasColorOption(..), colorHandle)
 getColorsStdout
   :: (MonadIO m, MonadReader env m, HasColorOption env) => m Colors
 getColorsStdout = getColorsHandle stdout
-
-getColorsStderr
-  :: (MonadIO m, MonadReader env m, HasColorOption env) => m Colors
-getColorsStderr = getColorsHandle stderr
 
 -- | Return 'Colors' based on options given 'Handle'
 getColorsHandle
