@@ -25,7 +25,7 @@ import Stackctl.Prelude
 
 import Data.Aeson
 import Data.Aeson.Casing
-import qualified RIO.Text as T
+import qualified Data.Text as T
 import Stackctl.AWS
 
 data StackSpecYaml = StackSpecYaml
@@ -62,7 +62,7 @@ newtype ParameterValue = ParameterValue
 instance FromJSON ParameterValue where
   parseJSON = \case
     String x -> pure $ ParameterValue x
-    Number x -> pure $ ParameterValue $ T.dropSuffix ".0" $ pack $ show x
+    Number x -> pure $ ParameterValue $ dropSuffix ".0" $ pack $ show x
     x -> fail $ "Expected String or Number, got: " <> show x
 
 instance ToJSON ParameterYaml where
@@ -90,3 +90,6 @@ instance ToJSON TagYaml where
 
 tagPairs :: KeyValue a => TagYaml -> [a]
 tagPairs (TagYaml t) = ["Key" .= (t ^. tag_key), "Value" .= (t ^. tag_value)]
+
+dropSuffix :: Text -> Text -> Text
+dropSuffix suffix t = fromMaybe t $ T.stripSuffix suffix t

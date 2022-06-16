@@ -5,8 +5,8 @@ module Stackctl.Prompt
 
 import Stackctl.Prelude
 
+import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import qualified RIO.Text as T
 
 prompt
   :: (MonadIO m, MonadLogger m, MonadReader env m)

@@ -7,9 +7,9 @@ module Stackctl.Spec.Changes.Format
 
 import Stackctl.Prelude
 
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Text as T
 import Options.Applicative hiding (action)
-import qualified RIO.NonEmpty as NE
-import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
 

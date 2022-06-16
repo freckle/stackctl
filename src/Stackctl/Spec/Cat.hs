@@ -8,13 +8,13 @@ import Stackctl.Prelude
 
 import Data.Aeson
 import Data.Aeson.Lens
+import qualified Data.HashMap.Strict as HashMap
+import Data.List (sort, sortOn)
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Data.Yaml as Yaml
 import Options.Applicative
-import qualified RIO.HashMap as HashMap
-import RIO.List (sort, sortOn)
-import qualified RIO.NonEmpty as NE
-import qualified RIO.Text as T
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
