@@ -1,18 +1,27 @@
 module Stackctl.VerboseOption
-  ( HasVerboseOption(..)
+  ( Verbosity
+  , verbositySetLogLevels
+  , HasVerboseOption(..)
   , verboseOption
   ) where
 
 import Stackctl.Prelude2
 
+import Blammo.Logging.LogSettings.LogLevels
 import Options.Applicative
 
-class HasVerboseOption env where
-  verboseOptionL :: Lens' env Bool
+newtype Verbosity = Verbosity Bool
 
-instance HasVerboseOption Bool where
+verbositySetLogLevels :: Verbosity -> (LogSettings -> LogSettings)
+verbositySetLogLevels (Verbosity b) =
+  if b then setLogSettingsLevels (newLogLevels LevelDebug []) else id
+
+class HasVerboseOption env where
+  verboseOptionL :: Lens' env Verbosity
+
+instance HasVerboseOption Verbosity where
   verboseOptionL = id
 
-verboseOption :: Parser Bool
-verboseOption =
-  switch $ mconcat [short 'v', long "verbose", help "Log verbosely"]
+verboseOption :: Parser Verbosity
+verboseOption = fmap Verbosity $ switch $ mconcat
+  [short 'v', long "verbose", help "Log verbosely"]
