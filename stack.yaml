@@ -1,6 +1,13 @@
 resolver: lts-18.24
 
 extra-deps:
+  - Blammo-1.0.1.1
+  - cfn-flip-0.1.0.2
+
+  # For Blammo
+  - monad-logger-aeson-0.2.0.1
+  - context-0.2.0.0
+
   - github: brendanhay/amazonka
     commit: f73a957d05f64863e867cf39d0db260718f0fadd # main, as of SSO support
     subdirs:
@@ -12,14 +19,6 @@ extra-deps:
       - lib/services/amazonka-ecr
       - lib/services/amazonka-sso
       - lib/services/amazonka-sts
-
-  # TODO: this has been released
-  - github: freckle/cfn-flip
-    commit: 49b7b2e0fcc4fd85f37cdb234bb64a4578b85f00
-
-  - ../blammo
-  - monad-logger-aeson-0.2.0.1
-  - context-0.2.0.0
 
   # for weeder
   - dhall-1.40.2@sha256:81c161bde08bc1fa71f70d0b1f3356c7fbcb6d05d7f0c6a4d1fbf2f0ed1cb857,35550

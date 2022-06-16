@@ -5,6 +5,34 @@
 
 packages:
 - completed:
+    hackage: Blammo-1.0.1.1@sha256:d3c7f5bed8a7778db116fe8318751037596afa0655ed12c190e4ff671b72e527,3954
+    pantry-tree:
+      size: 1115
+      sha256: 3881a44247abaa2ea26497eb070b6a2b345b845b0b13f0979b7c9ddc4b76b671
+  original:
+    hackage: Blammo-1.0.1.1
+- completed:
+    hackage: cfn-flip-0.1.0.2@sha256:86cd26b0edeb2876c1939ff0734d23f34f3819c8913fe0caf5e1d2d23c785950,5698
+    pantry-tree:
+      size: 3004
+      sha256: 061170703aafc6146dd5aefb9212c4f2f6582743f97695b443a93c1f659259b9
+  original:
+    hackage: cfn-flip-0.1.0.2
+- completed:
+    hackage: monad-logger-aeson-0.2.0.1@sha256:3ce33913e0f0f73cd272ce734abaae460bdbc48ad9c4d7192a912849060114b0,5156
+    pantry-tree:
+      size: 5103
+      sha256: f221efc9a29a358c63b571cc3fb8e86cdcab3ee6aa29c8d4395ca85adb8fe2af
+  original:
+    hackage: monad-logger-aeson-0.2.0.1
+- completed:
+    hackage: context-0.2.0.0@sha256:6b643adb4a64fe521873d08df0497f71f88e18b9ecff4b68b4eef938e446cfc9,1886
+    pantry-tree:
+      size: 952
+      sha256: b041ec197787d7cef078a2de33a74853179821e3083882f22b6d185e5764d75e
+  original:
+    hackage: context-0.2.0.0
+- completed:
     size: 27775608
     subdir: lib/amazonka
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
@@ -108,31 +136,6 @@ packages:
   original:
     subdir: lib/services/amazonka-sts
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-- completed:
-    size: 11915
-    url: https://github.com/freckle/cfn-flip/archive/49b7b2e0fcc4fd85f37cdb234bb64a4578b85f00.tar.gz
-    name: cfn-flip
-    version: 0.0.0.0
-    sha256: 65c3c02b10cbd60118bc9f7179c624ba2a6aac8f44e7de196c4ab643ba431cf1
-    pantry-tree:
-      size: 3159
-      sha256: 90897d5be240bd29a17fa2bff43a55c8bebc10ca9ad4ab3617910eb223ff2f74
-  original:
-    url: https://github.com/freckle/cfn-flip/archive/49b7b2e0fcc4fd85f37cdb234bb64a4578b85f00.tar.gz
-- completed:
-    hackage: monad-logger-aeson-0.2.0.1@sha256:3ce33913e0f0f73cd272ce734abaae460bdbc48ad9c4d7192a912849060114b0,5156
-    pantry-tree:
-      size: 5103
-      sha256: f221efc9a29a358c63b571cc3fb8e86cdcab3ee6aa29c8d4395ca85adb8fe2af
-  original:
-    hackage: monad-logger-aeson-0.2.0.1
-- completed:
-    hackage: context-0.2.0.0@sha256:6b643adb4a64fe521873d08df0497f71f88e18b9ecff4b68b4eef938e446cfc9,1886
-    pantry-tree:
-      size: 952
-      sha256: b041ec197787d7cef078a2de33a74853179821e3083882f22b6d185e5764d75e
-  original:
-    hackage: context-0.2.0.0
 - completed:
     hackage: dhall-1.40.2@sha256:81c161bde08bc1fa71f70d0b1f3356c7fbcb6d05d7f0c6a4d1fbf2f0ed1cb857,35550
     pantry-tree:
