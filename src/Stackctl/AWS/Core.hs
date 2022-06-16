@@ -27,8 +27,10 @@ module Stackctl.AWS.Core
 
 import Stackctl.Prelude2
 
-import Amazonka
+import Amazonka hiding (LogLevel(..))
+import qualified Amazonka as AWS
 import Conduit (ConduitM)
+import Control.Monad.Logger (defaultLoc, toLogStr)
 import Control.Monad.Trans.Resource (MonadResource)
 import RIO.Orphans as X (HasResourceMap(..), ResourceMap, withResourceMap)
 import Stackctl.AWS.Orphans ()
@@ -40,8 +42,27 @@ newtype AwsEnv = AwsEnv
 unL :: Lens' AwsEnv Env
 unL = lens unAwsEnv $ \x y -> x { unAwsEnv = y }
 
-awsEnvDiscover :: MonadIO m => m AwsEnv
-awsEnvDiscover = liftIO $ AwsEnv <$> newEnv discover
+awsEnvDiscover :: MonadLoggerIO m => m AwsEnv
+awsEnvDiscover = do
+  env <- liftIO $ newEnv discover
+  AwsEnv <$> configureLogging env
+
+configureLogging :: MonadLoggerIO m => Env -> m Env
+configureLogging env = do
+  loggerIO <- askLoggerIO
+  pure $ env
+    { AWS.envLogger = \level msg -> do
+      loggerIO
+        defaultLoc -- TODO: there may be a way to get a CallStack/Loc
+        "Amazonka"
+        (case level of
+          AWS.Info -> LevelInfo
+          AWS.Error -> LevelError
+          AWS.Debug -> LevelDebug
+          AWS.Trace -> LevelOther "trace"
+        )
+        (toLogStr msg)
+    }
 
 class HasAwsEnv env where
   awsEnvL :: Lens' env AwsEnv

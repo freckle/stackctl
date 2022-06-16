@@ -10,11 +10,18 @@ import Stackctl.Prelude2
 import Blammo.Logging.LogSettings.LogLevels
 import Options.Applicative
 
-newtype Verbosity = Verbosity Bool
+newtype Verbosity = Verbosity [()]
 
 verbositySetLogLevels :: Verbosity -> (LogSettings -> LogSettings)
-verbositySetLogLevels (Verbosity b) =
-  if b then setLogSettingsLevels (newLogLevels LevelDebug []) else id
+verbositySetLogLevels (Verbosity bs) = case bs of
+  [] -> id
+  [_] -> setLogSettingsLevels v
+  [_, _] -> setLogSettingsLevels vv
+  _ -> setLogSettingsLevels vvv
+ where
+  v = newLogLevels LevelDebug [("Amazonka", LevelInfo)]
+  vv = newLogLevels LevelDebug []
+  vvv = newLogLevels (LevelOther "trace") []
 
 class HasVerboseOption env where
   verboseOptionL :: Lens' env Verbosity
@@ -23,5 +30,8 @@ instance HasVerboseOption Verbosity where
   verboseOptionL = id
 
 verboseOption :: Parser Verbosity
-verboseOption = fmap Verbosity $ switch $ mconcat
-  [short 'v', long "verbose", help "Log verbosely"]
+verboseOption = fmap Verbosity $ many $ flag' () $ mconcat
+  [ short 'v'
+  , long "verbose"
+  , help "Increase verbosity (can be passed multiple times)"
+  ]
