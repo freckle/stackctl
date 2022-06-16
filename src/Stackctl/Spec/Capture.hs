@@ -4,7 +4,7 @@ module Stackctl.Spec.Capture
   , runCapture
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 import Stackctl.AWS
@@ -54,6 +54,7 @@ runCaptureOptions = CaptureOptions
 runCapture
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env

@@ -56,7 +56,7 @@ module Stackctl.AWS.CloudFormation
   , awsCloudFormationDeleteAllChangeSets
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Amazonka.CloudFormation.CreateChangeSet hiding (id)
 import Amazonka.CloudFormation.DeleteChangeSet
@@ -163,7 +163,7 @@ newChangeSetName = do
   pure $ ChangeSetName $ T.intercalate "-" $ map pack parts
 
 awsCloudFormationDescribeStack
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m Stack
 awsCloudFormationDescribeStack stackName = do
@@ -177,8 +177,8 @@ awsCloudFormationDescribeStack stackName = do
 awsCloudFormationDescribeStackMaybe
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      )
   => StackName
@@ -209,7 +209,7 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
     .| sinkList
 
 awsCloudFormationGetMostRecentStackEventId
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m (Maybe Text)
 awsCloudFormationGetMostRecentStackEventId stackName = do
@@ -232,7 +232,7 @@ awsCloudFormationGetMostRecentStackEventId stackName = do
     . (^. describeStackEventsResponse_stackEvents)
 
 awsCloudFormationDeleteStack
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m StackDeleteResult
 awsCloudFormationDeleteStack stackName = do
@@ -258,7 +258,7 @@ awsCloudFormationWait stackName = do
   req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
 awsCloudFormationGetTemplate
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m Value
 awsCloudFormationGetTemplate stackName = do
@@ -324,8 +324,8 @@ changeSetFailed = (== ChangeSetStatus_FAILED) . csStatus
 awsCloudFormationCreateChangeSet
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      )
   => StackName
@@ -369,7 +369,7 @@ awsCloudFormationCreateChangeSet stackName stackTemplate parameters capabilities
         pure $ cs <$ guard (not $ changeSetFailed cs)
 
 awsCloudFormationDescribeChangeSet
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => ChangeSetId
   -> m ChangeSet
 awsCloudFormationDescribeChangeSet changeSetId = do
@@ -396,11 +396,11 @@ awsCloudFormationExecuteChangeSet changeSetId = do
   void $ awsSend $ newExecuteChangeSet $ unChangeSetId changeSetId
 
 awsCloudFormationDeleteAllChangeSets
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m ()
 awsCloudFormationDeleteAllChangeSets stackName = do
-  logInfo $ "Deleting all changesets from " <> display stackName <> "..."
+  logInfo $ t $ "Deleting all changesets from " <> display stackName <> "..."
   runConduit
     $ awsPaginate (newListChangeSets $ unStackName stackName)
     .| concatMapC
@@ -410,7 +410,7 @@ awsCloudFormationDeleteAllChangeSets stackName = do
          )
     .| mapM_C
          (\csId -> do
-           logInfo $ "Enqueing delete of " <> display csId
+           logInfo $ t $ "Enqueing delete of " <> display csId
            void $ awsSend $ newDeleteChangeSet csId
          )
 

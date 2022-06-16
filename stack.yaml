@@ -14,6 +14,7 @@ extra-deps:
       - lib/services/amazonka-sso
       - lib/services/amazonka-sts
 
+  # TODO: this has been released
   - github: freckle/cfn-flip
     commit: 49b7b2e0fcc4fd85f37cdb234bb64a4578b85f00
 

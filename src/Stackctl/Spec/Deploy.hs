@@ -5,7 +5,7 @@ module Stackctl.Spec.Deploy
   , runDeploy
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 import RIO.Directory (createDirectoryIfMissing)
@@ -48,6 +48,7 @@ runDeployOptions = DeployOptions
 runDeploy
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
@@ -68,7 +69,7 @@ runDeploy DeployOptions {..} = do
 
     case emChangeSet of
       Left err -> do
-        logError $ display err
+        logError $ t $ display err
         exitFailure
       Right Nothing -> logInfo "Stack is up to date"
       Right (Just changeSet) -> do
@@ -91,8 +92,8 @@ data DeployConfirmation
 handleRollbackComplete
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      )
   => DeployConfirmation
@@ -103,6 +104,7 @@ handleRollbackComplete confirmation stackName = do
 
   when (maybe False stackIsRollbackComplete mStack) $ do
     logWarn
+      $ t
       $ "Stack "
       <> display stackName
       <> " is in ROLLBACK_COMPLETE state and must be deleted before proceeding"
@@ -116,13 +118,14 @@ handleRollbackComplete confirmation stackName = do
     result <- awsCloudFormationDeleteStack stackName
 
     case result of
-      StackDeleteSuccess -> logInfo $ display result
+      StackDeleteSuccess -> logInfo $ t $ display result
       StackDeleteFailure{} ->
-        logWarn $ display result <> ", deployment may fail"
+        logWarn $ t $ display result <> ", deployment may fail"
 
 deployChangeSet
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
@@ -132,7 +135,7 @@ deployChangeSet
   -> m ()
 deployChangeSet confirmation changeSet = do
   colors <- getColorsLogFunc
-  logInfo $ formatTTY colors stackName $ Just changeSet
+  logInfo $ t $ formatTTY colors stackName $ Just changeSet
 
   case confirmation of
     DeployWithConfirmation -> promptContinue
@@ -143,7 +146,7 @@ deployChangeSet confirmation changeSet = do
   mLastId <- awsCloudFormationGetMostRecentStackEventId stackName
   asyncTail <- async $ tailStackEventsSince stackName mLastId
 
-  logInfo $ "Executing ChangeSet " <> display changeSetId
+  logInfo $ t $ "Executing ChangeSet " <> display changeSetId
   result <- do
     awsCloudFormationExecuteChangeSet changeSetId
     awsCloudFormationWait stackName
@@ -151,9 +154,9 @@ deployChangeSet confirmation changeSet = do
   cancel asyncTail
 
   let
-    onSuccess = logInfo $ display result
+    onSuccess = logInfo $ t $ display result
     onFailure = do
-      logError $ display result
+      logError $ t $ display result
       exitFailure
 
   case result of
@@ -166,14 +169,19 @@ deployChangeSet confirmation changeSet = do
   changeSetId = csChangeSetId changeSet
 
 tailStackEventsSince
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: ( MonadResource m
+     , MonadLogger m
+     , MonadReader env m
+     , HasLogFunc env
+     , HasAwsEnv env
+     )
   => StackName
   -> Maybe Text -- ^ StackEventId
   -> m a
 tailStackEventsSince stackName mLastId = do
   colors <- getColorsLogFunc
   events <- awsCloudFormationDescribeStackEvents stackName mLastId
-  traverse_ (logInfo <=< formatStackEvent colors) $ reverse events
+  traverse_ (logInfo . t <=< formatStackEvent colors) $ reverse events
 
   -- Without this small delay before looping, our requests seem to hang
   -- intermittently (without errors) and often we miss events.

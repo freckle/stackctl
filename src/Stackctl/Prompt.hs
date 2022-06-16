@@ -1,16 +1,15 @@
 module Stackctl.Prompt
   ( prompt
   , promptContinue
-  )
-where
+  ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import qualified Data.Text.IO as T
 import qualified RIO.Text as T
 
 prompt
-  :: (MonadIO m, MonadReader env m, HasLogFunc env)
+  :: (MonadIO m, MonadLogger m, MonadReader env m)
   => Text
   -- ^ Message to present
   -> (Text -> Either Text a)
@@ -26,11 +25,11 @@ prompt message parse dispatch = do
 
   case parse x of
     Left err -> do
-      logWarn $ "Invalid input: " <> display err
+      logWarn $ t $ "Invalid input: " <> display err
       prompt message parse dispatch
     Right a -> dispatch a
 
-promptContinue :: (MonadIO m, MonadReader env m, HasLogFunc env) => m ()
+promptContinue :: (MonadIO m, MonadLogger m, MonadReader env m) => m ()
 promptContinue = prompt "Continue (y/n)" parse dispatch
  where
   parse x

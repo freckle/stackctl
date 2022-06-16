@@ -3,7 +3,7 @@ module Stackctl.Spec.Generate
   , generate
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Data.Aeson
 import Stackctl.AWS
@@ -32,6 +32,7 @@ data Generate = Generate
 generate
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env

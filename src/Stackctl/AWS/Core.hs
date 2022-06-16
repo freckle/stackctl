@@ -25,7 +25,7 @@ module Stackctl.AWS.Core
   , withResourceMap
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Amazonka
 import Conduit (ConduitM)
@@ -48,8 +48,8 @@ class HasAwsEnv env where
 
 awsSimple
   :: ( MonadResource m
+     , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      , AWSRequest a
      , Show (AWSResponse a)
@@ -59,9 +59,9 @@ awsSimple
   -> (AWSResponse a -> Maybe b)
   -> m b
 awsSimple name req post = do
-  logDebug $ display name
+  logDebug $ t $ display name
   resp <- awsSend req
-  logDebug $ display name <> "Response:\n" <> displayShow resp
+  logDebug $ t $ display name <> "Response:\n" <> displayShow resp
   maybe (throwString err) pure $ post resp
   where err = unpack name <> " successful, but processing the response failed"
 
