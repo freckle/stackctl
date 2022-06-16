@@ -4,7 +4,7 @@ module Stackctl.StackSpecYamlSpec
   ( spec
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import qualified Data.Yaml as Yaml
 import Stackctl.AWS

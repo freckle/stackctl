@@ -6,7 +6,7 @@ module Stackctl.FilterOption
   , filterFilePaths
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 import qualified RIO.NonEmpty as NE
@@ -18,13 +18,9 @@ newtype FilterOption = FilterOption
   { unFilterOption :: NonEmpty Pattern
   }
 
-instance Display FilterOption where
-  display =
-    display
-      . T.intercalate ","
-      . map (pack . decompile)
-      . NE.toList
-      . unFilterOption
+instance ToJSON FilterOption where
+  toJSON = toJSON . showFilterOption
+  toEncoding = toEncoding . showFilterOption
 
 class HasFilterOption env where
   filterOptionL :: Lens' env FilterOption

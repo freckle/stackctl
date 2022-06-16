@@ -7,7 +7,6 @@ import Stackctl.Prelude2
 
 import Data.Aeson
 import Stackctl.AWS
-import Stackctl.Colors
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -36,7 +35,6 @@ generate
      , MonadLogger m
      , MonadReader env m
      , HasAwsEnv env
-     , HasColorOption env
      )
   => Generate
   -> m FilePath
@@ -63,7 +61,7 @@ generate Generate {..} = do
 
     stackSpec = buildStackSpec gOutputDirectory specPath specYaml
 
-  logInfo $ "Generating specification in " <> fromString gOutputDirectory
+  logInfo "Generating specification"
   logStackSpec stackSpec
 
   writeStackSpec gOutputDirectory stackSpec gTemplate

@@ -4,7 +4,7 @@ module Stackctl.Subcommand
   , runSubcommand
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 import qualified Stackctl.CLI as CLI
@@ -14,14 +14,14 @@ data Subcommand options env = Subcommand
   { name :: Text
   , description :: Text
   , parse :: Parser options
-  , run :: options -> RIO env ()
+  , run :: options -> CLI.AppT env IO ()
   }
 
-subcommand :: Subcommand options env -> Mod CommandFields (RIO env ())
+subcommand :: Subcommand options env -> Mod CommandFields (CLI.AppT env IO ())
 subcommand Subcommand {..} =
   command (unpack name) (run <$> withInfo description parse)
 
-runSubcommand :: Mod CommandFields (RIO (CLI.App Options) ()) -> IO ()
+runSubcommand :: Mod CommandFields (CLI.AppT (CLI.App Options) IO ()) -> IO ()
 runSubcommand x = do
   (options, act) <-
     execParser
@@ -29,7 +29,7 @@ runSubcommand x = do
     $ (,)
     <$> optionsParser
     <*> subparser x
-  CLI.runApp options act
+  CLI.runAppT options act
 
 withInfo :: Text -> Parser a -> ParserInfo a
 withInfo d p = info (p <**> helper) $ progDesc (unpack d) <> fullDesc

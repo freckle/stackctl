@@ -3,7 +3,7 @@ module Stackctl.Options
   , optionsParser
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 import Stackctl.ColorOption
@@ -14,7 +14,7 @@ import Stackctl.VerboseOption
 data Options = Options
   { oDirectory :: FilePath
   , oFilterOption :: FilterOption
-  , oColor :: ColorOption
+  , oColor :: LogColor
   , oVerbose :: Bool
   }
 

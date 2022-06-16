@@ -3,7 +3,7 @@ module Stackctl.VerboseOption
   , verboseOption
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 

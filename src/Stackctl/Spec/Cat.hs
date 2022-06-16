@@ -75,14 +75,10 @@ runCat CatOptions {..} = do
   put 0 $ fromString dir <> "/"
   putStack 2 "stacks/"
   templates <- for tree $ \((accountId, accountName), regions) -> do
-    putStack 4
-      $ magenta (display accountId)
-      <> "."
-      <> display accountName
-      <> "/"
+    putStack 4 $ magenta (unAccountId accountId) <> "." <> accountName <> "/"
 
     for regions $ \(region, specs) -> do
-      putStack 6 $ magenta (display region) <> "/"
+      putStack 6 $ magenta (toText region) <> "/"
 
       let sorted = sortOn (stackSpecPathBasePath . stackSpecSpecPath) specs
       for sorted $ \spec -> do
@@ -116,38 +112,37 @@ specTree = map (second groupRegion) . groupAccount
 groupTo :: Ord b => (a -> b) -> [a] -> [(b, [a])]
 groupTo f = map (f . NE.head &&& NE.toList) . NE.groupAllWith f
 
-prettyPrintStackSpecYaml
-  :: Colors -> StackName -> StackSpecYaml -> [Utf8Builder]
+prettyPrintStackSpecYaml :: Colors -> StackName -> StackSpecYaml -> [Text]
 prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
-  [ [cyan "Name" <> ": " <> green (display name)]
-  , [cyan "Template" <> ": " <> green (fromString ssyTemplate)]
+  [ [cyan "Name" <> ": " <> green (unStackName name)]
+  , [cyan "Template" <> ": " <> green (pack ssyTemplate)]
   , ppList "Parameters" (ppParameters . map unParameterYaml) ssyParameters
   , ppList "Capabilities" ppCapabilities ssyCapabilities
   , ppList "Tags" (ppTags . map unTagYaml) ssyTags
   ]
  where
-  ppList :: Utf8Builder -> (a -> [Utf8Builder]) -> Maybe a -> [Utf8Builder]
+  ppList :: Text -> (a -> [Text]) -> Maybe a -> [Text]
   ppList label f = maybe [] (((cyan label <> ":") :) . f)
 
   ppParameters = concatMap $ \p ->
     [ "  - " <> cyan "ParameterKey" <> ": " <> maybe
       ""
-      (green . display)
+      green
       (p ^. parameter_parameterKey)
     , "    " <> cyan "ParameterValue" <> ": " <> maybe
       ""
-      display
+      toText
       (p ^. parameter_parameterValue)
     ]
 
-  ppCapabilities = map (("  - " <>) . green . display)
+  ppCapabilities = map (("  - " <>) . green . toText)
 
   ppTags = concatMap $ \tg ->
-    [ "  - " <> cyan "Key" <> ": " <> green (display $ tg ^. tag_key)
-    , "    " <> cyan "Value" <> ": " <> display (tg ^. tag_value)
+    [ "  - " <> cyan "Key" <> ": " <> green (tg ^. tag_key)
+    , "    " <> cyan "Value" <> ": " <> (tg ^. tag_value)
     ]
 
-prettyPrintTemplate :: Colors -> Value -> [Utf8Builder]
+prettyPrintTemplate :: Colors -> Value -> [Text]
 prettyPrintTemplate Colors {..} val = concat
   [ displayTextProperty "Description"
   , displayObjectProperty "Parameters"
@@ -155,29 +150,28 @@ prettyPrintTemplate Colors {..} val = concat
   , displayObjectProperty "Outputs"
   ]
  where
-  displayTextProperty :: Text -> [Utf8Builder]
-  displayTextProperty = displayPropertyWith $ \v ->
-    let tp = T.dropWhileEnd (== '\n') $ pack v in ["  " <> green (display tp)]
+  displayTextProperty :: Text -> [Text]
+  displayTextProperty = displayPropertyWith
+    $ \v -> let tp = T.dropWhileEnd (== '\n') $ pack v in ["  " <> green tp]
 
-  displayObjectProperty :: Text -> [Utf8Builder]
+  displayObjectProperty :: Text -> [Text]
   displayObjectProperty =
     displayPropertyWith @(HashMap Text Value)
-      $ map (("  - " <>) . green . display)
+      $ map (("  - " <>) . green)
       . sort
       . HashMap.keys
 
   displayPropertyWith
-    :: (FromJSON a, ToJSON a) => (a -> [Utf8Builder]) -> Text -> [Utf8Builder]
-  displayPropertyWith f k =
-    cyan (display k) <> ": " : fromMaybe [] displayValue
+    :: (FromJSON a, ToJSON a) => (a -> [Text]) -> Text -> [Text]
+  displayPropertyWith f k = cyan k <> ": " : fromMaybe [] displayValue
     where displayValue = val ^? key k . _JSON . to f
 
-putBoxed :: MonadIO m => Int -> [Utf8Builder] -> m ()
+putBoxed :: MonadIO m => Int -> [Text] -> m ()
 putBoxed n xs = do
   traverse_ (put n . ("│ " <>)) xs
   put n "└──────────"
   put 0 ""
 
-put :: MonadIO m => Int -> Utf8Builder -> m ()
-put n = liftIO . T.putStrLn . utf8BuilderToText . (indent <>)
+put :: MonadIO m => Int -> Text -> m ()
+put n = liftIO . T.putStrLn . (indent <>)
   where indent = mconcat $ replicate n " "

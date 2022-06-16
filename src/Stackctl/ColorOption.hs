@@ -1,49 +1,36 @@
 module Stackctl.ColorOption
-  ( ColorOption
+  ( LogColor(..)
   , HasColorOption(..)
   , colorOption
   , colorHandle
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
+import Blammo.Logging.LogSettings
 import Options.Applicative
 
-data ColorOption
-  = ColorAuto
-  | ColorAlways
-  | ColorNever
-
 class HasColorOption env where
-  colorOptionL :: Lens' env ColorOption
+  colorOptionL :: Lens' env LogColor
 
-instance HasColorOption ColorOption where
+instance HasColorOption LogColor where
   colorOptionL = id
 
-colorOption :: Parser ColorOption
-colorOption = option (eitherReader readColorOption) $ mconcat
+colorOption :: Parser LogColor
+colorOption = option (eitherReader readLogColor) $ mconcat
   [ long "color"
   , help "When to colorize output"
   , metavar "auto|always|never"
-  , value ColorAuto
-  , showDefaultWith showColorOption
+  , value LogColorAuto
+  , showDefaultWith showLogColor
   ]
 
-readColorOption :: String -> Either String ColorOption
-readColorOption = \case
-  "auto" -> Right ColorAuto
-  "always" -> Right ColorAlways
-  "never" -> Right ColorNever
-  x -> Left $ "Invalid color option: " <> x
+showLogColor :: LogColor -> String
+showLogColor = \case
+  LogColorAuto -> "auto"
+  LogColorAlways -> "always"
+  LogColorNever -> "never"
 
-showColorOption :: ColorOption -> String
-showColorOption = \case
-  ColorAuto -> "auto"
-  ColorAlways -> "always"
-  ColorNever -> "never"
-
-colorHandle :: MonadIO m => Handle -> ColorOption -> m Bool
-colorHandle h = \case
-  ColorAuto -> hIsTerminalDevice h
-  ColorAlways -> pure True
-  ColorNever -> pure False
+colorHandle :: MonadIO m => Handle -> LogColor -> m Bool
+colorHandle h lc = shouldColorHandle settings h
+  where settings = setLogSettingsColor lc defaultLogSettings

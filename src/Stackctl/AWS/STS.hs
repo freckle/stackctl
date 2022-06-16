@@ -8,8 +8,7 @@ import Amazonka.STS.GetCallerIdentity
 import Stackctl.AWS.Core
 
 awsGetCallerIdentityAccount
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => m AccountId
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m AccountId
 awsGetCallerIdentityAccount = do
   awsSimple "GetCallerIdentity" newGetCallerIdentity $ \resp -> do
     AccountId <$> resp ^. getCallerIdentityResponse_account

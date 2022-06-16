@@ -9,12 +9,10 @@
 module Stackctl.AWS.Orphans
   () where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
-import Amazonka (Region, ToText(..))
 import Amazonka.CloudFormation.DescribeChangeSet
 import Amazonka.CloudFormation.Types
-import Amazonka.S3.Types (BucketName, ObjectKey)
 import Data.Aeson
 import GHC.Generics (Rep)
 
@@ -48,28 +46,3 @@ deriving via (Generically ResourceChangeDetail)
   instance ToJSON ResourceChangeDetail
 deriving via (Generically ResourceTargetDefinition)
   instance ToJSON ResourceTargetDefinition
-
-newtype ToTextable a = ToTextable { unToTextable :: a }
-instance (ToText a) => Display (ToTextable a) where
-  display = display . toText . unToTextable
-
-deriving via (ToTextable Region)
-  instance Display Region
-
-deriving via (ToTextable Capability)
-  instance Display Capability
-deriving via (ToTextable ChangeAction)
-  instance Display ChangeAction
-deriving via (ToTextable ChangeSource)
-  instance Display ChangeSource
-deriving via (ToTextable Replacement)
-  instance Display Replacement
-deriving via (ToTextable ResourceAttribute)
-  instance Display ResourceAttribute
-deriving via (ToTextable RequiresRecreation)
-  instance Display RequiresRecreation
-
-deriving via (ToTextable BucketName)
-  instance Display BucketName
-deriving via (ToTextable ObjectKey)
-  instance Display ObjectKey

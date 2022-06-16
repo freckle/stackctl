@@ -3,7 +3,7 @@ module Stackctl.DirectoryOption
   , directoryOption
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Options.Applicative
 

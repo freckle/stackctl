@@ -16,7 +16,7 @@ module Stackctl.StackSpecPath
   , stackSpecPathFromFilePath
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import RIO.Char (isDigit)
 import RIO.FilePath (joinPath, splitDirectories)
@@ -32,16 +32,6 @@ data StackSpecPath = StackSpecPath
   , sspStackName :: StackName
   , sspPath :: FilePath
   }
-
-instance Display StackSpecPath where
-  display StackSpecPath {..} =
-    display sspAccountId
-      <> " ("
-      <> display sspAccountName
-      <> ") "
-      <> display sspRegion
-      <> ": "
-      <> display sspStackName
 
 stackSpecPath
   :: AccountId -> Text -> Region -> StackName -> FilePath -> StackSpecPath

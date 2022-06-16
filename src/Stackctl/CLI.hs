@@ -1,11 +1,14 @@
 module Stackctl.CLI
   ( App
   , optionsL
-  , runApp
+  , AppT
+  , runAppT
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
+import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
+import Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import Stackctl.AWS
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
@@ -13,25 +16,16 @@ import Stackctl.FilterOption
 import Stackctl.VerboseOption
 
 data App options = App
-  { appLogFunc :: LogFunc
-  , appProcessContext :: ProcessContext
-  , appResourceMap :: ResourceMap
-  , appAwsEnv :: AwsEnv
+  { appLogger :: Logger
   , appOptions :: options
+  , appAwsEnv :: AwsEnv
   }
 
 optionsL :: Lens' (App options) options
 optionsL = lens appOptions $ \x y -> x { appOptions = y }
 
-instance HasLogFunc (App options) where
-  logFuncL = lens appLogFunc $ \x y -> x { appLogFunc = y }
-
-instance HasProcessContext (App options) where
-  processContextL =
-    lens appProcessContext $ \x y -> x { appProcessContext = y }
-
-instance HasResourceMap (App options) where
-  resourceMapL = lens appResourceMap $ \x y -> x { appResourceMap = y }
+instance HasLogger (App options) where
+  loggerL = lens appLogger $ \x y -> x { appLogger = y }
 
 instance HasAwsEnv (App options) where
   awsEnvL = lens appAwsEnv $ \x y -> x { appAwsEnv = y }
@@ -48,29 +42,35 @@ instance HasColorOption options => HasColorOption (App options) where
 instance HasVerboseOption options => HasVerboseOption (App options) where
   verboseOptionL = optionsL . verboseOptionL
 
-runApp
-  :: (MonadUnliftIO m, HasColorOption options, HasVerboseOption options)
-  => options
-  -> RIO (App options) a
-  -> m a
-runApp options f = withApp options $ \app -> runRIO app f
+newtype AppT app m a = AppT
+  { unAppT :: ReaderT app (LoggingT (ResourceT m)) a
+  }
+  deriving newtype
+    ( Functor
+    , Applicative
+    , Monad
+    , MonadIO
+    , MonadUnliftIO
+    , MonadResource
+    , MonadReader app
+    , MonadLogger
+    )
 
-withApp
+runAppT
   :: (MonadUnliftIO m, HasColorOption options, HasVerboseOption options)
   => options
-  -> (App options -> m a)
+  -> AppT (App options) m a
   -> m a
-withApp options f = do
-  color <- colorHandle stderr $ options ^. colorOptionL
-  logOptions <- setLogUseLoc False . setLogUseColor color <$> logOptionsHandle
-    stderr
+runAppT options f = do
+  envLogSettings <- liftIO LoggingEnv.parse
+
+  logger <- newLogger $ adjustLogSettings
+    (options ^. colorOptionL)
     (options ^. verboseOptionL)
+    envLogSettings
 
-  withLogFunc logOptions $ \lf -> withResourceMap $ \rm -> do
-    app <-
-      App lf
-      <$> mkDefaultProcessContext
-      <*> pure rm
-      <*> awsEnvDiscover
-      <*> pure options
-    f app
+  app <- App logger options <$> runLoggerLoggingT logger awsEnvDiscover
+  runResourceT $ runLoggerLoggingT app $ runReaderT (unAppT f) app
+
+adjustLogSettings :: LogColor -> Bool -> LogSettings -> LogSettings
+adjustLogSettings = undefined

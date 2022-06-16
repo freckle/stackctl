@@ -2,7 +2,7 @@ module Stackctl.StackSpecSpec
   ( spec
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Stackctl.AWS
 import Stackctl.StackSpec

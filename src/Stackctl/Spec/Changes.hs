@@ -15,6 +15,7 @@ import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
+import Stackctl.StackSpecPath
 
 newtype ChangesOptions = ChangesOptions
   { scoFormat :: Format
@@ -36,7 +37,6 @@ runChanges
   => ChangesOptions
   -> m ()
 runChanges ChangesOptions {..} = do
-  colors <- getColorsStdout
   specs <- discoverSpecs
 
   for_ specs $ \spec -> do
@@ -46,11 +46,9 @@ runChanges ChangesOptions {..} = do
 
     case emChangeSet of
       Left err -> do
-        logError $ t $ display err
+        logError $ "Error creating ChangeSet" :# ["error" .= err]
         exitFailure
-      Right mChangeSet ->
-        liftIO $ T.putStrLn $ utf8BuilderToText $ formatChangeSet
-          colors
-          spec
-          scoFormat
-          mChangeSet
+      Right mChangeSet -> do
+        colors <- getColorsStdout
+        let name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
+        liftIO $ T.putStrLn $ formatChangeSet colors name scoFormat mChangeSet
