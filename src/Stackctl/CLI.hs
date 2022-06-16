@@ -72,5 +72,5 @@ runAppT options f = do
   app <- App logger options <$> runLoggerLoggingT logger awsEnvDiscover
   runResourceT $ runLoggerLoggingT app $ runReaderT (unAppT f) app
 
-adjustLogSettings :: LogColor -> Bool -> LogSettings -> LogSettings
-adjustLogSettings = undefined
+adjustLogSettings :: LogColor -> Verbosity -> LogSettings -> LogSettings
+adjustLogSettings lc v = setLogSettingsColor lc . verbositySetLogLevels v

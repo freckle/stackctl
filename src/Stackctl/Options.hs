@@ -15,7 +15,7 @@ data Options = Options
   { oDirectory :: FilePath
   , oFilterOption :: FilterOption
   , oColor :: LogColor
-  , oVerbose :: Bool
+  , oVerbose :: Verbosity
   }
 
 instance HasDirectoryOption Options where
