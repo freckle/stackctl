@@ -5,6 +5,7 @@ module Stackctl.StackSpecSpec
 import Stackctl.Prelude
 
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
@@ -29,13 +30,19 @@ toSpec :: Text -> [Text] -> StackSpec
 toSpec name depends = buildStackSpec "." specPath specBody
  where
   stackName = StackName name
-  specPath = stackSpecPath (AccountId "") "" (Region' "") stackName "a/b.yaml"
+  specPath = stackSpecPath scope stackName "a/b.yaml"
   specBody = StackSpecYaml
     { ssyDepends = Just $ map StackName depends
     , ssyTemplate = ""
     , ssyParameters = Nothing
     , ssyCapabilities = Nothing
     , ssyTags = Nothing
+    }
+
+  scope = AwsScope
+    { awsAccountId = AccountId ""
+    , awsAccountName = ""
+    , awsRegion = Region' ""
     }
 
 specName :: StackSpec -> Text

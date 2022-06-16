@@ -8,6 +8,7 @@ import Stackctl.Prelude
 import Data.List.Extra (dropPrefix)
 import qualified Data.List.NonEmpty as NE
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption(..), filterFilePaths)
 import Stackctl.StackSpec
@@ -19,30 +20,29 @@ discoverSpecs
   :: ( MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasAwsEnv env
+     , HasAwsScope env
      , HasDirectoryOption env
      , HasFilterOption env
      )
   => m [StackSpec]
 discoverSpecs = do
   dir <- view directoryOptionL
-  accountId <- fetchCurrentAccountId
-  region <- fetchCurrentRegion
+  scope@AwsScope {..} <- view awsScopeL
   discovered <- globRelativeTo
     dir
     [ compile
     $ "stacks"
-    </> unpack (unAccountId accountId)
+    </> unpack (unAccountId awsAccountId)
     <> ".*"
-    </> unpack (fromRegion region)
+    </> unpack (fromRegion awsRegion)
     <> "**"
     </> "*"
     <.> "yaml"
     , compile
     $ "stacks"
     </> "*."
-    <> unpack (unAccountId accountId)
-    </> unpack (fromRegion region)
+    <> unpack (unAccountId awsAccountId)
+    </> unpack (fromRegion awsRegion)
     <> "**"
     </> "*"
     <.> "yaml"
@@ -52,7 +52,7 @@ discoverSpecs = do
 
   let
     filtered = filterFilePaths filterOption discovered
-    toSpecPath = stackSpecPathFromFilePath accountId region
+    toSpecPath = stackSpecPathFromFilePath scope
     (errs, specPaths) = partitionEithers $ map toSpecPath filtered
 
   logDebug
@@ -62,9 +62,7 @@ discoverSpecs = do
   when (null filtered)
     $ logWarn
     $ "No specs found"
-    :# [ "aws"
-         .= object ["account" .= object ["id" .= accountId], "region" .= region]
-       , "filters" .= filterOption
+    :# [ "filters" .= filterOption
        , "discovered" .= length discovered
        , "errors" .= length errs
        ]
@@ -95,33 +93,13 @@ checkForDuplicateStackNames =
     exitFailure
 
 buildSpecPath
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
-  => Text -- ^ @.{account-name}@ to use
-  -> StackName
+  :: (MonadReader env m, HasAwsScope env)
+  => StackName
   -> FilePath
   -> m StackSpecPath
-buildSpecPath accountName stackName stackPath =
-  stackSpecPath
-    <$> fetchCurrentAccountId
-    <*> pure accountName
-    <*> fetchCurrentRegion
-    <*> pure stackName
-    <*> pure stackPath
-
-fetchCurrentAccountId
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m AccountId
-fetchCurrentAccountId = awsGetCallerIdentityAccount
-
--- | Fetch the discovered region for @aws@ calls made
---
--- You can't just ask for this. The only way to find it is to make an actual
--- API call that conveys the region somewhere via its response.
---
--- See <https://stackoverflow.com/a/63496689>.
---
-fetchCurrentRegion
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m Region
-fetchCurrentRegion = awsEc2DescribeFirstAvailabilityZoneRegionName
+buildSpecPath stackName stackPath = do
+  scope <- view awsScopeL
+  pure $ stackSpecPath scope stackName stackPath
 
 globRelativeTo :: MonadIO m => FilePath -> [Pattern] -> m [FilePath]
 globRelativeTo dir ps = liftIO $ do

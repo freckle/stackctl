@@ -8,8 +8,10 @@ module Stackctl.CLI
 import Stackctl.Prelude
 
 import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
+import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
@@ -18,6 +20,7 @@ import Stackctl.VerboseOption
 data App options = App
   { appLogger :: Logger
   , appOptions :: options
+  , appAwsScope :: AwsScope
   , appAwsEnv :: AwsEnv
   }
 
@@ -26,6 +29,9 @@ optionsL = lens appOptions $ \x y -> x { appOptions = y }
 
 instance HasLogger (App options) where
   loggerL = lens appLogger $ \x y -> x { appLogger = y }
+
+instance HasAwsScope (App options) where
+  awsScopeL = lens appAwsScope $ \x y -> x { appAwsScope = y }
 
 instance HasAwsEnv (App options) where
   awsEnvL = lens appAwsEnv $ \x y -> x { appAwsEnv = y }
@@ -54,10 +60,17 @@ newtype AppT app m a = AppT
     , MonadResource
     , MonadReader app
     , MonadLogger
+    , MonadThrow
+    , MonadCatch
+    , MonadMask
     )
 
 runAppT
-  :: (MonadUnliftIO m, HasColorOption options, HasVerboseOption options)
+  :: ( MonadMask m
+     , MonadUnliftIO m
+     , HasColorOption options
+     , HasVerboseOption options
+     )
   => options
   -> AppT (App options) m a
   -> m a
@@ -69,8 +82,29 @@ runAppT options f = do
     (options ^. verboseOptionL)
     envLogSettings
 
-  app <- App logger options <$> runLoggerLoggingT logger awsEnvDiscover
-  runResourceT $ runLoggerLoggingT app $ runReaderT (unAppT f) app
+  aws <- runLoggerLoggingT logger awsEnvDiscover
+
+  let
+    runAws
+      :: MonadUnliftIO m => ReaderT AwsEnv (LoggingT (ResourceT m)) a -> m a
+    runAws = runResourceT . runLoggerLoggingT logger . flip runReaderT aws
+
+  app <- App logger options <$> runAws fetchAwsScope <*> pure aws
+
+  let
+    AwsScope {..} = appAwsScope app
+
+    context =
+      [ "region" .= awsRegion
+      , "accountId" .= awsAccountId
+      , "accountName" .= awsAccountName
+      ]
+
+  runResourceT
+    $ runLoggerLoggingT app
+    $ flip runReaderT app
+    $ withThreadContext context
+    $ unAppT f
 
 adjustLogSettings :: LogColor -> Verbosity -> LogSettings -> LogSettings
 adjustLogSettings lc v =

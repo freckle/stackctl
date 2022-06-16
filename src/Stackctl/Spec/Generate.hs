@@ -7,16 +7,14 @@ import Stackctl.Prelude
 
 import Data.Aeson
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
-import System.Environment (lookupEnv)
 
 data Generate = Generate
   { gOutputDirectory :: FilePath
-  , gAccountName :: Maybe Text
-  -- ^ If not given, will use @${AWS_PROFILE:-unknown}@
   , gTemplatePath :: Maybe FilePath
   -- ^ If not given will use @{stack-name}.yaml@
   , gStackPath :: Maybe FilePath
@@ -30,11 +28,11 @@ data Generate = Generate
   }
 
 generate
-  :: ( MonadUnliftIO m
-     , MonadResource m
+  :: ( MonadMask m
+     , MonadUnliftIO m
      , MonadLogger m
      , MonadReader env m
-     , HasAwsEnv env
+     , HasAwsScope env
      )
   => Generate
   -> m FilePath
@@ -43,11 +41,7 @@ generate Generate {..} = do
     path = unpack (unStackName gStackName) <.> "yaml"
     stackPath = fromMaybe path gStackPath
 
-  profile <- liftIO $ maybe "unknown" pack <$> lookupEnv "AWS_PROFILE"
-  specPath <- buildSpecPath
-    (fromMaybe profile gAccountName)
-    gStackName
-    stackPath
+  specPath <- buildSpecPath gStackName stackPath
 
   let
     templatePath = fromMaybe path gTemplatePath
@@ -61,8 +55,7 @@ generate Generate {..} = do
 
     stackSpec = buildStackSpec gOutputDirectory specPath specYaml
 
-  logInfo "Generating specification"
-  logStackSpec stackSpec
-
-  writeStackSpec gOutputDirectory stackSpec gTemplate
-  pure $ stackSpecPathFilePath specPath
+  withThreadContext ["stackName" .= stackSpecStackName stackSpec] $ do
+    logInfo "Generating specification"
+    writeStackSpec gOutputDirectory stackSpec gTemplate
+    pure $ stackSpecPathFilePath specPath

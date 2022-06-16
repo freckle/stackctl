@@ -12,6 +12,7 @@ import qualified Data.Text.IO as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
@@ -46,10 +47,12 @@ runDeployOptions = DeployOptions
     )
 
 runDeploy
-  :: ( MonadUnliftIO m
+  :: ( MonadMask m
+     , MonadUnliftIO m
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
@@ -61,28 +64,27 @@ runDeploy DeployOptions {..} = do
   specs <- discoverSpecs
 
   for_ specs $ \spec -> do
-    logStackSpec spec
+    withThreadContext ["stackName" .= stackSpecStackName spec] $ do
+      handleRollbackComplete sdoDeployConfirmation $ stackSpecStackName spec
 
-    handleRollbackComplete sdoDeployConfirmation $ stackSpecStackName spec
+      emChangeSet <- createChangeSet spec
 
-    emChangeSet <- createChangeSet spec
+      case emChangeSet of
+        Left err -> do
+          logError $ "Error creating ChangeSet" :# ["error" .= err]
+          exitFailure
+        Right Nothing -> logInfo "Stack is up to date"
+        Right (Just changeSet) -> do
+          let stackName = stackSpecStackName spec
 
-    case emChangeSet of
-      Left err -> do
-        logError $ "Error creating ChangeSet" :# ["error" .= err]
-        exitFailure
-      Right Nothing -> logInfo "Stack is up to date"
-      Right (Just changeSet) -> do
-        let stackName = stackSpecStackName spec
+          for_ sdoSaveChangeSets $ \dir -> do
+            let out = dir </> unpack (unStackName stackName) <.> "json"
+            logInfo $ "Recording changeset" :# ["path" .= out]
+            createDirectoryIfMissing True dir
+            writeFileUtf8 out $ changeSetJSON changeSet
 
-        for_ sdoSaveChangeSets $ \dir -> do
-          let out = dir </> unpack (unStackName stackName) <.> "json"
-          logInfo $ "Recording changeset" :# ["path" .= out]
-          createDirectoryIfMissing True dir
-          writeFileUtf8 out $ changeSetJSON changeSet
-
-        deployChangeSet sdoDeployConfirmation changeSet
-        when sdoClean $ awsCloudFormationDeleteAllChangeSets stackName
+          deployChangeSet sdoDeployConfirmation changeSet
+          when sdoClean $ awsCloudFormationDeleteAllChangeSets stackName
 
 data DeployConfirmation
   = DeployWithConfirmation
