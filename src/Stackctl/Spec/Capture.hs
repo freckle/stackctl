@@ -8,6 +8,7 @@ import Stackctl.Prelude2
 
 import Options.Applicative
 import Stackctl.AWS
+import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.Spec.Generate
 
@@ -56,9 +57,9 @@ runCapture
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      , HasDirectoryOption env
+     , HasColorOption env
      )
   => CaptureOptions
   -> m ()

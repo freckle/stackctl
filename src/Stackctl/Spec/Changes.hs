@@ -9,7 +9,6 @@ import Stackctl.Prelude2
 import qualified Data.Text.IO as T
 import Options.Applicative
 import Stackctl.AWS
-import Stackctl.ColorOption (HasColorOption)
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
@@ -29,7 +28,6 @@ runChanges
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env

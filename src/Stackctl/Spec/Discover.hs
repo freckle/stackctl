@@ -22,10 +22,10 @@ discoverSpecs
   :: ( MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
+     , HasColorOption env
      )
   => m [StackSpec]
 discoverSpecs = do
@@ -63,7 +63,7 @@ discoverSpecs = do
   logDebug $ t $ "Filtered: " <> displayShow filtered
   logDebug $ t $ "Ignored: " <> display (T.intercalate ", " $ map pack errs)
 
-  colors@Colors {..} <- getColorsLogFunc
+  colors@Colors {..} <- getColorsStderr
 
   when (null filtered)
     $ logWarn

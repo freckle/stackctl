@@ -16,7 +16,6 @@ import RIO.List (sort, sortOn)
 import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
 import Stackctl.AWS
-import Stackctl.ColorOption (HasColorOption)
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption)
@@ -53,7 +52,6 @@ runCat
   :: ( MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env

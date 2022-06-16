@@ -7,6 +7,7 @@ import Stackctl.Prelude2
 
 import Data.Aeson
 import Stackctl.AWS
+import Stackctl.Colors
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -34,8 +35,8 @@ generate
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
+     , HasColorOption env
      )
   => Generate
   -> m FilePath

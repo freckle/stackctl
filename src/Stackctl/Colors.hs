@@ -1,13 +1,14 @@
 -- | Facilities for colorizing output
 module Stackctl.Colors
   ( Colors(..)
-  , getColorsLogFunc
+  , HasColorOption
   , getColorsStdout
+  , getColorsStderr
   , getColorsHandle
   , noColors
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Stackctl.ColorOption (HasColorOption(..), colorHandle)
 
@@ -47,15 +48,15 @@ noColors = Colors
 -- @'getColorsHandle' 'stderr'@, but doing it from the 'LogFunc' guarantees
 -- consistency.
 --
-getColorsLogFunc :: (MonadReader env m, HasLogFunc env) => m Colors
-getColorsLogFunc = do
-  c <- view logFuncUseColorL
-  pure $ if c then colors else noColors
 
 -- | Return 'Colors' based on options and 'stdout'
 getColorsStdout
   :: (MonadIO m, MonadReader env m, HasColorOption env) => m Colors
 getColorsStdout = getColorsHandle stdout
+
+getColorsStderr
+  :: (MonadIO m, MonadReader env m, HasColorOption env) => m Colors
+getColorsStderr = getColorsHandle stderr
 
 -- | Return 'Colors' based on options given 'Handle'
 getColorsHandle
