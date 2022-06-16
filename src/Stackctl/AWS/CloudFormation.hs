@@ -389,7 +389,7 @@ awsCloudFormationDeleteAllChangeSets
   => StackName
   -> m ()
 awsCloudFormationDeleteAllChangeSets stackName = do
-  logInfo $ "Deleting all changesets" :# ["stackName" .= stackName]
+  logInfo "Deleting all changesets"
   runConduit
     $ awsPaginate (newListChangeSets $ unStackName stackName)
     .| concatMapC

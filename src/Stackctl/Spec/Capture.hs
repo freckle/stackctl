@@ -68,7 +68,12 @@ runCapture CaptureOptions {..} = do
   dir <- view directoryOptionL
   stack <- awsCloudFormationDescribeStack scoStackName
   template <- awsCloudFormationGetTemplate scoStackName
-  void $ generate Generate
+
+  let
+    setScopeName scope =
+      maybe scope (\name -> scope { awsAccountName = name }) scoAccountName
+
+  void $ local (awsScopeL %~ setScopeName) $ generate Generate
     { gOutputDirectory = dir
     , gTemplatePath = scoTemplatePath
     , gStackPath = scoStackPath
