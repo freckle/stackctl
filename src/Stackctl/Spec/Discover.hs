@@ -83,7 +83,7 @@ checkForDuplicateStackNames =
     :: (MonadIO m, MonadLogger m) => NonEmpty (NonEmpty StackSpecPath) -> m ()
   reportCollisions errs = do
     for_ errs $ \specPaths -> do
-      let collidingPaths = stackSpecPathFilePath <$> specPaths
+      let collidingPaths = stackSpecPathBasePath <$> specPaths
 
       logError
         $ "Multiple specifications produced the same Stack name"
