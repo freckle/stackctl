@@ -14,6 +14,6 @@ awsEc2DescribeFirstAvailabilityZoneRegionName = do
   let req = newDescribeAvailabilityZones
   awsSimple "DescribeAvailabilityZones" req $ \resp -> do
     azs <- resp ^. describeAvailabilityZonesResponse_availabilityZones
-    az <- headMaybe azs
+    az <- listToMaybe azs
     rn <- regionName az
     hush $ fromText rn
