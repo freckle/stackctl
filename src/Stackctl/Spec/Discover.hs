@@ -17,7 +17,8 @@ import System.FilePath (isPathSeparator)
 import System.FilePath.Glob
 
 discoverSpecs
-  :: ( MonadResource m
+  :: ( MonadMask m
+     , MonadResource m
      , MonadLogger m
      , MonadReader env m
      , HasAwsScope env
@@ -55,19 +56,19 @@ discoverSpecs = do
     toSpecPath = stackSpecPathFromFilePath scope
     (errs, specPaths) = partitionEithers $ map toSpecPath filtered
 
-  logDebug
-    $ "Discovered specs"
-    :# ["discovered" .= discovered, "filtered" .= filtered, "ignored" .= errs]
+    context =
+      [ "path" .= dir
+      , "filters" .= filterOption
+      , "discovered" .= length discovered
+      , "filtered" .= length filtered
+      , "errors" .= length errs
+      ]
 
-  when (null filtered)
-    $ logWarn
-    $ "No specs found"
-    :# [ "filters" .= filterOption
-       , "discovered" .= length discovered
-       , "errors" .= length errs
-       ]
+  withThreadContext context $ do
+    logDebug "Discovered specs"
+    when (null filtered) $ logWarn "No specs found"
+    checkForDuplicateStackNames specPaths
 
-  checkForDuplicateStackNames specPaths
   sortStackSpecs <$> traverse (readStackSpec dir) specPaths
 
 checkForDuplicateStackNames
