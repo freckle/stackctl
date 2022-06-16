@@ -5,13 +5,10 @@ module Stackctl.Spec.Discover
 
 import Stackctl.Prelude2
 
-import Data.Semigroup (sconcat)
 import RIO.FilePath (isPathSeparator)
 import RIO.List (dropPrefix)
 import qualified RIO.NonEmpty as NE
-import qualified RIO.Text as T
 import Stackctl.AWS
-import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption(..), filterFilePaths)
 import Stackctl.StackSpec
@@ -25,7 +22,6 @@ discoverSpecs
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
-     , HasColorOption env
      )
   => m [StackSpec]
 discoverSpecs = do
@@ -59,35 +55,26 @@ discoverSpecs = do
     toSpecPath = stackSpecPathFromFilePath accountId region
     (errs, specPaths) = partitionEithers $ map toSpecPath filtered
 
-  logDebug $ t $ "Discovered: " <> displayShow discovered
-  logDebug $ t $ "Filtered: " <> displayShow filtered
-  logDebug $ t $ "Ignored: " <> display (T.intercalate ", " $ map pack errs)
-
-  colors@Colors {..} <- getColorsStderr
+  logDebug
+    $ "Discovered specs"
+    :# ["discovered" .= discovered, "filtered" .= filtered, "ignored" .= errs]
 
   when (null filtered)
     $ logWarn
-    $ t
-    $ "No specs found in "
-    <> magenta (fromString dir)
-    <> " for "
-    <> cyan (display accountId)
-    <> "/"
-    <> cyan (display region)
-    <> " matching "
-    <> green (display filterOption)
-    <> " ("
-    <> display (length discovered)
-    <> " discovered but not matched, "
-    <> red (display $ length errs)
-    <> " matched but ignored due to errors)"
+    $ "No specs found"
+    :# [ "aws"
+         .= object ["account" .= object ["id" .= accountId], "region" .= region]
+       , "filters" .= filterOption
+       , "discovered" .= length discovered
+       , "errors" .= length errs
+       ]
 
-  checkForDuplicateStackNames colors specPaths
+  checkForDuplicateStackNames specPaths
   sortStackSpecs <$> traverse (readStackSpec dir) specPaths
 
 checkForDuplicateStackNames
-  :: (MonadIO m, MonadLogger m) => Colors -> [StackSpecPath] -> m ()
-checkForDuplicateStackNames Colors {..} =
+  :: (MonadIO m, MonadLogger m) => [StackSpecPath] -> m ()
+checkForDuplicateStackNames =
   traverse_ reportCollisions
     . NE.nonEmpty
     . filter ((> 1) . length)
@@ -99,17 +86,16 @@ checkForDuplicateStackNames Colors {..} =
     for_ errs $ \specPaths -> do
       let collidingPaths = stackSpecPathFilePath <$> specPaths
 
-      logError $ t $ mconcat
-        [ "Multiple specifications produced Stack name "
-        <> cyan (display $ stackSpecPathStackName $ NE.head specPaths)
-        <> ":"
-        , sconcat $ ("\n  - " <>) . magenta . fromString <$> collidingPaths
-        ]
+      logError
+        $ "Multiple specifications produced the same Stack name"
+        :# [ "name" .= stackSpecPathStackName (NE.head specPaths)
+           , "paths" .= collidingPaths
+           ]
 
     exitFailure
 
 buildSpecPath
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => Text -- ^ @.{account-name}@ to use
   -> StackName
   -> FilePath
@@ -123,8 +109,7 @@ buildSpecPath accountName stackName stackPath =
     <*> pure stackPath
 
 fetchCurrentAccountId
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => m AccountId
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m AccountId
 fetchCurrentAccountId = awsGetCallerIdentityAccount
 
 -- | Fetch the discovered region for @aws@ calls made
@@ -135,8 +120,7 @@ fetchCurrentAccountId = awsGetCallerIdentityAccount
 -- See <https://stackoverflow.com/a/63496689>.
 --
 fetchCurrentRegion
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => m Region
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m Region
 fetchCurrentRegion = awsEc2DescribeFirstAvailabilityZoneRegionName
 
 globRelativeTo :: MonadIO m => FilePath -> [Pattern] -> m [FilePath]

@@ -5,13 +5,13 @@ module Stackctl.Spec.Changes.Format
   , formatTTY
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
-import Stackctl.AWS
-import Stackctl.Colors
 import Options.Applicative hiding (action)
 import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
+import Stackctl.AWS
+import Stackctl.Colors
 
 data Format
   = FormatTTY
@@ -37,22 +37,19 @@ showFormat = \case
   FormatTTY -> "tty"
   FormatPullRequest -> "pr"
 
-formatChangeSet
-  :: Display name => Colors -> name -> Format -> Maybe ChangeSet -> Utf8Builder
+formatChangeSet :: Colors -> Text -> Format -> Maybe ChangeSet -> Text
 formatChangeSet colors name = \case
   FormatTTY -> formatTTY colors name
   FormatPullRequest -> formatPullRequest name
 
-formatTTY :: Display name => Colors -> name -> Maybe ChangeSet -> Utf8Builder
+formatTTY :: Colors -> Text -> Maybe ChangeSet -> Text
 formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
-  (Nothing, _) -> "No changes for " <> display name
+  (Nothing, _) -> "No changes for " <> name
   (_, Nothing) -> "Metadata only changes (e.g. Tags or Outputs)"
   (_, Just rcs) ->
-    ("\n" <>)
-      $ (<> "\n")
-      $ mconcat
-      $ ("Changes for " <> cyan (display name) <> ":")
-      : map (("\n  " <>) . formatResourceChange) (NE.toList rcs)
+    ("\n" <>) $ (<> "\n") $ mconcat $ ("Changes for " <> cyan name <> ":") : map
+      (("\n  " <>) . formatResourceChange)
+      (NE.toList rcs)
  where
   rChanges = do
     cs <- mChangeSet
@@ -62,40 +59,37 @@ formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
   formatResourceChange ResourceChange' {..} =
     maybe "" colorAction action
       <> " "
-      <> maybe "" display logicalResourceId
+      <> maybe "" toText logicalResourceId
       <> " ("
-      <> maybe "" (cyan . display) resourceType
+      <> maybe "" cyan resourceType
       <> ")"
-      <> maybe "" ((" " <>) . magenta . display) physicalResourceId
+      <> maybe "" ((" " <>) . magenta) physicalResourceId
       <> maybe "" (("\n    Replacement: " <>) . colorReplacement) replacement
-      <> maybe
-           ""
-           (("\n    Scope: " <>) . display . T.intercalate ", " . map toText)
-           scope
+      <> maybe "" (("\n    Scope: " <>) . T.intercalate ", " . map toText) scope
       <> maybe "" (("\n    Details:" <>) . formatDetails) details
 
   formatDetails =
     mconcat . map ("\n      * " <>) . mapMaybe (formatDetail colors)
 
   colorAction = \case
-    x@ChangeAction_Add -> green (display x)
-    x@ChangeAction_Modify -> yellow (display x)
-    x@ChangeAction_Remove -> red (display x)
-    ChangeAction' x -> display x
+    x@ChangeAction_Add -> green (toText x)
+    x@ChangeAction_Modify -> yellow (toText x)
+    x@ChangeAction_Remove -> red (toText x)
+    ChangeAction' x -> x
 
   colorReplacement = \case
-    x@Replacement_True -> red (display x)
-    x@Replacement_False -> green (display x)
-    x@Replacement_Conditional -> yellow (display x)
-    Replacement' x -> display x
+    x@Replacement_True -> red (toText x)
+    x@Replacement_False -> green (toText x)
+    x@Replacement_Conditional -> yellow (toText x)
+    Replacement' x -> x
 
-formatPullRequest :: Display name => name -> Maybe ChangeSet -> Utf8Builder
+formatPullRequest :: Text -> Maybe ChangeSet -> Text
 formatPullRequest name mChangeSet =
   emoji
     <> " This PR generates "
     <> description
     <> " for `"
-    <> display name
+    <> name
     <> "`."
     <> fromMaybe "" (commentBody <$> mChangeSet <*> rChanges)
     <> "\n"
@@ -109,7 +103,7 @@ formatPullRequest name mChangeSet =
     (Nothing, _) -> "no changes"
     (_, Nothing) -> "only metadata changes (Tags, Outputs, etc)"
     (_, Just 1) -> "**1** change"
-    (_, Just n) -> "**" <> displayShow n <> "** changes"
+    (_, Just n) -> "**" <> pack (show n) <> "** changes"
 
   nChanges = length <$> rChanges
 
@@ -118,7 +112,7 @@ formatPullRequest name mChangeSet =
     changes <- csChanges cs
     NE.nonEmpty $ mapMaybe resourceChange changes
 
-commentBody :: ChangeSet -> NonEmpty ResourceChange -> Utf8Builder
+commentBody :: ChangeSet -> NonEmpty ResourceChange -> Text
 commentBody cs rcs =
   mconcat
     $ [ "\n"
@@ -131,30 +125,30 @@ commentBody cs rcs =
        , "\n<summary>Full changes</summary>"
        , "\n"
        , "\n```json"
-       , "\n" <> display (changeSetJSON cs)
+       , "\n" <> changeSetJSON cs
        , "\n```"
        , "\n"
        , "\n</details>"
        ]
 
-commentTableRow :: ResourceChange -> Utf8Builder
+commentTableRow :: ResourceChange -> Text
 commentTableRow ResourceChange' {..} = mconcat
   [ "\n"
-  , "| " <> maybe "" display action <> " "
-  , "| " <> maybe "" display logicalResourceId <> " "
-  , "| " <> maybe "" display physicalResourceId <> " "
-  , "| " <> maybe "" display resourceType <> " "
-  , "| " <> maybe "" display replacement <> " "
-  , "| " <> maybe "" (display . T.intercalate ", " . map toText) scope <> " "
+  , "| " <> maybe "" toText action <> " "
+  , "| " <> maybe "" toText logicalResourceId <> " "
+  , "| " <> maybe "" toText physicalResourceId <> " "
+  , "| " <> maybe "" toText resourceType <> " "
+  , "| " <> maybe "" toText replacement <> " "
+  , "| " <> maybe "" (T.intercalate ", " . map toText) scope <> " "
   , "| " <> maybe "" (mdList . mapMaybe (formatDetail noColors)) details <> " "
   , "|"
   ]
 
-mdList :: [Utf8Builder] -> Utf8Builder
+mdList :: [Text] -> Text
 mdList xs =
   "<ul>" <> mconcat (map (\x -> "<li>" <> x <> "</li>") xs) <> "</ul>"
 
-formatDetail :: Colors -> ResourceChangeDetail -> Maybe Utf8Builder
+formatDetail :: Colors -> ResourceChangeDetail -> Maybe Text
 formatDetail Colors {..} ResourceChangeDetail' {..} = do
   c <- changeSource
   t <- target
@@ -165,14 +159,14 @@ formatDetail Colors {..} ResourceChangeDetail' {..} = do
     rr = requiresRecreation t
 
   pure
-    $ display c
-    <> maybe "" ((" in " <>) . display) attr
-    <> maybe "" (\x -> " (" <> magenta (display x) <> ")") n
+    $ toText c
+    <> maybe "" ((" in " <>) . toText) attr
+    <> maybe "" (\x -> " (" <> magenta (toText x) <> ")") n
     <> maybe "" ((", recreation " <>) . formatRR) rr
-    <> maybe "" ((", caused by " <>) . display) causingEntity
+    <> maybe "" ((", caused by " <>) . toText) causingEntity
  where
   formatRR = \case
-    x@RequiresRecreation_Always -> red $ display x
-    x@RequiresRecreation_Never -> green $ display x
-    x@RequiresRecreation_Conditionally -> yellow $ display x
-    RequiresRecreation' x -> display x
+    x@RequiresRecreation_Always -> red (toText x)
+    x@RequiresRecreation_Never -> green (toText x)
+    x@RequiresRecreation_Conditionally -> yellow (toText x)
+    RequiresRecreation' x -> x

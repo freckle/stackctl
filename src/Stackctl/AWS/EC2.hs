@@ -10,8 +10,7 @@ import RIO.List (headMaybe)
 import Stackctl.AWS.Core
 
 awsEc2DescribeFirstAvailabilityZoneRegionName
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => m Region
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m Region
 awsEc2DescribeFirstAvailabilityZoneRegionName = do
   let req = newDescribeAvailabilityZones
   awsSimple "DescribeAvailabilityZones" req $ \resp -> do

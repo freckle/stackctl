@@ -84,19 +84,6 @@ packages:
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
     size: 27775608
-    subdir: lib/services/amazonka-s3
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-    name: amazonka-s3
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
-    pantry-tree:
-      size: 37929
-      sha256: 57bc3c2aa426230e1f339fee5710eb43ace36d05c91113bd035b4de5aac26329
-  original:
-    subdir: lib/services/amazonka-s3
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-- completed:
-    size: 27775608
     subdir: lib/services/amazonka-sso
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka-sso
@@ -132,6 +119,20 @@ packages:
       sha256: 90897d5be240bd29a17fa2bff43a55c8bebc10ca9ad4ab3617910eb223ff2f74
   original:
     url: https://github.com/freckle/cfn-flip/archive/49b7b2e0fcc4fd85f37cdb234bb64a4578b85f00.tar.gz
+- completed:
+    hackage: monad-logger-aeson-0.2.0.1@sha256:3ce33913e0f0f73cd272ce734abaae460bdbc48ad9c4d7192a912849060114b0,5156
+    pantry-tree:
+      size: 5103
+      sha256: f221efc9a29a358c63b571cc3fb8e86cdcab3ee6aa29c8d4395ca85adb8fe2af
+  original:
+    hackage: monad-logger-aeson-0.2.0.1
+- completed:
+    hackage: context-0.2.0.0@sha256:6b643adb4a64fe521873d08df0497f71f88e18b9ecff4b68b4eef938e446cfc9,1886
+    pantry-tree:
+      size: 952
+      sha256: b041ec197787d7cef078a2de33a74853179821e3083882f22b6d185e5764d75e
+  original:
+    hackage: context-0.2.0.0
 - completed:
     hackage: dhall-1.40.2@sha256:81c161bde08bc1fa71f70d0b1f3356c7fbcb6d05d7f0c6a4d1fbf2f0ed1cb857,35550
     pantry-tree:

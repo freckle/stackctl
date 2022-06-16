@@ -6,7 +6,7 @@ module Stackctl.Commands
   , version
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Stackctl.AWS
 import Stackctl.ColorOption
@@ -20,9 +20,7 @@ import Stackctl.Subcommand
 import Stackctl.Version
 
 cat
-  :: ( HasLogFunc env
-     , HasResourceMap env
-     , HasAwsEnv env
+  :: ( HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -36,13 +34,7 @@ cat = Subcommand
   }
 
 capture
-  :: ( HasLogFunc env
-     , HasResourceMap env
-     , HasAwsEnv env
-     , HasDirectoryOption env
-     , HasColorOption env
-     )
-  => Subcommand CaptureOptions env
+  :: (HasAwsEnv env, HasDirectoryOption env) => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
   , description = "Capture deployed Stacks as specifications"
@@ -51,9 +43,7 @@ capture = Subcommand
   }
 
 changes
-  :: ( HasLogFunc env
-     , HasResourceMap env
-     , HasAwsEnv env
+  :: ( HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -67,9 +57,7 @@ changes = Subcommand
   }
 
 deploy
-  :: ( HasLogFunc env
-     , HasResourceMap env
-     , HasAwsEnv env
+  :: ( HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -82,7 +70,7 @@ deploy = Subcommand
   , run = runDeploy
   }
 
-version :: HasLogFunc env => Subcommand () env
+version :: Subcommand () env
 version = Subcommand
   { name = "version"
   , description = "Output the version"

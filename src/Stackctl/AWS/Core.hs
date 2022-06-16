@@ -47,21 +47,13 @@ class HasAwsEnv env where
   awsEnvL :: Lens' env AwsEnv
 
 awsSimple
-  :: ( MonadResource m
-     , MonadLogger m
-     , MonadReader env m
-     , HasAwsEnv env
-     , AWSRequest a
-     , Show (AWSResponse a)
-     )
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSRequest a)
   => Text
   -> a
   -> (AWSResponse a -> Maybe b)
   -> m b
 awsSimple name req post = do
-  logDebug $ t $ display name
   resp <- awsSend req
-  logDebug $ t $ display name <> "Response:\n" <> displayShow resp
   maybe (throwString err) pure $ post resp
   where err = unpack name <> " successful, but processing the response failed"
 
@@ -99,4 +91,4 @@ awsWithin r = local $ over (awsEnvL . unL) (within r)
 newtype AccountId = AccountId
   { unAccountId :: Text
   }
-  deriving newtype (Eq, Ord, Display)
+  deriving newtype (Eq, Ord, ToJSON)

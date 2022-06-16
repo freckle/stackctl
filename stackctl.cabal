@@ -87,7 +87,8 @@ library
       TypeFamilies
   ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
-      Glob
+      Blammo
+    , Glob
     , aeson
     , aeson-casing
     , aeson-pretty
@@ -95,7 +96,6 @@ library
     , amazonka-cloudformation
     , amazonka-core
     , amazonka-ec2
-    , amazonka-s3
     , amazonka-sts
     , base ==4.*
     , bytestring

@@ -25,7 +25,7 @@ prompt message parse dispatch = do
 
   case parse x of
     Left err -> do
-      logWarn $ t $ "Invalid input: " <> display err
+      logWarn $ "Invalid input" :# ["error" .= err]
       prompt message parse dispatch
     Right a -> dispatch a
 

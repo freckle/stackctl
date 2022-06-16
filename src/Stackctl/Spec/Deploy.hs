@@ -7,6 +7,7 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude2
 
+import qualified Data.Text.IO as T
 import Options.Applicative
 import RIO.Directory (createDirectoryIfMissing)
 import RIO.List (headMaybe)
@@ -69,7 +70,7 @@ runDeploy DeployOptions {..} = do
 
     case emChangeSet of
       Left err -> do
-        logError $ t $ display err
+        logError $ "Error creating ChangeSet" :# ["error" .= err]
         exitFailure
       Right Nothing -> logInfo "Stack is up to date"
       Right (Just changeSet) -> do
@@ -77,7 +78,7 @@ runDeploy DeployOptions {..} = do
 
         for_ sdoSaveChangeSets $ \dir -> do
           let out = dir </> unpack (unStackName stackName) <.> "json"
-          logInfo $ "Recording changeset details to " <> fromString out
+          logInfo $ "Recording changeset" :# ["path" .= out]
           createDirectoryIfMissing True dir
           writeFileUtf8 out $ changeSetJSON changeSet
 
@@ -104,10 +105,8 @@ handleRollbackComplete confirmation stackName = do
 
   when (maybe False stackIsRollbackComplete mStack) $ do
     logWarn
-      $ t
-      $ "Stack "
-      <> display stackName
-      <> " is in ROLLBACK_COMPLETE state and must be deleted before proceeding"
+      $ "Stack is in ROLLBACK_COMPLETE state and must be deleted before proceeding"
+      :# ["stackName" .= stackName]
 
     case confirmation of
       DeployWithConfirmation -> promptContinue
@@ -118,9 +117,12 @@ handleRollbackComplete confirmation stackName = do
     result <- awsCloudFormationDeleteStack stackName
 
     case result of
-      StackDeleteSuccess -> logInfo $ t $ display result
+      StackDeleteSuccess ->
+        logInfo $ "" :# ["result" .= prettyStackDeleteResult result]
       StackDeleteFailure{} ->
-        logWarn $ t $ display result <> ", deployment may fail"
+        logWarn
+          $ "Failure result, deployment may fail"
+          :# ["result" .= prettyStackDeleteResult result]
 
 deployChangeSet
   :: ( MonadUnliftIO m
@@ -134,8 +136,9 @@ deployChangeSet
   -> ChangeSet
   -> m ()
 deployChangeSet confirmation changeSet = do
-  colors <- getColorsStderr
-  logInfo $ t $ formatTTY colors stackName $ Just changeSet
+  colors <- getColorsStdout
+  liftIO $ T.putStrLn $ formatTTY colors (unStackName stackName) $ Just
+    changeSet
 
   case confirmation of
     DeployWithConfirmation -> promptContinue
@@ -146,7 +149,7 @@ deployChangeSet confirmation changeSet = do
   mLastId <- awsCloudFormationGetMostRecentStackEventId stackName
   asyncTail <- async $ tailStackEventsSince stackName mLastId
 
-  logInfo $ t $ "Executing ChangeSet " <> display changeSetId
+  logInfo $ "Executing ChangeSet" :# ["changeSetId" .= changeSetId]
   result <- do
     awsCloudFormationExecuteChangeSet changeSetId
     awsCloudFormationWait stackName
@@ -154,9 +157,9 @@ deployChangeSet confirmation changeSet = do
   cancel asyncTail
 
   let
-    onSuccess = logInfo $ t $ display result
+    onSuccess = logInfo $ "" :# ["result" .= prettyStackDeployResult result]
     onFailure = do
-      logError $ t $ display result
+      logError $ "" :# ["result" .= prettyStackDeployResult result]
       exitFailure
 
   case result of
@@ -181,7 +184,7 @@ tailStackEventsSince
 tailStackEventsSince stackName mLastId = do
   colors <- getColorsStderr
   events <- awsCloudFormationDescribeStackEvents stackName mLastId
-  traverse_ (logInfo . t <=< formatStackEvent colors) $ reverse events
+  traverse_ (logInfo . (:# []) <=< formatStackEvent colors) $ reverse events
 
   -- Without this small delay before looping, our requests seem to hang
   -- intermittently (without errors) and often we miss events.
@@ -191,7 +194,7 @@ tailStackEventsSince stackName mLastId = do
   -- any last-id we were given
   tailStackEventsSince stackName $ getLastEventId events <|> mLastId
 
-formatStackEvent :: MonadIO m => Colors -> StackEvent -> m Utf8Builder
+formatStackEvent :: MonadIO m => Colors -> StackEvent -> m Text
 formatStackEvent Colors {..} e = do
   timestamp <-
     liftIO $ formatTime defaultTimeLocale "%F %T %Z" <$> utcToLocalZonedTime
@@ -201,22 +204,20 @@ formatStackEvent Colors {..} e = do
     [ fromString timestamp
     , " | "
     , maybe "" colorStatus $ e ^. stackEvent_resourceStatus
-    , maybe "" (magenta . display . (" " <>))
-    $ e
-    ^. stackEvent_logicalResourceId
-    , maybe "" ((\x -> " (" <> x <> ")") . display . T.strip)
+    , maybe "" (magenta . (" " <>)) $ e ^. stackEvent_logicalResourceId
+    , maybe "" ((\x -> " (" <> x <> ")") . T.strip)
     $ e
     ^. stackEvent_resourceStatusReason
     ]
  where
   colorStatus = \case
     ResourceStatus' x
-      | "ROLLBACK" `T.isInfixOf` x -> red (display x)
-      | "COMPLETE" `T.isSuffixOf` x -> green (display x)
-      | "FAILED" `T.isSuffixOf` x -> red (display x)
-      | "IN_PROGRESS" `T.isSuffixOf` x -> blue (display x)
-      | "SKIPPED" `T.isSuffixOf` x -> yellow (display x)
-      | otherwise -> display x
+      | "ROLLBACK" `T.isInfixOf` x -> red x
+      | "COMPLETE" `T.isSuffixOf` x -> green x
+      | "FAILED" `T.isSuffixOf` x -> red x
+      | "IN_PROGRESS" `T.isSuffixOf` x -> blue x
+      | "SKIPPED" `T.isSuffixOf` x -> yellow x
+      | otherwise -> x
 
 getLastEventId :: [StackEvent] -> Maybe Text
 getLastEventId = fmap (^. stackEvent_eventId) . headMaybe

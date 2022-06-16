@@ -22,7 +22,6 @@ import Data.Graph (graphFromEdges, topSort)
 import qualified Data.Yaml as Yaml
 import RIO.Directory (createDirectoryIfMissing)
 import Stackctl.AWS
-import Stackctl.Colors
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
 
@@ -31,9 +30,6 @@ data StackSpec = StackSpec
   , ssSpecPath :: StackSpecPath
   , ssSpecBody :: StackSpecYaml
   }
-
-instance Display StackSpec where
-  display StackSpec {..} = display ssSpecPath
 
 stackSpecSpecPath :: StackSpec -> StackSpecPath
 stackSpecSpecPath = ssSpecPath
@@ -64,28 +60,20 @@ stackSpecTags = maybe [] (map unTagYaml) . ssyTags . ssSpecBody
 buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
 buildStackSpec = StackSpec
 
-logStackSpec
-  :: (MonadIO m, MonadLogger m, MonadReader env m, HasColorOption env)
-  => StackSpec
-  -> m ()
-logStackSpec ss@StackSpec {..} = do
-  Colors {..} <- getColorsStderr
-
-  let
-    account =
-      cyan (display $ stackSpecPathAccountId ssSpecPath)
-        <> " ("
-        <> display (stackSpecPathAccountName ssSpecPath)
-        <> ")"
-
-  traverse_
-    (logInfo . t)
-    [ magenta $ fromString (stackSpecPathFilePath ssSpecPath)
-    , "  Stack:    " <> cyan (display $ stackSpecStackName ss)
-    , "  Template: " <> cyan (fromString $ ssyTemplate ssSpecBody)
-    , "  Account:  " <> account
-    , "  Region:   " <> cyan (display $ stackSpecPathRegion ssSpecPath)
-    ]
+logStackSpec :: MonadLogger m => StackSpec -> m ()
+logStackSpec ss@StackSpec {..} =
+  logInfo
+    $ pack (stackSpecPathFilePath ssSpecPath)
+    :# [ "stackName" .= stackSpecStackName ss
+       , "template" .= ssyTemplate ssSpecBody
+       , "aws" .= object
+         [ "account" .= object
+           [ "id" .= stackSpecPathAccountId ssSpecPath
+           , "name" .= stackSpecPathAccountName ssSpecPath
+           ]
+         , "region" .= stackSpecPathRegion ssSpecPath
+         ]
+       ]
 
 writeStackSpec
   :: MonadUnliftIO m

@@ -14,7 +14,9 @@ module Stackctl.AWS.CloudFormation
   , stackEvent_timestamp
   , StackTemplate(..)
   , StackDeployResult(..)
+  , prettyStackDeployResult
   , StackDeleteResult(..)
+  , prettyStackDeleteResult
   , Parameter
   , parameter_parameterKey
   , parameter_parameterValue
@@ -97,21 +99,18 @@ import UnliftIO.Exception.Lens (handling_, trying)
 newtype StackId = StackId
   { unStackId :: Text
   }
-  deriving newtype (Eq, Ord, Show, Display, FromJSON, ToJSON)
+  deriving newtype (Eq, Ord, Show, FromJSON, ToJSON)
 
 newtype StackName = StackName
   { unStackName :: Text
   }
-  deriving newtype (Eq, Ord, Show, Display, FromJSON, ToJSON)
+  deriving newtype (Eq, Ord, Show, FromJSON, ToJSON)
 
 newtype StackTemplate = StackTemplate
   { unStackTemplate :: FilePath
   }
   deriving stock (Eq, Show)
   deriving newtype FromJSON
-
-instance Display StackTemplate where
-  display = fromString . unStackTemplate
 
 data StackDeployResult
   = StackCreateSuccess
@@ -120,12 +119,12 @@ data StackDeployResult
   | StackUpdateFailure Bool
   deriving stock Show
 
-instance Display StackDeployResult where
-  display = \case
-    StackCreateSuccess -> "Created Stack successfully"
-    StackCreateFailure{} -> "Failed to create Stack"
-    StackUpdateSuccess -> "Updated Stack successfully"
-    StackUpdateFailure{} -> "Failed to update Stack"
+prettyStackDeployResult :: StackDeployResult -> Text
+prettyStackDeployResult = \case
+  StackCreateSuccess -> "Created Stack successfully"
+  StackCreateFailure{} -> "Failed to create Stack"
+  StackUpdateSuccess -> "Updated Stack successfully"
+  StackUpdateFailure{} -> "Failed to update Stack"
 
 stackCreateResult :: Accept -> StackDeployResult
 stackCreateResult = \case
@@ -143,10 +142,10 @@ data StackDeleteResult
   = StackDeleteSuccess
   | StackDeleteFailure Bool
 
-instance Display StackDeleteResult where
-  display = \case
-    StackDeleteSuccess -> "Deleted Stack successfully"
-    StackDeleteFailure{} -> "Failed to delete Stack"
+prettyStackDeleteResult :: StackDeleteResult -> Text
+prettyStackDeleteResult = \case
+  StackDeleteSuccess -> "Deleted Stack successfully"
+  StackDeleteFailure{} -> "Failed to delete Stack"
 
 stackDeleteResult :: Accept -> StackDeleteResult
 stackDeleteResult = \case
@@ -163,9 +162,7 @@ newChangeSetName = do
   pure $ ChangeSetName $ T.intercalate "-" $ map pack parts
 
 awsCloudFormationDescribeStack
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => StackName
-  -> m Stack
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => StackName -> m Stack
 awsCloudFormationDescribeStack stackName = do
   let
     req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
@@ -175,12 +172,7 @@ awsCloudFormationDescribeStack stackName = do
     listToMaybe stacks
 
 awsCloudFormationDescribeStackMaybe
-  :: ( MonadUnliftIO m
-     , MonadResource m
-     , MonadLogger m
-     , MonadReader env m
-     , HasAwsEnv env
-     )
+  :: (MonadUnliftIO m, MonadResource m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m (Maybe Stack)
 awsCloudFormationDescribeStackMaybe stackName =
@@ -209,7 +201,7 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
     .| sinkList
 
 awsCloudFormationGetMostRecentStackEventId
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> m (Maybe Text)
 awsCloudFormationGetMostRecentStackEventId stackName = do
@@ -258,9 +250,7 @@ awsCloudFormationWait stackName = do
   req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
 awsCloudFormationGetTemplate
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => StackName
-  -> m Value
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => StackName -> m Value
 awsCloudFormationGetTemplate stackName = do
   let
     req =
@@ -292,12 +282,12 @@ readParameter x = case T.breakOn "=" $ pack x of
 newtype ChangeSetId = ChangeSetId
   { unChangeSetId :: Text
   }
-  deriving newtype (Display, FromJSON, ToJSON)
+  deriving newtype (FromJSON, ToJSON)
 
 newtype ChangeSetName = ChangeSetName
   { unChangeSetName :: Text
   }
-  deriving newtype (Display, FromJSON, ToJSON)
+  deriving newtype (FromJSON, ToJSON)
 
 data ChangeSet = ChangeSet
   { csCreationTime :: UTCTime
@@ -369,7 +359,7 @@ awsCloudFormationCreateChangeSet stackName stackTemplate parameters capabilities
         pure $ cs <$ guard (not $ changeSetFailed cs)
 
 awsCloudFormationDescribeChangeSet
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => ChangeSetId
   -> m ChangeSet
 awsCloudFormationDescribeChangeSet changeSetId = do
@@ -400,7 +390,7 @@ awsCloudFormationDeleteAllChangeSets
   => StackName
   -> m ()
 awsCloudFormationDeleteAllChangeSets stackName = do
-  logInfo $ t $ "Deleting all changesets from " <> display stackName <> "..."
+  logInfo $ "Deleting all changesets" :# ["stackName" .= stackName]
   runConduit
     $ awsPaginate (newListChangeSets $ unStackName stackName)
     .| concatMapC
@@ -410,7 +400,7 @@ awsCloudFormationDeleteAllChangeSets stackName = do
          )
     .| mapM_C
          (\csId -> do
-           logInfo $ t $ "Enqueing delete of " <> display csId
+           logInfo $ "Enqueing delete" :# ["changeSetId" .= csId]
            void $ awsSend $ newDeleteChangeSet csId
          )
 
