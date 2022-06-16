@@ -5,14 +5,14 @@ module Stackctl.Spec.Discover
 
 import Stackctl.Prelude
 
-import RIO.FilePath (isPathSeparator)
-import RIO.List (dropPrefix)
-import qualified RIO.NonEmpty as NE
+import Data.List.Extra (dropPrefix)
+import qualified Data.List.NonEmpty as NE
 import Stackctl.AWS
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption(..), filterFilePaths)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
+import System.FilePath (isPathSeparator)
 import System.FilePath.Glob
 
 discoverSpecs

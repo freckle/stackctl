@@ -8,10 +8,9 @@ module Stackctl.FilterOption
 
 import Stackctl.Prelude
 
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Text as T
 import Options.Applicative
-import qualified RIO.NonEmpty as NE
-import qualified RIO.Text as T
-import qualified RIO.Text.Partial as T (splitOn)
 import System.FilePath.Glob
 
 newtype FilterOption = FilterOption

@@ -20,9 +20,6 @@ module Stackctl.AWS.Core
   , FromText(..)
   , ToText(..)
   , MonadResource
-  , HasResourceMap(..)
-  , ResourceMap
-  , withResourceMap
   ) where
 
 import Stackctl.Prelude
@@ -32,7 +29,6 @@ import qualified Amazonka as AWS
 import Conduit (ConduitM)
 import Control.Monad.Logger (defaultLoc, toLogStr)
 import Control.Monad.Trans.Resource (MonadResource)
-import RIO.Orphans as X (HasResourceMap(..), ResourceMap, withResourceMap)
 import Stackctl.AWS.Orphans ()
 
 newtype AwsEnv = AwsEnv

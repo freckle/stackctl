@@ -24,6 +24,7 @@ import Data.Aeson as X (ToJSON(..), object)
 import RIO.Directory as X (withCurrentDirectory)
 import RIO.FilePath as X
   (dropExtension, takeBaseName, takeDirectory, (<.>), (</>))
+import RIO.List as X (headMaybe)
 import RIO.Process as X
 import RIO.Text as X (pack, unpack)
 

@@ -6,7 +6,6 @@ import Stackctl.Prelude
 
 import Amazonka.EC2.DescribeAvailabilityZones
 import Amazonka.EC2.Types (AvailabilityZone(..))
-import RIO.List (headMaybe)
 import Stackctl.AWS.Core
 
 awsEc2DescribeFirstAvailabilityZoneRegionName

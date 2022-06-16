@@ -86,13 +86,12 @@ import Conduit
 import Control.Lens ((?~))
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
+import qualified Data.ByteString.Lazy as BSL
 import Data.Monoid (First)
+import qualified Data.Text as T
+import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
-import qualified RIO.ByteString.Lazy as BSL
-import qualified RIO.Text as T
-import qualified RIO.Text.Partial as T (breakOn)
-import RIO.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 import Stackctl.AWS.Core
 import UnliftIO.Exception.Lens (handling_, trying)
 
@@ -155,9 +154,9 @@ stackDeleteResult = \case
 
 -- | @stackctl-{timestamp}-{uuid}@
 newChangeSetName :: MonadIO m => m ChangeSetName
-newChangeSetName = do
+newChangeSetName = liftIO $ do
   timestamp <- formatTime defaultTimeLocale "%Y%m%d%H%M" <$> getCurrentTime
-  uuid <- liftIO $ UUID.toString <$> UUID.nextRandom
+  uuid <- UUID.toString <$> UUID.nextRandom
   let parts = ["stackctl", timestamp, uuid]
   pure $ ChangeSetName $ T.intercalate "-" $ map pack parts
 

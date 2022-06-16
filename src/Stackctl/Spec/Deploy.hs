@@ -7,12 +7,10 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude
 
+import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
-import RIO.Directory (createDirectoryIfMissing)
-import RIO.List (headMaybe)
-import qualified RIO.Text as T
-import RIO.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Stackctl.AWS
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
@@ -21,6 +19,7 @@ import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
+import UnliftIO.Directory (createDirectoryIfMissing)
 
 data DeployOptions = DeployOptions
   { sdoSaveChangeSets :: Maybe FilePath

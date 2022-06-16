@@ -20,10 +20,10 @@ import qualified CfnFlip
 import Data.Aeson
 import Data.Graph (graphFromEdges, topSort)
 import qualified Data.Yaml as Yaml
-import RIO.Directory (createDirectoryIfMissing)
 import Stackctl.AWS
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
+import UnliftIO.Directory (createDirectoryIfMissing)
 
 data StackSpec = StackSpec
   { ssSpecRoot :: FilePath

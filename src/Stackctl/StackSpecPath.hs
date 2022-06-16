@@ -18,11 +18,10 @@ module Stackctl.StackSpecPath
 
 import Stackctl.Prelude
 
-import RIO.Char (isDigit)
-import RIO.FilePath (joinPath, splitDirectories)
-import qualified RIO.Text as T
-import qualified RIO.Text.Partial as T (breakOn)
+import Data.Char (isDigit)
+import qualified Data.Text as T
 import Stackctl.AWS
+import System.FilePath (joinPath, splitDirectories)
 
 data StackSpecPath = StackSpecPath
   { sspAccountId :: AccountId

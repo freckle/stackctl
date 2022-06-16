@@ -71,19 +71,20 @@ library:
     - conduit
     - containers
     - errors
+    - extra
     - filepath
     - lens
     - lens-aeson
-    - mtl
     - monad-logger
+    - mtl
     - optparse-applicative
     - resourcet
     - rio
-    - rio-orphans
     - text
     - time
     - unliftio
     - unliftio-core
+    - unordered-containers
     - uuid
     - yaml
 
