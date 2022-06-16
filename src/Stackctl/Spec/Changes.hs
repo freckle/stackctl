@@ -4,7 +4,7 @@ module Stackctl.Spec.Changes
   , runChanges
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import qualified Data.Text.IO as T
 import Options.Applicative

@@ -5,7 +5,7 @@ module Stackctl.ColorOption
   , colorHandle
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Blammo.Logging.LogSettings
 import Options.Applicative

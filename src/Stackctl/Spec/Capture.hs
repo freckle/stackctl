@@ -4,7 +4,7 @@ module Stackctl.Spec.Capture
   , runCapture
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Options.Applicative
 import Stackctl.AWS

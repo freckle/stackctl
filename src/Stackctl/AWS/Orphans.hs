@@ -9,7 +9,7 @@
 module Stackctl.AWS.Orphans
   () where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Amazonka.CloudFormation.DescribeChangeSet
 import Amazonka.CloudFormation.Types

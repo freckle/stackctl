@@ -2,7 +2,7 @@ module Main
   ( main
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import qualified Stackctl.Commands as Commands
 import Stackctl.Subcommand

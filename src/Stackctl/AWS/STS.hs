@@ -2,7 +2,7 @@ module Stackctl.AWS.STS
   ( awsGetCallerIdentityAccount
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Amazonka.STS.GetCallerIdentity
 import Stackctl.AWS.Core

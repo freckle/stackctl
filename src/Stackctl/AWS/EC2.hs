@@ -2,7 +2,7 @@ module Stackctl.AWS.EC2
   ( awsEc2DescribeFirstAvailabilityZoneRegionName
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Amazonka.EC2.DescribeAvailabilityZones
 import Amazonka.EC2.Types (AvailabilityZone(..))

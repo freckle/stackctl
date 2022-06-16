@@ -14,7 +14,7 @@ module Stackctl.StackSpec
   , sortStackSpecs
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import qualified CfnFlip
 import Data.Aeson

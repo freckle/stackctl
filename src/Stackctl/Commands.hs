@@ -6,7 +6,7 @@ module Stackctl.Commands
   , version
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Stackctl.AWS
 import Stackctl.ColorOption

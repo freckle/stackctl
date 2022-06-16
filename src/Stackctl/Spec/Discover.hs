@@ -3,7 +3,7 @@ module Stackctl.Spec.Discover
   , buildSpecPath
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import RIO.FilePath (isPathSeparator)
 import RIO.List (dropPrefix)

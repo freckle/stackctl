@@ -3,7 +3,7 @@ module Stackctl.Spec.Generate
   , generate
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Data.Aeson
 import Stackctl.AWS

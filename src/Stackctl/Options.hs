@@ -3,7 +3,7 @@ module Stackctl.Options
   , optionsParser
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Options.Applicative
 import Stackctl.ColorOption

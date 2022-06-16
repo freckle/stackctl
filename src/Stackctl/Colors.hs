@@ -6,7 +6,7 @@ module Stackctl.Colors
   , noColors
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Blammo.Logging.Colors
 import Stackctl.ColorOption (HasColorOption(..), colorHandle)

@@ -5,7 +5,7 @@ module Stackctl.CLI
   , runAppT
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
 import Control.Monad.Trans.Resource (ResourceT, runResourceT)

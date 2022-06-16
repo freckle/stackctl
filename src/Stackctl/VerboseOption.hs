@@ -5,7 +5,7 @@ module Stackctl.VerboseOption
   , verboseOption
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Blammo.Logging.LogSettings.LogLevels
 import Options.Applicative

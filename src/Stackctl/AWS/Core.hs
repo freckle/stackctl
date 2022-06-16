@@ -25,7 +25,7 @@ module Stackctl.AWS.Core
   , withResourceMap
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Amazonka hiding (LogLevel(..))
 import qualified Amazonka as AWS
