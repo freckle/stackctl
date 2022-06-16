@@ -11,13 +11,26 @@ Discovering Stack name collisions
   >   stacks/539282909833.x/us-east-1/foo-bar/app.yaml \
   >   stacks/539282909833.x/us-east-1/foo-bar-app.yaml \
   >   stacks/539282909833.x/us-east-1/foo/bar-app.yaml
-  > stackctl cat
-  Multiple specifications produced Stack name dev-app:
-    - stacks/539282909833.x/us-east-1/dev-app.yaml
-    - stacks/539282909833.x/us-east-1/dev/app.yaml
-  Multiple specifications produced Stack name foo-bar-app:
-    - stacks/539282909833.x/us-east-1/foo-bar-app.yaml
-    - stacks/539282909833.x/us-east-1/foo/bar-app.yaml
-    - stacks/539282909833.x/us-east-1/foo/bar/app.yaml
-    - stacks/539282909833.x/us-east-1/foo-bar/app.yaml
-  [1]
+  > LOG_FORMAT=json stackctl cat |& jq --sort-keys '.message'
+  {
+    "meta": {
+      "name": "dev-app",
+      "paths": [
+        "dev-app.yaml",
+        "dev/app.yaml"
+      ]
+    },
+    "text": "Multiple specifications produced the same Stack name"
+  }
+  {
+    "meta": {
+      "name": "foo-bar-app",
+      "paths": [
+        "foo-bar-app.yaml",
+        "foo/bar-app.yaml",
+        "foo/bar/app.yaml",
+        "foo-bar/app.yaml"
+      ]
+    },
+    "text": "Multiple specifications produced the same Stack name"
+  }
