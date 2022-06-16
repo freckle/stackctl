@@ -36,7 +36,12 @@ cat = Subcommand
   }
 
 capture
-  :: (HasLogFunc env, HasResourceMap env, HasAwsEnv env, HasDirectoryOption env)
+  :: ( HasLogFunc env
+     , HasResourceMap env
+     , HasAwsEnv env
+     , HasDirectoryOption env
+     , HasColorOption env
+     )
   => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
@@ -67,6 +72,7 @@ deploy
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
+     , HasColorOption env
      )
   => Subcommand DeployOptions env
 deploy = Subcommand

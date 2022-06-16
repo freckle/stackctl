@@ -65,11 +65,11 @@ buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
 buildStackSpec = StackSpec
 
 logStackSpec
-  :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogFunc env)
+  :: (MonadIO m, MonadLogger m, MonadReader env m, HasColorOption env)
   => StackSpec
   -> m ()
 logStackSpec ss@StackSpec {..} = do
-  Colors {..} <- getColorsLogFunc
+  Colors {..} <- getColorsStderr
 
   let
     account =

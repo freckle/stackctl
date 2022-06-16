@@ -50,10 +50,10 @@ runDeploy
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
+     , HasColorOption env
      )
   => DeployOptions
   -> m ()
@@ -127,14 +127,14 @@ deployChangeSet
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
+     , HasColorOption env
      )
   => DeployConfirmation
   -> ChangeSet
   -> m ()
 deployChangeSet confirmation changeSet = do
-  colors <- getColorsLogFunc
+  colors <- getColorsStderr
   logInfo $ t $ formatTTY colors stackName $ Just changeSet
 
   case confirmation of
@@ -172,14 +172,14 @@ tailStackEventsSince
   :: ( MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
+     , HasColorOption env
      )
   => StackName
   -> Maybe Text -- ^ StackEventId
   -> m a
 tailStackEventsSince stackName mLastId = do
-  colors <- getColorsLogFunc
+  colors <- getColorsStderr
   events <- awsCloudFormationDescribeStackEvents stackName mLastId
   traverse_ (logInfo . t <=< formatStackEvent colors) $ reverse events
 
