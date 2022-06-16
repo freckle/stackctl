@@ -50,7 +50,8 @@ runCatOptions = CatOptions
     )
 
 runCat
-  :: ( MonadResource m
+  :: ( MonadMask m
+     , MonadResource m
      , MonadLogger m
      , MonadReader env m
      , HasAwsScope env
