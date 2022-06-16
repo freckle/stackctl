@@ -219,4 +219,4 @@ formatStackEvent Colors {..} e = do
       | otherwise -> x
 
 getLastEventId :: [StackEvent] -> Maybe Text
-getLastEventId = fmap (^. stackEvent_eventId) . headMaybe
+getLastEventId = fmap (^. stackEvent_eventId) . listToMaybe
