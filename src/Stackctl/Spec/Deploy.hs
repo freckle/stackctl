@@ -118,12 +118,8 @@ handleRollbackComplete confirmation stackName = do
     result <- awsCloudFormationDeleteStack stackName
 
     case result of
-      StackDeleteSuccess ->
-        logInfo $ "" :# ["result" .= prettyStackDeleteResult result]
-      StackDeleteFailure{} ->
-        logWarn
-          $ "Failure result, deployment may fail"
-          :# ["result" .= prettyStackDeleteResult result]
+      StackDeleteSuccess -> logInfo $ prettyStackDeleteResult result :# []
+      StackDeleteFailure{} -> logWarn $ prettyStackDeleteResult result :# []
 
 deployChangeSet
   :: ( MonadUnliftIO m
@@ -158,9 +154,9 @@ deployChangeSet confirmation changeSet = do
   cancel asyncTail
 
   let
-    onSuccess = logInfo $ "" :# ["result" .= prettyStackDeployResult result]
+    onSuccess = logInfo $ prettyStackDeployResult result :# []
     onFailure = do
-      logError $ "" :# ["result" .= prettyStackDeployResult result]
+      logError $ prettyStackDeployResult result :# []
       exitFailure
 
   case result of
