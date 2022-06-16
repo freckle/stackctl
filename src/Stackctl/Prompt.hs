@@ -3,7 +3,7 @@ module Stackctl.Prompt
   , promptContinue
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import qualified Data.Text.IO as T
 import qualified RIO.Text as T

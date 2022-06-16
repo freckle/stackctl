@@ -21,7 +21,7 @@ module Stackctl.StackSpecYaml
   , TagYaml(..)
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Data.Aeson
 import Data.Aeson.Casing

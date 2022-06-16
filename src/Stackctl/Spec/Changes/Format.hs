@@ -5,7 +5,7 @@ module Stackctl.Spec.Changes.Format
   , formatTTY
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Options.Applicative hiding (action)
 import qualified RIO.NonEmpty as NE

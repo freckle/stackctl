@@ -6,7 +6,7 @@ module Stackctl.FilterOption
   , filterFilePaths
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Options.Applicative
 import qualified RIO.NonEmpty as NE

@@ -5,7 +5,7 @@ module Stackctl.Spec.Deploy
   , runDeploy
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import qualified Data.Text.IO as T
 import Options.Applicative

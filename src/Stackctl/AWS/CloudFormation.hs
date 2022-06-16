@@ -58,7 +58,7 @@ module Stackctl.AWS.CloudFormation
   , awsCloudFormationDeleteAllChangeSets
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Amazonka.CloudFormation.CreateChangeSet hiding (id)
 import Amazonka.CloudFormation.DeleteChangeSet

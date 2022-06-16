@@ -2,7 +2,7 @@ module Stackctl.AWS.CloudFormationSpec
   ( spec
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Data.List (isSuffixOf)
 import Stackctl.AWS.CloudFormation

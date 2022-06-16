@@ -4,7 +4,7 @@ module Stackctl.Spec.Cat
   , runCat
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Data.Aeson
 import Data.Aeson.Lens

@@ -4,7 +4,7 @@ module Stackctl.Subcommand
   , runSubcommand
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Options.Applicative
 import qualified Stackctl.CLI as CLI

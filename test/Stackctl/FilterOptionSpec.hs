@@ -2,7 +2,7 @@ module Stackctl.FilterOptionSpec
   ( spec
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import Stackctl.FilterOption
 import Test.Hspec

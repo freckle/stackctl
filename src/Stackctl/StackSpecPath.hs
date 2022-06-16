@@ -16,7 +16,7 @@ module Stackctl.StackSpecPath
   , stackSpecPathFromFilePath
   ) where
 
-import Stackctl.Prelude2
+import Stackctl.Prelude
 
 import RIO.Char (isDigit)
 import RIO.FilePath (joinPath, splitDirectories)
