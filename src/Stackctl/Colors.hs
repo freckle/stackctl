@@ -23,3 +23,6 @@ getColorsHandle h = do
   colorOption <- view colorOptionL
   c <- colorHandle h colorOption
   pure $ getColors c
+
+noColors :: Colors
+noColors = getColors False
