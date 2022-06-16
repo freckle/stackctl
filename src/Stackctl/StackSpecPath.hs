@@ -21,40 +21,38 @@ import Stackctl.Prelude
 import Data.Char (isDigit)
 import qualified Data.Text as T
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import System.FilePath (joinPath, splitDirectories)
 
 data StackSpecPath = StackSpecPath
-  { sspAccountId :: AccountId
-  , sspAccountName :: Text
+  { sspAwsScope :: AwsScope
   , sspAccountPathPart :: FilePath
-  , sspRegion :: Region
   , sspStackName :: StackName
   , sspPath :: FilePath
   }
 
-stackSpecPath
-  :: AccountId -> Text -> Region -> StackName -> FilePath -> StackSpecPath
-stackSpecPath sspAccountId sspAccountName sspRegion sspStackName sspPath =
-  StackSpecPath
-    { sspAccountId
-    , sspAccountName
-    , sspAccountPathPart
-    , sspRegion
-    , sspStackName
-    , sspPath
-    }
+stackSpecPath :: AwsScope -> StackName -> FilePath -> StackSpecPath
+stackSpecPath sspAwsScope@AwsScope {..} sspStackName sspPath = StackSpecPath
+  { sspAwsScope
+  , sspAccountPathPart
+  , sspStackName
+  , sspPath
+  }
  where
   sspAccountPathPart =
-    unpack $ unAccountId sspAccountId <> "." <> sspAccountName
+    unpack $ unAccountId awsAccountId <> "." <> awsAccountName
 
 stackSpecPathAccountId :: StackSpecPath -> AccountId
-stackSpecPathAccountId = sspAccountId
+stackSpecPathAccountId = awsAccountId . sspAwsScope
 
 stackSpecPathAccountName :: StackSpecPath -> Text
-stackSpecPathAccountName = sspAccountName
+stackSpecPathAccountName = awsAccountName . sspAwsScope
+
+stackSpecPathAccountPathPart :: StackSpecPath -> FilePath
+stackSpecPathAccountPathPart = sspAccountPathPart
 
 stackSpecPathRegion :: StackSpecPath -> Region
-stackSpecPathRegion = sspRegion
+stackSpecPathRegion = awsRegion . sspAwsScope
 
 stackSpecPathBasePath :: StackSpecPath -> FilePath
 stackSpecPathBasePath = sspPath
@@ -64,48 +62,49 @@ stackSpecPathStackName = sspStackName
 
 -- | Render the (relative) 'StackSpecPath'
 stackSpecPathFilePath :: StackSpecPath -> FilePath
-stackSpecPathFilePath StackSpecPath {..} =
-  "stacks" </> sspAccountPathPart </> unpack (fromRegion sspRegion) </> sspPath
+stackSpecPathFilePath path =
+  "stacks"
+    </> stackSpecPathAccountPathPart path
+    </> unpack (fromRegion $ stackSpecPathRegion path)
+    </> stackSpecPathBasePath path
 
 stackSpecPathFromFilePath
-  :: AccountId
-  -> Region
+  :: AwsScope
   -> FilePath -- ^ Must be relative, @stacks/@
   -> Either String StackSpecPath
-stackSpecPathFromFilePath accountId region path = case splitDirectories path of
-  ("stacks" : pathAccount : pathRegion : rest) -> do
-    (accountName, pathAccountId) <- parseAccountPath pathAccount
+stackSpecPathFromFilePath awsScope@AwsScope {..} path =
+  case splitDirectories path of
+    ("stacks" : pathAccount : pathRegion : rest) -> do
+      (accountName, pathAccountId) <- parseAccountPath pathAccount
 
-    unless (pathAccountId == accountId)
-      $ Left
-      $ "Unexpected account: "
-      <> unpack (unAccountId pathAccountId)
-      <> " != "
-      <> unpack (unAccountId accountId)
+      unless (pathAccountId == awsAccountId)
+        $ Left
+        $ "Unexpected account: "
+        <> unpack (unAccountId pathAccountId)
+        <> " != "
+        <> unpack (unAccountId awsAccountId)
 
-    unless (unpack (fromRegion region) == pathRegion)
-      $ Left
-      $ "Unexpected region: "
-      <> pathRegion
-      <> " != "
-      <> unpack (fromRegion region)
+      unless (unpack (fromRegion awsRegion) == pathRegion)
+        $ Left
+        $ "Unexpected region: "
+        <> pathRegion
+        <> " != "
+        <> unpack (fromRegion awsRegion)
 
-    stackName <-
-      maybe (Left "Must end in .yaml") (Right . StackName)
-      $ T.stripSuffix ".yaml"
-      $ T.intercalate "-"
-      $ map pack rest
+      stackName <-
+        maybe (Left "Must end in .yaml") (Right . StackName)
+        $ T.stripSuffix ".yaml"
+        $ T.intercalate "-"
+        $ map pack rest
 
-    Right $ StackSpecPath
-      { sspAccountId = accountId
-      , sspAccountName = accountName
-      , sspAccountPathPart = pathAccount
-      , sspRegion = region
-      , sspStackName = stackName
-      , sspPath = joinPath rest
-      }
+      Right $ StackSpecPath
+        { sspAwsScope = awsScope { awsAccountName = accountName }
+        , sspAccountPathPart = pathAccount
+        , sspStackName = stackName
+        , sspPath = joinPath rest
+        }
 
-  _ -> Left $ "Path is not stacks/././.: " <> path
+    _ -> Left $ "Path is not stacks/././.: " <> path
 
 -- | Handle @{account-name}.{account-id}@ or @{account-id}.{account-name}@
 parseAccountPath :: FilePath -> Either String (Text, AccountId)

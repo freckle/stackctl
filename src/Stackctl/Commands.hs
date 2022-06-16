@@ -9,6 +9,7 @@ module Stackctl.Commands
 import Stackctl.Prelude
 
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
@@ -20,7 +21,7 @@ import Stackctl.Subcommand
 import Stackctl.Version
 
 cat
-  :: ( HasAwsEnv env
+  :: ( HasAwsScope env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -34,7 +35,8 @@ cat = Subcommand
   }
 
 capture
-  :: (HasAwsEnv env, HasDirectoryOption env) => Subcommand CaptureOptions env
+  :: (HasAwsScope env, HasAwsEnv env, HasDirectoryOption env)
+  => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
   , description = "Capture deployed Stacks as specifications"
@@ -43,7 +45,8 @@ capture = Subcommand
   }
 
 changes
-  :: ( HasAwsEnv env
+  :: ( HasAwsScope env
+     , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -57,7 +60,8 @@ changes = Subcommand
   }
 
 deploy
-  :: ( HasAwsEnv env
+  :: ( HasAwsScope env
+     , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env

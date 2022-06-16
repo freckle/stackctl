@@ -16,6 +16,7 @@ import qualified Data.Text.IO as T
 import qualified Data.Yaml as Yaml
 import Options.Applicative
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption)
@@ -52,7 +53,7 @@ runCat
   :: ( MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasAwsEnv env
+     , HasAwsScope env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env

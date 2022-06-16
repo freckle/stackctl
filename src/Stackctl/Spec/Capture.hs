@@ -8,6 +8,7 @@ import Stackctl.Prelude
 
 import Options.Applicative
 import Stackctl.AWS
+import Stackctl.AWS.Scope
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.Spec.Generate
 
@@ -52,10 +53,12 @@ runCaptureOptions = CaptureOptions
       ))
 
 runCapture
-  :: ( MonadUnliftIO m
+  :: ( MonadMask m
+     , MonadUnliftIO m
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
      )
@@ -67,7 +70,6 @@ runCapture CaptureOptions {..} = do
   template <- awsCloudFormationGetTemplate scoStackName
   void $ generate Generate
     { gOutputDirectory = dir
-    , gAccountName = scoAccountName
     , gTemplatePath = scoTemplatePath
     , gStackPath = scoStackPath
     , gStackName = scoStackName

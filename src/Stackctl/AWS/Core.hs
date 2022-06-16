@@ -63,6 +63,9 @@ configureLogging env = do
 class HasAwsEnv env where
   awsEnvL :: Lens' env AwsEnv
 
+instance HasAwsEnv AwsEnv where
+  awsEnvL = id
+
 awsSimple
   :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSRequest a)
   => Text

@@ -30,6 +30,7 @@ library
       Stackctl.AWS.Core
       Stackctl.AWS.EC2
       Stackctl.AWS.Orphans
+      Stackctl.AWS.Scope
       Stackctl.AWS.STS
       Stackctl.CLI
       Stackctl.ColorOption
@@ -102,6 +103,7 @@ library
     , conduit
     , containers
     , errors
+    , exceptions
     , extra
     , filepath
     , lens

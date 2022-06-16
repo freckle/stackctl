@@ -71,6 +71,7 @@ library:
     - conduit
     - containers
     - errors
+    - exceptions
     - extra
     - filepath
     - lens

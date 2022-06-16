@@ -7,7 +7,6 @@ module Stackctl.StackSpec
   , stackSpecCapabilities
   , stackSpecTags
   , buildStackSpec
-  , logStackSpec
   , writeStackSpec
   , readStackSpec
   , createChangeSet
@@ -59,21 +58,6 @@ stackSpecTags = maybe [] (map unTagYaml) . ssyTags . ssSpecBody
 
 buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
 buildStackSpec = StackSpec
-
-logStackSpec :: MonadLogger m => StackSpec -> m ()
-logStackSpec ss@StackSpec {..} =
-  logInfo
-    $ pack (stackSpecPathFilePath ssSpecPath)
-    :# [ "stackName" .= stackSpecStackName ss
-       , "template" .= ssyTemplate ssSpecBody
-       , "aws" .= object
-         [ "account" .= object
-           [ "id" .= stackSpecPathAccountId ssSpecPath
-           , "name" .= stackSpecPathAccountName ssSpecPath
-           ]
-         , "region" .= stackSpecPathRegion ssSpecPath
-         ]
-       ]
 
 writeStackSpec
   :: MonadUnliftIO m
