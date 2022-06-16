@@ -39,6 +39,7 @@ library
       Stackctl.FilterOption
       Stackctl.Options
       Stackctl.Prelude
+      Stackctl.Prelude2
       Stackctl.Prompt
       Stackctl.Spec.Capture
       Stackctl.Spec.Cat
@@ -105,6 +106,7 @@ library
     , filepath
     , lens
     , lens-aeson
+    , monad-logger
     , mtl
     , optparse-applicative
     , resourcet

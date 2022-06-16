@@ -3,7 +3,7 @@ module Stackctl.Spec.Discover
   , buildSpecPath
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Data.Semigroup (sconcat)
 import RIO.FilePath (isPathSeparator)
@@ -20,6 +20,7 @@ import System.FilePath.Glob
 
 discoverSpecs
   :: ( MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
@@ -58,14 +59,15 @@ discoverSpecs = do
     toSpecPath = stackSpecPathFromFilePath accountId region
     (errs, specPaths) = partitionEithers $ map toSpecPath filtered
 
-  logDebug $ "Discovered: " <> displayShow discovered
-  logDebug $ "Filtered: " <> displayShow filtered
-  logDebug $ "Ignored: " <> display (T.intercalate ", " $ map pack errs)
+  logDebug $ t $ "Discovered: " <> displayShow discovered
+  logDebug $ t $ "Filtered: " <> displayShow filtered
+  logDebug $ t $ "Ignored: " <> display (T.intercalate ", " $ map pack errs)
 
   colors@Colors {..} <- getColorsLogFunc
 
   when (null filtered)
     $ logWarn
+    $ t
     $ "No specs found in "
     <> magenta (fromString dir)
     <> " for "
@@ -84,10 +86,7 @@ discoverSpecs = do
   sortStackSpecs <$> traverse (readStackSpec dir) specPaths
 
 checkForDuplicateStackNames
-  :: (MonadIO m, MonadReader env m, HasLogFunc env)
-  => Colors
-  -> [StackSpecPath]
-  -> m ()
+  :: (MonadIO m, MonadLogger m) => Colors -> [StackSpecPath] -> m ()
 checkForDuplicateStackNames Colors {..} =
   traverse_ reportCollisions
     . NE.nonEmpty
@@ -95,14 +94,12 @@ checkForDuplicateStackNames Colors {..} =
     . NE.groupAllWith stackSpecPathStackName
  where
   reportCollisions
-    :: (MonadIO m, MonadReader env m, HasLogFunc env)
-    => NonEmpty (NonEmpty StackSpecPath)
-    -> m ()
+    :: (MonadIO m, MonadLogger m) => NonEmpty (NonEmpty StackSpecPath) -> m ()
   reportCollisions errs = do
     for_ errs $ \specPaths -> do
       let collidingPaths = stackSpecPathFilePath <$> specPaths
 
-      logError $ mconcat
+      logError $ t $ mconcat
         [ "Multiple specifications produced Stack name "
         <> cyan (display $ stackSpecPathStackName $ NE.head specPaths)
         <> ":"
@@ -112,7 +109,7 @@ checkForDuplicateStackNames Colors {..} =
     exitFailure
 
 buildSpecPath
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => Text -- ^ @.{account-name}@ to use
   -> StackName
   -> FilePath
@@ -126,7 +123,7 @@ buildSpecPath accountName stackName stackPath =
     <*> pure stackPath
 
 fetchCurrentAccountId
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => m AccountId
 fetchCurrentAccountId = awsGetCallerIdentityAccount
 
@@ -138,7 +135,7 @@ fetchCurrentAccountId = awsGetCallerIdentityAccount
 -- See <https://stackoverflow.com/a/63496689>.
 --
 fetchCurrentRegion
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => m Region
 fetchCurrentRegion = awsEc2DescribeFirstAvailabilityZoneRegionName
 

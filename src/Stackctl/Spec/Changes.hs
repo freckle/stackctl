@@ -4,7 +4,7 @@ module Stackctl.Spec.Changes
   , runChanges
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import qualified Data.Text.IO as T
 import Options.Applicative
@@ -27,6 +27,7 @@ runChangesOptions = ChangesOptions <$> formatOption
 runChanges
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
@@ -47,7 +48,7 @@ runChanges ChangesOptions {..} = do
 
     case emChangeSet of
       Left err -> do
-        logError $ display err
+        logError $ t $ display err
         exitFailure
       Right mChangeSet ->
         liftIO $ T.putStrLn $ utf8BuilderToText $ formatChangeSet

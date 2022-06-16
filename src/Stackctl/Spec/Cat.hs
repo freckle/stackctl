@@ -4,7 +4,7 @@ module Stackctl.Spec.Cat
   , runCat
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Data.Aeson
 import Data.Aeson.Lens
@@ -51,6 +51,7 @@ runCatOptions = CatOptions
 
 runCat
   :: ( MonadResource m
+     , MonadLogger m
      , MonadReader env m
      , HasLogFunc env
      , HasAwsEnv env
@@ -143,9 +144,9 @@ prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
 
   ppCapabilities = map (("  - " <>) . green . display)
 
-  ppTags = concatMap $ \t ->
-    [ "  - " <> cyan "Key" <> ": " <> green (display $ t ^. tag_key)
-    , "    " <> cyan "Value" <> ": " <> display (t ^. tag_value)
+  ppTags = concatMap $ \tg ->
+    [ "  - " <> cyan "Key" <> ": " <> green (display $ tg ^. tag_key)
+    , "    " <> cyan "Value" <> ": " <> display (tg ^. tag_value)
     ]
 
 prettyPrintTemplate :: Colors -> Value -> [Utf8Builder]
@@ -158,7 +159,7 @@ prettyPrintTemplate Colors {..} val = concat
  where
   displayTextProperty :: Text -> [Utf8Builder]
   displayTextProperty = displayPropertyWith $ \v ->
-    let t = T.dropWhileEnd (== '\n') $ pack v in ["  " <> green (display t)]
+    let tp = T.dropWhileEnd (== '\n') $ pack v in ["  " <> green (display tp)]
 
   displayObjectProperty :: Text -> [Utf8Builder]
   displayObjectProperty =

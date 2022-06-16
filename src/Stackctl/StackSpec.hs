@@ -14,7 +14,7 @@ module Stackctl.StackSpec
   , sortStackSpecs
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import qualified CfnFlip
 import Data.Aeson
@@ -65,7 +65,9 @@ buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
 buildStackSpec = StackSpec
 
 logStackSpec
-  :: (MonadIO m, MonadReader env m, HasLogFunc env) => StackSpec -> m ()
+  :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogFunc env)
+  => StackSpec
+  -> m ()
 logStackSpec ss@StackSpec {..} = do
   Colors {..} <- getColorsLogFunc
 
@@ -77,7 +79,7 @@ logStackSpec ss@StackSpec {..} = do
         <> ")"
 
   traverse_
-    logInfo
+    (logInfo . t)
     [ magenta $ fromString (stackSpecPathFilePath ssSpecPath)
     , "  Stack:    " <> cyan (display $ stackSpecStackName ss)
     , "  Template: " <> cyan (fromString $ ssyTemplate ssSpecBody)
@@ -127,8 +129,8 @@ readStackSpec dir specPath = do
 createChangeSet
   :: ( MonadUnliftIO m
      , MonadResource m
+     , MonadLogger m
      , MonadReader env m
-     , HasLogFunc env
      , HasAwsEnv env
      )
   => StackSpec

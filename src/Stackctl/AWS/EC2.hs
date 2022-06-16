@@ -2,15 +2,15 @@ module Stackctl.AWS.EC2
   ( awsEc2DescribeFirstAvailabilityZoneRegionName
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude2
 
 import Amazonka.EC2.DescribeAvailabilityZones
 import Amazonka.EC2.Types (AvailabilityZone(..))
-import Stackctl.AWS.Core
 import RIO.List (headMaybe)
+import Stackctl.AWS.Core
 
 awsEc2DescribeFirstAvailabilityZoneRegionName
-  :: (MonadResource m, MonadReader env m, HasLogFunc env, HasAwsEnv env)
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => m Region
 awsEc2DescribeFirstAvailabilityZoneRegionName = do
   let req = newDescribeAvailabilityZones
