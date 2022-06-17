@@ -18,6 +18,7 @@ dist/stackctl.tar.gz: $(ARCHIVE_TARGETS)
 
 SRCS := $(shell \
   find ./src ./app -name '*.hs'; \
+  echo stack.yaml; \
   echo stackctl.cabal \
 )
 
