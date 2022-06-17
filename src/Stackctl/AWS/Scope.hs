@@ -2,7 +2,6 @@ module Stackctl.AWS.Scope
   ( AwsScope(..)
   , HasAwsScope(..)
   , fetchAwsScope
-  , runAwsScope
   ) where
 
 import Stackctl.Prelude
@@ -31,11 +30,3 @@ fetchAwsScope =
     <$> awsGetCallerIdentityAccount
     <*> liftIO (maybe "unknown" pack <$> lookupEnv "AWS_PROFILE")
     <*> awsEc2DescribeFirstAvailabilityZoneRegionName
-
-runAwsScope
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
-  => ReaderT AwsScope m a
-  -> m a
-runAwsScope f = do
-  scope <- fetchAwsScope
-  runReaderT f scope
