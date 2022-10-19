@@ -5,12 +5,12 @@
 
 packages:
 - completed:
-    hackage: Blammo-1.0.1.1@sha256:d3c7f5bed8a7778db116fe8318751037596afa0655ed12c190e4ff671b72e527,3954
+    hackage: Blammo-1.0.3.0@sha256:a1a43291768a1f116fcd15cb2e2f480d778635ce86a94809ca1dc008afc93753,3897
     pantry-tree:
-      size: 1115
-      sha256: 3881a44247abaa2ea26497eb070b6a2b345b845b0b13f0979b7c9ddc4b76b671
+      size: 1258
+      sha256: a11ccf2e129ea181449162f39000a1e7097b380d19cd5d3280b72c739e99c16f
   original:
-    hackage: Blammo-1.0.1.1
+    hackage: Blammo-1.0.3.0
 - completed:
     hackage: cfn-flip-0.1.0.2@sha256:86cd26b0edeb2876c1939ff0734d23f34f3819c8913fe0caf5e1d2d23c785950,5698
     pantry-tree:
@@ -19,19 +19,19 @@ packages:
   original:
     hackage: cfn-flip-0.1.0.2
 - completed:
-    hackage: monad-logger-aeson-0.2.0.1@sha256:3ce33913e0f0f73cd272ce734abaae460bdbc48ad9c4d7192a912849060114b0,5156
+    hackage: monad-logger-aeson-0.4.0.2@sha256:0a1189f53fdfa57e88735d0d65b943983010203fcd3f122ea552042dfb2d2501,6215
     pantry-tree:
-      size: 5103
-      sha256: f221efc9a29a358c63b571cc3fb8e86cdcab3ee6aa29c8d4395ca85adb8fe2af
+      size: 7096
+      sha256: 3955f99746fcb73d120b4bd486a110eec0bad975c00cc5ca29b3ba259c12a4b9
   original:
-    hackage: monad-logger-aeson-0.2.0.1
+    hackage: monad-logger-aeson-0.4.0.2
 - completed:
-    hackage: context-0.2.0.0@sha256:6b643adb4a64fe521873d08df0497f71f88e18b9ecff4b68b4eef938e446cfc9,1886
+    hackage: context-0.2.0.1@sha256:b5a1390a5ad11b7edd0449c9ef96823f082bff4988bd09583e37a4e93e9aad10,1891
     pantry-tree:
       size: 952
-      sha256: b041ec197787d7cef078a2de33a74853179821e3083882f22b6d185e5764d75e
+      sha256: ebb043dd007864588c6b1676a0d30e521deab4353a3f19716f6f6f7d52b62817
   original:
-    hackage: context-0.2.0.0
+    hackage: context-0.2.0.1
 - completed:
     size: 27775608
     subdir: lib/amazonka
@@ -137,29 +137,15 @@ packages:
     subdir: lib/services/amazonka-sts
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    hackage: dhall-1.40.2@sha256:81c161bde08bc1fa71f70d0b1f3356c7fbcb6d05d7f0c6a4d1fbf2f0ed1cb857,35550
+    hackage: algebraic-graphs-0.5@sha256:6eeec5ed1687ff7aa916e7bf9f02f51aaabde6f314dc0b7b1a84156974d7da73,8071
     pantry-tree:
-      size: 316011
-      sha256: 1018ad42fcd8ca1f874c3a05aac2b3381424cebae41c4c0e77226b598e63d1a7
+      size: 4128
+      sha256: cca4a0348bb126506cacd8436948a68aad62e75d45df8c71f4090a00e69b45ee
   original:
-    hackage: dhall-1.40.2@sha256:81c161bde08bc1fa71f70d0b1f3356c7fbcb6d05d7f0c6a4d1fbf2f0ed1cb857,35550
-- completed:
-    hackage: generic-lens-2.2.1.0@sha256:6843380740d66cb6bf8ebaaf29d307d2610580eb8303222ee51ada033eca273f,3895
-    pantry-tree:
-      size: 2470
-      sha256: 2e44f7d17674411cd2e1fc80e8b87e841924d19b9477a0e1213bfd078f9d38ed
-  original:
-    hackage: generic-lens-2.2.1.0@sha256:6843380740d66cb6bf8ebaaf29d307d2610580eb8303222ee51ada033eca273f,3895
-- completed:
-    hackage: generic-lens-core-2.2.1.0@sha256:a7ee35db4a6e9ed736f6f772f7c05929c9f95995bcbcdc16d5c48daa8835a455,2941
-    pantry-tree:
-      size: 2202
-      sha256: a6cc6f5c5702eac5227c563911a66ae096fab96bf8827530f4f8b7f3cf2b5713
-  original:
-    hackage: generic-lens-core-2.2.1.0@sha256:a7ee35db4a6e9ed736f6f772f7c05929c9f95995bcbcdc16d5c48daa8835a455,2941
+    hackage: algebraic-graphs-0.5
 snapshots:
 - completed:
-    size: 587821
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/24.yaml
-    sha256: 06d844ba51e49907bd29cb58b4a5f86ee7587a4cd7e6cf395eeec16cba619ce8
-  original: lts-18.24
+    size: 619405
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/28.yaml
+    sha256: 7f4393ad659c579944d12202cffb12d8e4b8114566b015f77bbc303a24cff934
+  original: lts-19.28

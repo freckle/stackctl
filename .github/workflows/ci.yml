@@ -19,7 +19,7 @@ jobs:
 
       - uses: freckle/weeder-action@v1
         with:
-          weeder-version: 2.2.0
+          weeder-version: 2.3.0
 
       - uses: actions/upload-artifact@v2
         with:
