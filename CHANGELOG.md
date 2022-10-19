@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.1.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.1.1...main)
+
+## [v1.0.1.1](https://github.com/freckle/stackctl/compare/v1.0.1.0...v1.0.1.1)
+
+- Respect `LOG_DESTINATION` (the default remains `stderr`)
 
 ## [v1.0.1.0](https://github.com/freckle/stackctl/compare/v1.0.0.2...v1.0.1.0)
 
