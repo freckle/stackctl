@@ -77,7 +77,6 @@ library:
     - lens
     - lens-aeson
     - monad-logger
-    - mtl
     - optparse-applicative
     - resourcet
     - rio
