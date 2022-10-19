@@ -56,7 +56,7 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
-    - Blammo
+    - Blammo >= 1.0.3.0 # Env.parseWith
     - Glob
     - aeson
     - aeson-casing
