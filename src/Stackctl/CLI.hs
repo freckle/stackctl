@@ -75,7 +75,9 @@ runAppT
   -> AppT (App options) m a
   -> m a
 runAppT options f = do
-  envLogSettings <- liftIO LoggingEnv.parse
+  -- Log to stderr by default, since we produce useful stdout (e.g. changes).
+  envLogSettings <- liftIO LoggingEnv.parseWith
+    $ setLogSettingsDestination LogDestinationStderr defaultLogSettings
 
   logger <- newLogger $ adjustLogSettings
     (options ^. colorOptionL)
@@ -107,7 +109,4 @@ runAppT options f = do
     $ unAppT f
 
 adjustLogSettings :: LogColor -> Verbosity -> LogSettings -> LogSettings
-adjustLogSettings lc v =
-  setLogSettingsDestination LogDestinationStderr
-    . setLogSettingsColor lc
-    . verbositySetLogLevels v
+adjustLogSettings lc v = setLogSettingsColor lc . verbositySetLogLevels v
