@@ -6,6 +6,7 @@ module Stackctl.Spec.Changes
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (flushLogger)
 import qualified Data.Text.IO as T
 import Options.Applicative
 import Stackctl.AWS
@@ -31,6 +32,7 @@ runChanges
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
@@ -53,4 +55,6 @@ runChanges ChangesOptions {..} = do
         Right mChangeSet -> do
           colors <- getColorsStdout
           let name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
+
+          flushLogger
           liftIO $ T.putStrLn $ formatChangeSet colors name scoFormat mChangeSet

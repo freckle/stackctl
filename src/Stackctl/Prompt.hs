@@ -5,11 +5,12 @@ module Stackctl.Prompt
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (flushLogger)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
 prompt
-  :: (MonadIO m, MonadLogger m, MonadReader env m)
+  :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogger env)
   => Text
   -- ^ Message to present
   -> (Text -> Either Text a)
@@ -18,6 +19,8 @@ prompt
   -- ^ Action to take on result
   -> m r
 prompt message parse dispatch = do
+  flushLogger
+
   x <- liftIO $ do
     T.putStr $ message <> "? "
     hFlush stdout
@@ -29,7 +32,8 @@ prompt message parse dispatch = do
       prompt message parse dispatch
     Right a -> dispatch a
 
-promptContinue :: (MonadIO m, MonadLogger m, MonadReader env m) => m ()
+promptContinue
+  :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogger env) => m ()
 promptContinue = prompt "Continue (y/n)" parse dispatch
  where
   parse x

@@ -5,147 +5,147 @@
 
 packages:
 - completed:
-    hackage: Blammo-1.0.3.0@sha256:a1a43291768a1f116fcd15cb2e2f480d778635ce86a94809ca1dc008afc93753,3897
+    hackage: Blammo-1.1.0.0@sha256:6195c1e290c78ba2c454966b95ba486583592392e46e09f4da806c5fb97c4919,3897
     pantry-tree:
+      sha256: a37b1b5974dcb28ea3405dac0ccd14f206c414e989aa52dd72bd0a83c1e890fc
       size: 1258
-      sha256: a11ccf2e129ea181449162f39000a1e7097b380d19cd5d3280b72c739e99c16f
   original:
-    hackage: Blammo-1.0.3.0
+    hackage: Blammo-1.1.0.0
 - completed:
     hackage: cfn-flip-0.1.0.2@sha256:86cd26b0edeb2876c1939ff0734d23f34f3819c8913fe0caf5e1d2d23c785950,5698
     pantry-tree:
-      size: 3004
       sha256: 061170703aafc6146dd5aefb9212c4f2f6582743f97695b443a93c1f659259b9
+      size: 3004
   original:
     hackage: cfn-flip-0.1.0.2
 - completed:
     hackage: monad-logger-aeson-0.4.0.2@sha256:0a1189f53fdfa57e88735d0d65b943983010203fcd3f122ea552042dfb2d2501,6215
     pantry-tree:
-      size: 7096
       sha256: 3955f99746fcb73d120b4bd486a110eec0bad975c00cc5ca29b3ba259c12a4b9
+      size: 7096
   original:
     hackage: monad-logger-aeson-0.4.0.2
 - completed:
     hackage: context-0.2.0.1@sha256:b5a1390a5ad11b7edd0449c9ef96823f082bff4988bd09583e37a4e93e9aad10,1891
     pantry-tree:
-      size: 952
       sha256: ebb043dd007864588c6b1676a0d30e521deab4353a3f19716f6f6f7d52b62817
+      size: 952
   original:
     hackage: context-0.2.0.1
 - completed:
-    size: 27775608
-    subdir: lib/amazonka
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     pantry-tree:
-      size: 1257
       sha256: 0257a27c3332e400abc0f4a38f7a875c4a2a04b03ac342d7481e19d9d5665040
+      size: 1257
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/amazonka
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
   original:
     subdir: lib/amazonka
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    size: 27775608
-    subdir: lib/amazonka-core
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka-core
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     pantry-tree:
-      size: 3117
       sha256: 2eadbad33f65f20781409c4de9faee04e7e4baa92906db696b78689f53de0a83
+      size: 3117
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/amazonka-core
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
   original:
     subdir: lib/amazonka-core
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    size: 27775608
-    subdir: lib/services/amazonka-cloudformation
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka-cloudformation
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     pantry-tree:
-      size: 25784
       sha256: a9f557fdf3f3d5f960a28921465609e338ce702e1ecdf6e559e01efdccb364a6
+      size: 25784
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/services/amazonka-cloudformation
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
   original:
     subdir: lib/services/amazonka-cloudformation
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    size: 27775608
-    subdir: lib/services/amazonka-certificatemanager
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka-certificatemanager
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     pantry-tree:
-      size: 7063
       sha256: 86c39ebac8e40030c05048385c1153deb124193e49bb2651c38bd1232bbd3fff
+      size: 7063
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/services/amazonka-certificatemanager
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
   original:
     subdir: lib/services/amazonka-certificatemanager
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    size: 27775608
-    subdir: lib/services/amazonka-ec2
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka-ec2
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     pantry-tree:
-      size: 190150
       sha256: 29c4666aa6cd81a371cdef208199f45a99d9fdef31f3ff9450c1762a64dd60d0
+      size: 190150
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/services/amazonka-ec2
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
   original:
     subdir: lib/services/amazonka-ec2
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    size: 27775608
-    subdir: lib/services/amazonka-ecr
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
     name: amazonka-ecr
-    version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     pantry-tree:
-      size: 12161
       sha256: 8c8b2a242ac973b0205916de20d8066cf3820acd47d98d6ec6df9182f6b31966
+      size: 12161
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/services/amazonka-ecr
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
   original:
     subdir: lib/services/amazonka-ecr
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
+    name: amazonka-sso
+    pantry-tree:
+      sha256: f11babeeaf0481ae68134ced86e9d1d9396d1beb7bd70e0a1e6b77bc4148a192
+      size: 1869
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     size: 27775608
     subdir: lib/services/amazonka-sso
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-    name: amazonka-sso
     version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
-    pantry-tree:
-      size: 1869
-      sha256: f11babeeaf0481ae68134ced86e9d1d9396d1beb7bd70e0a1e6b77bc4148a192
   original:
     subdir: lib/services/amazonka-sso
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
+    name: amazonka-sts
+    pantry-tree:
+      sha256: 64ed22eaaea868b32cf56f162d1bd7332b048d8f2ea073c4e9827ed08e71cc70
+      size: 2932
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
     size: 27775608
     subdir: lib/services/amazonka-sts
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-    name: amazonka-sts
     version: '2.0'
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
-    pantry-tree:
-      size: 2932
-      sha256: 64ed22eaaea868b32cf56f162d1bd7332b048d8f2ea073c4e9827ed08e71cc70
   original:
     subdir: lib/services/amazonka-sts
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
     hackage: algebraic-graphs-0.5@sha256:6eeec5ed1687ff7aa916e7bf9f02f51aaabde6f314dc0b7b1a84156974d7da73,8071
     pantry-tree:
-      size: 4128
       sha256: cca4a0348bb126506cacd8436948a68aad62e75d45df8c71f4090a00e69b45ee
+      size: 4128
   original:
     hackage: algebraic-graphs-0.5
 snapshots:
 - completed:
+    sha256: 7f4393ad659c579944d12202cffb12d8e4b8114566b015f77bbc303a24cff934
     size: 619405
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/28.yaml
-    sha256: 7f4393ad659c579944d12202cffb12d8e4b8114566b015f77bbc303a24cff934
   original: lts-19.28
