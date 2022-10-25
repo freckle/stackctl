@@ -65,6 +65,7 @@ library:
     - amazonka-cloudformation
     - amazonka-core
     - amazonka-ec2
+    - amazonka-lambda
     - amazonka-sts
     - bytestring
     - cfn-flip

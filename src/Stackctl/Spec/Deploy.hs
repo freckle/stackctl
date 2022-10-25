@@ -14,6 +14,7 @@ import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Action
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
@@ -86,6 +87,7 @@ runDeploy DeployOptions {..} = do
             writeFileUtf8 out $ changeSetJSON changeSet
 
           deployChangeSet sdoDeployConfirmation changeSet
+          runActions stackName PostDeploy $ stackSpecActions spec
           when sdoClean $ awsCloudFormationDeleteAllChangeSets stackName
 
 data DeployConfirmation

@@ -79,6 +79,7 @@ runCapture CaptureOptions {..} = do
     , gStackPath = scoStackPath
     , gStackName = scoStackName
     , gDepends = scoDepends
+    , gActions = Nothing
     , gParameters = parameters stack
     , gCapabilities = capabilities stack
     , gTags = tags stack

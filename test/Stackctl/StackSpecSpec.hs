@@ -33,6 +33,7 @@ toSpec name depends = buildStackSpec "." specPath specBody
   specPath = stackSpecPath scope stackName "a/b.yaml"
   specBody = StackSpecYaml
     { ssyDepends = Just $ map StackName depends
+    , ssyActions = Nothing
     , ssyTemplate = ""
     , ssyParameters = Nothing
     , ssyCapabilities = Nothing

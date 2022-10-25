@@ -97,6 +97,11 @@ Template: <path>
 Depends:
   - <name>
 
+Actions:
+  - on: <event>
+    run:
+      <action>: <argument...>
+
 Parameters:
   - ParameterKey: <string>
     ParameterValue: <string>
@@ -120,6 +125,24 @@ And these constituent parts are used as follows:
 
 > Optional. Other Stacks (by name) that should be ordered before this one if
 > deployed together.
+
+*{.Actions}*\
+
+> Optional. Actions to run when certain Stack management events occur.
+
+*{.Actions[].on}*\
+
+> The event on which to perform the action:
+>
+> - **PostDeploy**: run the action after a successful deployment
+
+*{.Actions[].run}*\
+
+> The action to perform on the given event:
+>
+> - **InvokeLambdaByStackOutput**: *\<output name>*: invoke the function whose
+>   name is found in the given Output of the deployed Stack
+> - **InvokeLambdaByName**: *\<function name>*: invoke the given function
 
 *{.Parameters}*\
 

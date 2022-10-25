@@ -3,6 +3,7 @@ module Stackctl.StackSpec
   , stackSpecSpecPath
   , stackSpecSpecBody
   , stackSpecStackName
+  , stackSpecActions
   , stackSpecParameters
   , stackSpecCapabilities
   , stackSpecTags
@@ -20,6 +21,7 @@ import Data.Aeson
 import Data.Graph (graphFromEdges, topSort)
 import qualified Data.Yaml as Yaml
 import Stackctl.AWS
+import Stackctl.Action
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
 import UnliftIO.Directory (createDirectoryIfMissing)
@@ -41,6 +43,9 @@ stackSpecStackName = stackSpecPathStackName . ssSpecPath
 
 stackSpecDepends :: StackSpec -> [StackName]
 stackSpecDepends = fromMaybe [] . ssyDepends . ssSpecBody
+
+stackSpecActions :: StackSpec -> [Action]
+stackSpecActions = fromMaybe [] . ssyActions . ssSpecBody
 
 stackSpecTemplateFile :: StackSpec -> StackTemplate
 stackSpecTemplateFile StackSpec {..} =

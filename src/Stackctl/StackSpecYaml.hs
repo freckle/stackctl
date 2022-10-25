@@ -30,10 +30,12 @@ import Data.Aeson
 import Data.Aeson.Casing
 import qualified Data.Text as T
 import Stackctl.AWS
+import Stackctl.Action
 
 data StackSpecYaml = StackSpecYaml
   { ssyTemplate :: FilePath
   , ssyDepends :: Maybe [StackName]
+  , ssyActions :: Maybe [Action]
   , ssyParameters :: Maybe [ParameterYaml]
   , ssyCapabilities :: Maybe [Capability]
   , ssyTags :: Maybe [TagYaml]
