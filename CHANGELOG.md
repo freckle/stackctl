@@ -1,4 +1,14 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.1.2...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.2.0...main)
+
+## [v1.0.2.0](https://github.com/freckle/stackctl/compare/v1.0.1.2...v1.0.2.0)
+
+- Add `Stackctl.Action`
+
+  Support for taking actions during Stack management, currently we support
+  invoking a lambda post-deployment. In the future, we can add more, such as
+  running local pre-deploy validation or preparation scripts.
+
+- Add `awsCloudFormationDescribeStackOutputs`
 
 ## [v1.0.1.2](https://github.com/freckle/stackctl/compare/v1.0.1.1...v1.0.1.2)
 
