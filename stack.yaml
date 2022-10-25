@@ -13,10 +13,11 @@ extra-deps:
     subdirs:
       - lib/amazonka
       - lib/amazonka-core
-      - lib/services/amazonka-cloudformation
       - lib/services/amazonka-certificatemanager
+      - lib/services/amazonka-cloudformation
       - lib/services/amazonka-ec2
       - lib/services/amazonka-ecr
+      - lib/services/amazonka-lambda
       - lib/services/amazonka-sso
       - lib/services/amazonka-sts
 

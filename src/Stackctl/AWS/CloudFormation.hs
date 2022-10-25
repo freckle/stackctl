@@ -33,6 +33,7 @@ module Stackctl.AWS.CloudFormation
   , output_outputValue
   , awsCloudFormationDescribeStack
   , awsCloudFormationDescribeStackMaybe
+  , awsCloudFormationDescribeStackOutputs
   , awsCloudFormationDescribeStackEvents
   , awsCloudFormationGetMostRecentStackEventId
   , awsCloudFormationDeleteStack
@@ -179,6 +180,14 @@ awsCloudFormationDescribeStackMaybe stackName =
   -- returning an empty list, so we need to do this through exceptions
   handling_ _ValidationError (pure Nothing) $ do
     Just <$> awsCloudFormationDescribeStack stackName
+
+awsCloudFormationDescribeStackOutputs
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  => StackName
+  -> m [Output]
+awsCloudFormationDescribeStackOutputs stackName = do
+  stack <- awsCloudFormationDescribeStack stackName
+  pure $ fromMaybe [] $ outputs stack
 
 awsCloudFormationDescribeStackEvents
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)

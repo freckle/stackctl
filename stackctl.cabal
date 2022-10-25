@@ -25,10 +25,12 @@ source-repository head
 
 library
   exposed-modules:
+      Stackctl.Action
       Stackctl.AWS
       Stackctl.AWS.CloudFormation
       Stackctl.AWS.Core
       Stackctl.AWS.EC2
+      Stackctl.AWS.Lambda
       Stackctl.AWS.Orphans
       Stackctl.AWS.Scope
       Stackctl.AWS.STS
@@ -96,6 +98,7 @@ library
     , amazonka-cloudformation
     , amazonka-core
     , amazonka-ec2
+    , amazonka-lambda
     , amazonka-sts
     , base ==4.*
     , bytestring

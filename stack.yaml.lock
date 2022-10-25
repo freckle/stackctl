@@ -59,19 +59,6 @@ packages:
     subdir: lib/amazonka-core
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
-    name: amazonka-cloudformation
-    pantry-tree:
-      sha256: a9f557fdf3f3d5f960a28921465609e338ce702e1ecdf6e559e01efdccb364a6
-      size: 25784
-    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
-    size: 27775608
-    subdir: lib/services/amazonka-cloudformation
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-    version: '2.0'
-  original:
-    subdir: lib/services/amazonka-cloudformation
-    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-- completed:
     name: amazonka-certificatemanager
     pantry-tree:
       sha256: 86c39ebac8e40030c05048385c1153deb124193e49bb2651c38bd1232bbd3fff
@@ -83,6 +70,19 @@ packages:
     version: '2.0'
   original:
     subdir: lib/services/amazonka-certificatemanager
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+- completed:
+    name: amazonka-cloudformation
+    pantry-tree:
+      sha256: a9f557fdf3f3d5f960a28921465609e338ce702e1ecdf6e559e01efdccb364a6
+      size: 25784
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/services/amazonka-cloudformation
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
+  original:
+    subdir: lib/services/amazonka-cloudformation
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
     name: amazonka-ec2
@@ -109,6 +109,19 @@ packages:
     version: '2.0'
   original:
     subdir: lib/services/amazonka-ecr
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+- completed:
+    name: amazonka-lambda
+    pantry-tree:
+      sha256: 7e6feb0f8af0a9f6ce20db04d69a0e7b92838f27d17f65f0cd1a3c87b6a6331e
+      size: 19117
+    sha256: 14aeaa9f748f7ac03683e8a8126760ed16aa82152404a96c0333b582444cd381
+    size: 27775608
+    subdir: lib/services/amazonka-lambda
+    url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
+    version: '2.0'
+  original:
+    subdir: lib/services/amazonka-lambda
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 - completed:
     name: amazonka-sso

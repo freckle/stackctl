@@ -8,6 +8,7 @@ import Stackctl.Prelude
 import Data.Aeson
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Action
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -21,6 +22,7 @@ data Generate = Generate
   -- ^ If not given will use @{stack-name}.yaml@
   , gStackName :: StackName
   , gDepends :: Maybe [StackName]
+  , gActions :: Maybe [Action]
   , gParameters :: Maybe [Parameter]
   , gCapabilities :: Maybe [Capability]
   , gTags :: Maybe [Tag]
@@ -48,6 +50,7 @@ generate Generate {..} = do
     specYaml = StackSpecYaml
       { ssyTemplate = templatePath
       , ssyDepends = gDepends
+      , ssyActions = gActions
       , ssyParameters = map ParameterYaml <$> gParameters
       , ssyCapabilities = gCapabilities
       , ssyTags = map TagYaml <$> gTags
