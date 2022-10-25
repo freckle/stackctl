@@ -1,11 +1,11 @@
 cabal-version: 1.18
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           stackctl
-version:        1.0.1.1
+version:        1.0.1.2
 description:    Please see <https://github.com/freckle/stackctl#readme>
 homepage:       https://github.com/freckle/stackctl#readme
 bug-reports:    https://github.com/freckle/stackctl/issues

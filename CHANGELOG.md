@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.1.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.1.2...main)
+
+## [v1.0.1.2](https://github.com/freckle/stackctl/compare/v1.0.1.1...v1.0.1.2)
+
+- Always flush log messages before our own output
 
 ## [v1.0.1.1](https://github.com/freckle/stackctl/compare/v1.0.1.0...v1.0.1.1)
 
