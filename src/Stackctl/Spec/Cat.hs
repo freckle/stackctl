@@ -6,6 +6,7 @@ module Stackctl.Spec.Cat
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (flushLogger)
 import Data.Aeson
 import Data.Aeson.Lens
 import qualified Data.HashMap.Strict as HashMap
@@ -54,6 +55,7 @@ runCat
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsScope env
      , HasDirectoryOption env
      , HasFilterOption env
@@ -73,6 +75,8 @@ runCat CatOptions {..} = do
     putTemplate n x = if sctoNoTemplates then pure () else put n x
     putTemplateBody n x =
       if sctoNoTemplates || sctoBrief then pure () else putBoxed n x
+
+  flushLogger
 
   put 0 $ fromString dir <> "/"
   putStack 2 "stacks/"

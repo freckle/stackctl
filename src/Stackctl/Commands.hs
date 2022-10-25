@@ -21,7 +21,8 @@ import Stackctl.Subcommand
 import Stackctl.Version
 
 cat
-  :: ( HasAwsScope env
+  :: ( HasLogger env
+     , HasAwsScope env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -45,7 +46,8 @@ capture = Subcommand
   }
 
 changes
-  :: ( HasAwsScope env
+  :: ( HasLogger env
+     , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
@@ -60,7 +62,8 @@ changes = Subcommand
   }
 
 deploy
-  :: ( HasAwsScope env
+  :: ( HasLogger env
+     , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env

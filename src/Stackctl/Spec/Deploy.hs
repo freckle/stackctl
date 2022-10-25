@@ -7,6 +7,7 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (flushLogger)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
@@ -52,6 +53,7 @@ runDeploy
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
@@ -96,6 +98,7 @@ handleRollbackComplete
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsEnv env
      )
   => DeployConfirmation
@@ -126,6 +129,7 @@ deployChangeSet
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsEnv env
      , HasColorOption env
      )
@@ -134,6 +138,8 @@ deployChangeSet
   -> m ()
 deployChangeSet confirmation changeSet = do
   colors <- getColorsStdout
+
+  flushLogger
   liftIO $ T.putStrLn $ formatTTY colors (unStackName stackName) $ Just
     changeSet
 
