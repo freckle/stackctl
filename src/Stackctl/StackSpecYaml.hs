@@ -3,6 +3,9 @@
 -- @
 -- Template: <path>
 --
+-- Depends:
+-- - <string>
+--
 -- Parameters:
 -- - ParameterKey: <string>
 --   ParameterValue: <string>
