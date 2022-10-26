@@ -149,13 +149,6 @@ packages:
   original:
     subdir: lib/services/amazonka-sts
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
-- completed:
-    hackage: algebraic-graphs-0.5@sha256:6eeec5ed1687ff7aa916e7bf9f02f51aaabde6f314dc0b7b1a84156974d7da73,8071
-    pantry-tree:
-      sha256: cca4a0348bb126506cacd8436948a68aad62e75d45df8c71f4090a00e69b45ee
-      size: 4128
-  original:
-    hackage: algebraic-graphs-0.5
 snapshots:
 - completed:
     sha256: 7f4393ad659c579944d12202cffb12d8e4b8114566b015f77bbc303a24cff934
