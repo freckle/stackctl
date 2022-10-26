@@ -20,6 +20,3 @@ extra-deps:
       - lib/services/amazonka-lambda
       - lib/services/amazonka-sso
       - lib/services/amazonka-sts
-
-  # For weeder-2.3.0
-  - algebraic-graphs-0.5
