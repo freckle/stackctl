@@ -7,9 +7,8 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude
 
-import Blammo.Logging.Logger (flushLogger)
+import Blammo.Logging.Logger (pushLogStrLn)
 import qualified Data.Text as T
-import qualified Data.Text.IO as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
 import Stackctl.AWS
@@ -22,6 +21,7 @@ import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
+import System.Log.FastLogger (toLogStr)
 import UnliftIO.Directory (createDirectoryIfMissing)
 
 data DeployOptions = DeployOptions
@@ -141,9 +141,7 @@ deployChangeSet
 deployChangeSet confirmation changeSet = do
   colors <- getColorsStdout
 
-  flushLogger
-  liftIO $ T.putStrLn $ formatTTY colors (unStackName stackName) $ Just
-    changeSet
+  pushLogger $ formatTTY colors (unStackName stackName) $ Just changeSet
 
   case confirmation of
     DeployWithConfirmation -> promptContinue
@@ -180,6 +178,7 @@ tailStackEventsSince
   :: ( MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsEnv env
      , HasColorOption env
      )
@@ -189,7 +188,7 @@ tailStackEventsSince
 tailStackEventsSince stackName mLastId = do
   colors <- getColorsStdout
   events <- awsCloudFormationDescribeStackEvents stackName mLastId
-  traverse_ (liftIO . T.putStrLn <=< formatStackEvent colors) $ reverse events
+  traverse_ (pushLogger <=< formatStackEvent colors) $ reverse events
 
   -- Without this small delay before looping, our requests seem to hang
   -- intermittently (without errors) and often we miss events.
@@ -226,3 +225,8 @@ formatStackEvent Colors {..} e = do
 
 getLastEventId :: [StackEvent] -> Maybe Text
 getLastEventId = fmap (^. stackEvent_eventId) . listToMaybe
+
+pushLogger :: (MonadIO m, MonadReader env m, HasLogger env) => Text -> m ()
+pushLogger msg = do
+  logger <- view loggerL
+  pushLogStrLn logger $ toLogStr msg
