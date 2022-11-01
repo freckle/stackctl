@@ -74,6 +74,7 @@ library:
     - errors
     - exceptions
     - extra
+    - fast-logger
     - filepath
     - lens
     - lens-aeson
