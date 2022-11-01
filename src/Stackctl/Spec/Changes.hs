@@ -6,7 +6,6 @@ module Stackctl.Spec.Changes
 
 import Stackctl.Prelude
 
-import Blammo.Logging.Logger (flushLogger)
 import qualified Data.Text.IO as T
 import Options.Applicative
 import Stackctl.AWS
@@ -19,12 +18,20 @@ import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 
-newtype ChangesOptions = ChangesOptions
+data ChangesOptions = ChangesOptions
   { scoFormat :: Format
+  , scoOutput :: FilePath
   }
 
+-- brittany-disable-next-binding
+
 runChangesOptions :: Parser ChangesOptions
-runChangesOptions = ChangesOptions <$> formatOption
+runChangesOptions = ChangesOptions
+  <$> formatOption
+  <*> argument str
+    (  metavar "PATH"
+    <> help "Where to write the changes summary"
+    )
 
 runChanges
   :: ( MonadMask m
@@ -32,7 +39,6 @@ runChanges
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
-     , HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
@@ -55,6 +61,8 @@ runChanges ChangesOptions {..} = do
         Right mChangeSet -> do
           colors <- getColorsStdout
           let name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
-
-          flushLogger
-          liftIO $ T.putStrLn $ formatChangeSet colors name scoFormat mChangeSet
+          liftIO $ T.writeFile scoOutput $ formatChangeSet
+            colors
+            name
+            scoFormat
+            mChangeSet

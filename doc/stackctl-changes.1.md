@@ -22,6 +22,14 @@ successful operation.
 
 > Output changes in **FORMAT**. See dedicated section.
 
+**PATH**\
+
+> Where to write the changes summary.
+>
+> This is a required option to make the interaction with logging explicit. You
+> can pass */dev/stdout* if you want the changes written alongside any logging
+> and don't mind interleaving or ordering problems that may occur.
+
 # AVAILABLE FORMATS
 
 **tty**\
