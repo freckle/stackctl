@@ -70,3 +70,14 @@ jobs:
           asset_path: ./dist/stackctl.tar.gz
           asset_name: stackctl-${{ matrix.suffix }}.tar.gz
           asset_content_type: application/gzip
+
+  upload-hackage:
+    needs: tag
+    if: needs.tag.outputs.tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - if: steps.tag.outputs.tag
+        uses: freckle/stack-upload-action@v2
+        env:
+          HACKAGE_API_KEY: ${{ secrets.HACKAGE_UPLOAD_API_KEY }}
