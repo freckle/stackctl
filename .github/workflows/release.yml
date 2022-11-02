@@ -53,10 +53,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-
-      # Caching is broken on OSX, we'll just let it be slow
-      - if: ${{ matrix.os != 'macOS-latest' }}
-        uses: freckle/stack-cache-action@v2
+      - uses: freckle/stack-cache-action@v2
 
       - run: |
           stack install --copy-compiler-tool pandoc
