@@ -47,7 +47,7 @@ jobs:
   #     - run: pip install cram
   #     - run: cram -v integration/tests
 
-  hlint:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
