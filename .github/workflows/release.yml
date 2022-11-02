@@ -21,6 +21,11 @@ jobs:
     if: needs.tag.outputs.tag
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - id: release-notes
+        uses: freckle/release-notes-action@v1
+        with:
+          version: ${{ needs.tag.outputs.tag }}
       - uses: actions/create-release@v1
         id: create-release
         env:
@@ -28,6 +33,7 @@ jobs:
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           release_name: Release ${{ needs.tag.outputs.tag }}
+          body_path: ${{ steps.release-notes.outputs.path }}
           draft: false
           prerelease: false
     outputs:
