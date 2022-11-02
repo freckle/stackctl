@@ -8,7 +8,7 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: tag
         uses: freckle/haskell-tag-action@v1
         env:
@@ -46,7 +46,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Caching is broken on OSX, we'll just let it be slow
       - if: ${{ matrix.os != 'macOS-latest' }}
