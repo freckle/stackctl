@@ -1,4 +1,11 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.0.2.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.0...main)
+
+## [v1.1.0.0](https://github.com/freckle/stackctl/compare/v1.0.2.0...v1.1.0.0)
+
+- Fix interleaved or out-of-order output bugs by streaming deployment events
+  through the Logger instead of directly to `stdout`
+- Logging goes to `stdout` by default (`LOG_DESTINATION` can still be used)
+- The `changes` subcommand now requires a `PATH` argument
 
 ## [v1.0.2.0](https://github.com/freckle/stackctl/compare/v1.0.1.2...v1.0.2.0)
 
