@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.1...main)
+
+## [v1.1.0.1](https://github.com/freckle/stackctl/compare/v1.1.0.0...v1.1.0.1)
+
+- Update to `cfn-flip-0.1.0.3`
 
 ## [v1.1.0.0](https://github.com/freckle/stackctl/compare/v1.0.2.0...v1.1.0.0)
 
