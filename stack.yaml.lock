@@ -12,12 +12,12 @@ packages:
   original:
     hackage: Blammo-1.1.0.0
 - completed:
-    hackage: cfn-flip-0.1.0.2@sha256:86cd26b0edeb2876c1939ff0734d23f34f3819c8913fe0caf5e1d2d23c785950,5698
+    hackage: cfn-flip-0.1.0.3@sha256:8737882d818d74b29d3b1791a4df4dc89995870312374989c47c29352ea503ec,5615
     pantry-tree:
-      sha256: 061170703aafc6146dd5aefb9212c4f2f6582743f97695b443a93c1f659259b9
-      size: 3004
+      sha256: 715102dfcca7053390eda5be0504485fb93b8b84226fe373a6e62d297090d49b
+      size: 3139
   original:
-    hackage: cfn-flip-0.1.0.2
+    hackage: cfn-flip-0.1.0.3
 - completed:
     hackage: monad-logger-aeson-0.4.0.2@sha256:0a1189f53fdfa57e88735d0d65b943983010203fcd3f122ea552042dfb2d2501,6215
     pantry-tree:
@@ -151,7 +151,7 @@ packages:
     url: https://github.com/brendanhay/amazonka/archive/f73a957d05f64863e867cf39d0db260718f0fadd.tar.gz
 snapshots:
 - completed:
-    sha256: 7f4393ad659c579944d12202cffb12d8e4b8114566b015f77bbc303a24cff934
-    size: 619405
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/28.yaml
-  original: lts-19.28
+    sha256: e5f56f619132209b826084cacd6374d7f0344cc88a9d1d305878190e4204ae1f
+    size: 619205
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/31.yaml
+  original: lts-19.31

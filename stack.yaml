@@ -1,8 +1,8 @@
-resolver: lts-19.28
+resolver: lts-19.31
 
 extra-deps:
   - Blammo-1.1.0.0
-  - cfn-flip-0.1.0.2
+  - cfn-flip-0.1.0.3
 
   # For Blammo
   - monad-logger-aeson-0.4.0.2

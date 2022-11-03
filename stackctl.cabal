@@ -102,7 +102,7 @@ library
     , amazonka-sts
     , base ==4.*
     , bytestring
-    , cfn-flip
+    , cfn-flip >=0.1.0.3
     , conduit
     , containers
     , errors

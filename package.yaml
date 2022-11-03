@@ -68,7 +68,7 @@ library:
     - amazonka-lambda
     - amazonka-sts
     - bytestring
-    - cfn-flip
+    - cfn-flip >= 0.1.0.3 # bugfix for Condition
     - conduit
     - containers
     - errors
