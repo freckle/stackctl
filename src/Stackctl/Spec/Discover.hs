@@ -52,21 +52,21 @@ discoverSpecs = do
   filterOption <- view filterOptionL
 
   let
-    filtered = filterFilePaths filterOption discovered
+    matched = filterFilePaths filterOption discovered
     toSpecPath = stackSpecPathFromFilePath scope
-    (errs, specPaths) = partitionEithers $ map toSpecPath filtered
+    (errs, specPaths) = partitionEithers $ map toSpecPath matched
 
     context =
       [ "path" .= dir
       , "filters" .= filterOption
       , "discovered" .= length discovered
-      , "filtered" .= length filtered
+      , "matched" .= length matched
       , "errors" .= length errs
       ]
 
   withThreadContext context $ do
     logDebug "Discovered specs"
-    when (null filtered) $ logWarn "No specs found"
+    when (null matched) $ logWarn "No specs found"
     checkForDuplicateStackNames specPaths
 
   sortStackSpecs <$> traverse (readStackSpec dir) specPaths
