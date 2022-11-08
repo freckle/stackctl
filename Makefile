@@ -48,18 +48,20 @@ DESTDIR ?=
 PREFIX ?= /usr/local
 MANPREFIX ?= $(PREFIX)/share/man
 
+INSTALL ?= $(shell command -v ginstall 2>/dev/null || echo install)
+
 .PHONY: install
 install:
-	install -Dm755 stackctl $(DESTDIR)$(PREFIX)/bin/stackctl
-	install -Dm644 completion/bash $(DESTDIR)$(PREFIX)/share/bash-completion/completions/stackctl
-	install -Dm644 completion/fish $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d/stackctl.fish
-	install -Dm644 completion/zsh $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_stackctl
-	install -Dm644 doc/stackctl.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl.1
-	install -Dm644 doc/stackctl-cat.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-cat.1
-	install -Dm644 doc/stackctl-capture.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-capture.1
-	install -Dm644 doc/stackctl-changes.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-changes.1
-	install -Dm644 doc/stackctl-deploy.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-deploy.1
-	install -Dm644 doc/stackctl-version.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-version.1
+	$(INSTALL) -Dm755 stackctl $(DESTDIR)$(PREFIX)/bin/stackctl
+	$(INSTALL) -Dm644 completion/bash $(DESTDIR)$(PREFIX)/share/bash-completion/completions/stackctl
+	$(INSTALL) -Dm644 completion/fish $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d/stackctl.fish
+	$(INSTALL) -Dm644 completion/zsh $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_stackctl
+	$(INSTALL) -Dm644 doc/stackctl.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl.1
+	$(INSTALL) -Dm644 doc/stackctl-cat.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-cat.1
+	$(INSTALL) -Dm644 doc/stackctl-capture.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-capture.1
+	$(INSTALL) -Dm644 doc/stackctl-changes.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-changes.1
+	$(INSTALL) -Dm644 doc/stackctl-deploy.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-deploy.1
+	$(INSTALL) -Dm644 doc/stackctl-version.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-version.1
 
 .PHONY: uninstall
 uninstall:
