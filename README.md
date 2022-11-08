@@ -41,6 +41,8 @@ instead.
 Go to the [latest release][latest] and download the `.tar.gz` asset appropriate
 for your OS. Navigate to the directory containing the downloaded file and run:
 
+[latest]: https://github.com/freckle/stackctl/releases/latest
+
 ```console
 tar xvf stackctl-*.tar.gz
 cd stackctl
