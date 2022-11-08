@@ -16,14 +16,19 @@ import qualified Data.ByteString.Lazy as BSL
 import Stackctl.AWS.Core
 
 data LambdaInvokeResult
-  = LambdaInvokeSuccess
+  = LambdaInvokeSuccess ByteString
   | LambdaInvokeError LambdaError (Maybe Text)
   | LambdaInvokeFailure Int (Maybe Text)
   deriving stock Show
 
 logLambdaInvocationResult :: MonadLogger m => LambdaInvokeResult -> m ()
 logLambdaInvocationResult = \case
-  LambdaInvokeSuccess -> logInfo "LambdaInvokeSuccess"
+  LambdaInvokeSuccess bs -> do
+    let
+      meta = case decode @Value $ BSL.fromStrict bs of
+        Nothing -> ["response" .= decodeUtf8 bs]
+        Just response -> ["response" .= response]
+    logInfo $ "LambdaInvokeSuccess" :# meta
   LambdaInvokeError LambdaError {..} mFunctionError ->
     logError $ (:# []) $ mconcat
       [ "LambdaInvokeError"
@@ -41,7 +46,7 @@ logLambdaInvocationResult = \case
 
 isLambdaInvocationSuccess :: LambdaInvokeResult -> Bool
 isLambdaInvocationSuccess = \case
-  LambdaInvokeSuccess -> True
+  LambdaInvokeSuccess{} -> True
   LambdaInvokeError{} -> False
   LambdaInvokeFailure{} -> False
 
@@ -72,6 +77,7 @@ awsLambdaInvoke name payload = do
     status = resp ^. invokeResponse_statusCode
     mError = decode . BSL.fromStrict =<< resp ^. invokeResponse_payload
     mFunctionError = resp ^. invokeResponse_functionError
+    response = fromMaybe "" $ resp ^. invokeResponse_payload
 
   logDebug
     $ "Function result"
@@ -84,7 +90,7 @@ awsLambdaInvoke name payload = do
   pure $ if
     | statusIsUnsuccessful status -> LambdaInvokeFailure status mFunctionError
     | Just e <- mError            -> LambdaInvokeError e mFunctionError
-    | otherwise                   -> LambdaInvokeSuccess
+    | otherwise                   -> LambdaInvokeSuccess response
 
 statusIsUnsuccessful :: Int -> Bool
 statusIsUnsuccessful s = s < 200 || s >= 300
