@@ -71,8 +71,8 @@ instance ToJSON ActionRun where
     InvokeLambdaByName name -> "InvokeLambdaByName" .= name
 
 data ActionFailure
-  = NoSuchOutput StackName Text [Output]
-  | InvokeLambdaFailure LambdaInvokeResult
+  = NoSuchOutput
+  | InvokeLambdaFailure
   deriving stock Show
   deriving anyclass Exception
 
@@ -100,15 +100,21 @@ runAction stackName Action { on, run } = do
     InvokeLambdaByStackOutput outputName -> do
       outputs <- awsCloudFormationDescribeStackOutputs stackName
       case findOutputValue outputName outputs of
-        Nothing -> throwIO $ NoSuchOutput stackName outputName outputs
+        Nothing -> do
+          logError
+            $ "Output not found"
+            :# [ "stackName" .= stackName
+               , "desiredOutput" .= outputName
+               , "availableOutputs" .= map (^. output_outputKey) outputs
+               ]
+          throwIO NoSuchOutput
         Just name -> invoke name
     InvokeLambdaByName name -> invoke name
  where
   invoke name = do
     result <- awsLambdaInvoke name payload
     logLambdaInvocationResult result
-    unless (isLambdaInvocationSuccess result) $ throwIO $ InvokeLambdaFailure
-      result
+    unless (isLambdaInvocationSuccess result) $ throwIO InvokeLambdaFailure
 
   payload = object ["stack" .= stackName, "event" .= on]
 
