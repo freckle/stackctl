@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${OS:=$(uname -s)}"
+: "${PREFIX:=$HOME/.local}"
+: "${RELEASE_TAG:=""}"
+
+case "$OS" in
+  Linux)
+    asset_name=stackctl-x86_64-linux.tar.gz
+    ;;
+  Darwin)
+    asset_name=stackctl-x86_64-osx.tar.gz
+    ;;
+  *)
+    echo "Unsupported (unknown OS: $OS)" >&2
+    exit 1
+    ;;
+esac
+
+if [[ -z "$RELEASE_TAG" ]]; then
+  path=/releases/latest
+else
+  path=/releases/tags/$RELEASE_TAG
+fi
+
+url=$(
+  curl --fail "https://api.github.com/repos/freckle/stackctl$path" |
+    jq --raw-output "
+      .assets[]
+        | select(.name == \"$asset_name\")
+        | .browser_download_url
+    "
+)
+
+cd /tmp
+curl --fail --location "$url" | tar vxzf -
+cd stackctl && make install PREFIX="$PREFIX"
+
+echo
+echo "Installed $PREFIX/bin/stackctl"
+set -x +e
+which stackctl
+stackctl version
