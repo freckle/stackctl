@@ -16,31 +16,46 @@ This project also contains a Haskell library for doing the same.
 
 ## Install
 
-### Binary install
+### Pre-requisites
+
+- Have `~/.local/bin` on your `$PATH`
+- Have `~/.local/share/man` on your `$MANPATH` (for documentation)
+- If on OSX, `brew install coreutils` (i.e. have `ginstall` available)
+
+### Scripted
+
+```console
+curl -L https://raw.githubusercontent.com/freckle/stackctl/main/install | bash
+```
+
+**NOTE**: some in the community have expressed [concerns][curlsh-bad] about the
+security of so-called "curl-sh" installations. We think the argument has been
+[pretty well debunked][curlsh-ok], but feel free to use the manual steps
+instead.
+
+[curlsh-bad]: https://0x46.net/thoughts/2019/04/27/piping-curl-to-shell/
+[curlsh-ok]: https://www.arp242.net/curl-to-sh.html
+
+### Manual
 
 Go to the [latest release][latest] and download the `.tar.gz` asset appropriate
 for your OS. Navigate to the directory containing the downloaded file and run:
 
 ```console
-tar xvf stackctl-*.tar.gz && cd stackctl
+tar xvf stackctl-*.tar.gz
+cd stackctl
 ```
 
-[latest]: https://github.com/freckle/stackctl/releases/latest
+User installation:
 
-#### Global installation
+```console
+make install PREFIX="$HOME/.local"
+```
 
-Install into `/usr/local/`, with appropriate permissions:
+Global installation
 
 ```console
 sudo make install
-```
-
-#### User installation
-
-Set `PREFIX` to base the installation in a directory of your choosing:
-
-```console
-make install PREFIX=$HOME/.local
 ```
 
 ## Usage
