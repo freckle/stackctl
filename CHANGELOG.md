@@ -1,4 +1,10 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.2...main)
+
+## [v1.1.0.2](https://github.com/freckle/stackctl/compare/v1.1.0.1...v1.1.0.2)
+
+- Log responses from `awsLambdaInvoke` when running actions
+- Clarify discovery logging
+- Add install script
 
 ## [v1.1.0.1](https://github.com/freckle/stackctl/compare/v1.1.0.0...v1.1.0.1)
 
