@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.2...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.3...main)
+
+## [v1.1.0.3](https://github.com/freckle/stackctl/compare/v1.1.0.2...v1.1.0.3)
+
+- Require Blammo-1.1.1.0
 
 ## [v1.1.0.2](https://github.com/freckle/stackctl/compare/v1.1.0.1...v1.1.0.2)
 
