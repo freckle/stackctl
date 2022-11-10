@@ -5,12 +5,12 @@
 
 packages:
 - completed:
-    hackage: Blammo-1.1.0.0@sha256:6195c1e290c78ba2c454966b95ba486583592392e46e09f4da806c5fb97c4919,3897
+    hackage: Blammo-1.1.1.0@sha256:60d5fce5abe561b27389da1df6a17fefef36e91e956790f10626b5cf1a19cde3,4008
     pantry-tree:
-      sha256: a37b1b5974dcb28ea3405dac0ccd14f206c414e989aa52dd72bd0a83c1e890fc
-      size: 1258
+      sha256: 9dabb8c19abb6d1c60c5ebbfbf8960cc45b4db609d0559c06a8cd94cb513272b
+      size: 1415
   original:
-    hackage: Blammo-1.1.0.0
+    hackage: Blammo-1.1.1.0
 - completed:
     hackage: cfn-flip-0.1.0.3@sha256:8737882d818d74b29d3b1791a4df4dc89995870312374989c47c29352ea503ec,5615
     pantry-tree:

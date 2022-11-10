@@ -1,7 +1,7 @@
 resolver: lts-19.31
 
 extra-deps:
-  - Blammo-1.1.0.0
+  - Blammo-1.1.1.0
   - cfn-flip-0.1.0.3
 
   # For Blammo
