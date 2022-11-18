@@ -54,10 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: freckle/stack-cache-action@v2
-
-      - run: |
-          stack install --copy-compiler-tool pandoc
-          make dist/stackctl.tar.gz
+      - uses: r-lib/actions/setup-pandoc@v2
+      - if: ${{ runner.os == 'macOS' }}
+        run: brew install coreutils # need GNU install
+      - run: make install.check PANDOC=pandoc
       - uses: actions/upload-release-asset@v1
         id: upload-release-asset
         env:
