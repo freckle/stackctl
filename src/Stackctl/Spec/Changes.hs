@@ -48,6 +48,9 @@ runChanges
   => ChangesOptions
   -> m ()
 runChanges ChangesOptions {..} = do
+  -- Clear file before starting, as we have to use append for each spec
+  liftIO $ T.writeFile scoOutput ""
+
   specs <- discoverSpecs
 
   for_ specs $ \spec -> do
@@ -60,9 +63,7 @@ runChanges ChangesOptions {..} = do
           exitFailure
         Right mChangeSet -> do
           colors <- getColorsStdout
-          let name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
-          liftIO $ T.writeFile scoOutput $ formatChangeSet
-            colors
-            name
-            scoFormat
-            mChangeSet
+          let
+            name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
+            formatted = formatChangeSet colors name scoFormat mChangeSet
+          liftIO $ T.appendFile scoOutput $ formatted <> "\n"
