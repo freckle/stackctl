@@ -37,6 +37,7 @@ dist/stackctl/doc/%: doc/%.md
 	$(PANDOC) --standalone $< --to man >$@
 
 dist/stackctl/Makefile: Makefile
+	mkdir -p dist/stackctl
 	cp $< $@
 
 .PHONY: clean
@@ -70,6 +71,11 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d/stackctl.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_stackctl
 	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl.1
+	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-cat.1
+	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-capture.1
+	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-changes.1
+	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-deploy.1
+	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-version.1
 
 .PHONY: install.check
 install.check: dist/stackctl.tar.gz

@@ -1,4 +1,9 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.0.5...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.1.0...main)
+
+## [v1.1.1.0](https://github.com/freckle/stackctl/compare/v1.1.0.5...v1.1.1.0)
+
+- Add `--parameter` to `changes` and `deploy`
+- Sort changes by causing-before-caused
 
 ## [v1.1.0.5](https://github.com/freckle/stackctl/compare/v1.1.0.4...v1.1.0.5)
 
