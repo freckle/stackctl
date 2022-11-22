@@ -19,6 +19,7 @@ import Stackctl.Prelude
 import qualified CfnFlip
 import Data.Aeson
 import Data.Graph (graphFromEdges, topSort)
+import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
 import Stackctl.AWS
 import Stackctl.Action
@@ -99,10 +100,6 @@ readStackSpec dir specPath = do
     throwString $ path <> " is invalid: " <> Yaml.prettyPrintParseException e
 
 -- | Create a Change Set between a Stack Specification and deployed state
---
--- We use @aws cloudformation deploy --no-execute-changeset@ because it handles
--- the create-or-update logic for us.
---
 createChangeSet
   :: ( MonadUnliftIO m
      , MonadResource m
@@ -111,11 +108,13 @@ createChangeSet
      , HasAwsEnv env
      )
   => StackSpec
+  -> [Parameter]
   -> m (Either Text (Maybe ChangeSet))
-createChangeSet spec = awsCloudFormationCreateChangeSet
+createChangeSet spec parameters = awsCloudFormationCreateChangeSet
   (stackSpecStackName spec)
   (stackSpecTemplateFile spec)
-  (stackSpecParameters spec)
+  (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
+  )
   (stackSpecCapabilities spec)
   (stackSpecTags spec)
 

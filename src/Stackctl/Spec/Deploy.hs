@@ -17,6 +17,7 @@ import Stackctl.Action
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
+import Stackctl.ParameterOption
 import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
@@ -25,7 +26,8 @@ import System.Log.FastLogger (toLogStr)
 import UnliftIO.Directory (createDirectoryIfMissing)
 
 data DeployOptions = DeployOptions
-  { sdoSaveChangeSets :: Maybe FilePath
+  { sdoParameters :: [Parameter]
+  , sdoSaveChangeSets :: Maybe FilePath
   , sdoDeployConfirmation :: DeployConfirmation
   , sdoClean :: Bool
   }
@@ -34,7 +36,8 @@ data DeployOptions = DeployOptions
 
 runDeployOptions :: Parser DeployOptions
 runDeployOptions = DeployOptions
-  <$> optional (strOption
+  <$> many parameterOption
+  <*> optional (strOption
     (  long "save-change-sets"
     <> metavar "DIRECTORY"
     <> help "Save executed changesets to DIRECTORY"
@@ -71,7 +74,7 @@ runDeploy DeployOptions {..} = do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
       handleRollbackComplete sdoDeployConfirmation $ stackSpecStackName spec
 
-      emChangeSet <- createChangeSet spec
+      emChangeSet <- createChangeSet spec sdoParameters
 
       case emChangeSet of
         Left err -> do

@@ -17,6 +17,12 @@ creates a Change Set and executes it after confirmation.
 
 # OPTIONS
 
+**\-p**, **\--parameter** *\<KEY=[VALUE]\>*\
+
+> Override the given Parameter for this operation. Omitting *VALUE* will result
+> in overriding the Parameter as an empty string. May be specified 0 or more
+> times.
+
 **\--save-change-sets** *\<PATH\>*\
 
 > Save generated Change Sets to **PATH/STACK.json**

@@ -22,6 +22,12 @@ successful operation.
 
 > Output changes in **FORMAT**. See dedicated section.
 
+**\-p**, **\--parameter** *\<KEY=[VALUE]\>*\
+
+> Override the given Parameter for this operation. Omitting *VALUE* will result
+> in overriding the Parameter as an empty string. May be specified 0 or more
+> times.
+
 **PATH**\
 
 > Where to write the changes summary.

@@ -41,6 +41,7 @@ library
       Stackctl.DirectoryOption
       Stackctl.FilterOption
       Stackctl.Options
+      Stackctl.ParameterOption
       Stackctl.Prelude
       Stackctl.Prompt
       Stackctl.Spec.Capture
