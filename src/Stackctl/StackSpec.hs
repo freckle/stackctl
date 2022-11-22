@@ -18,11 +18,11 @@ import Stackctl.Prelude
 
 import qualified CfnFlip
 import Data.Aeson
-import Data.Graph (graphFromEdges, topSort)
 import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
 import Stackctl.AWS
 import Stackctl.Action
+import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
 import UnliftIO.Directory (createDirectoryIfMissing)
@@ -119,12 +119,4 @@ createChangeSet spec parameters = awsCloudFormationCreateChangeSet
   (stackSpecTags spec)
 
 sortStackSpecs :: [StackSpec] -> [StackSpec]
-sortStackSpecs specs = map nodeFromVertex $ reverse $ topSort graph
- where
-  (graph, tripleFromVertex, _) = graphFromEdges $ map tripleFromNode specs
-
-  nodeFromVertex = nodeFromTriple . tripleFromVertex
-
-  tripleFromNode n = (n, stackSpecStackName n, stackSpecDepends n)
-
-  nodeFromTriple (n, _, _) = n
+sortStackSpecs = sortByDependencies stackSpecStackName stackSpecDepends

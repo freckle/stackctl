@@ -44,6 +44,7 @@ library
       Stackctl.ParameterOption
       Stackctl.Prelude
       Stackctl.Prompt
+      Stackctl.Sort
       Stackctl.Spec.Capture
       Stackctl.Spec.Cat
       Stackctl.Spec.Changes
