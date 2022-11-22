@@ -404,7 +404,7 @@ changeCausedBy c = fromMaybe [] $ do
 
 detailCausingLogicalResourceId :: ResourceChangeDetail -> Maybe Text
 detailCausingLogicalResourceId ResourceChangeDetail' {..} =
-      T.takeWhile (/= '.') <$> causingEntity
+  T.takeWhile (/= '.') <$> causingEntity
 
 awsCloudFormationExecuteChangeSet
   :: (MonadResource m, MonadReader env m, HasAwsEnv env) => ChangeSetId -> m ()
