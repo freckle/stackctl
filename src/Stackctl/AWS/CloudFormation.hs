@@ -94,6 +94,7 @@ import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
 import Stackctl.AWS.Core
+import Stackctl.Sort
 import UnliftIO.Exception.Lens (handling_, trying)
 
 newtype StackId = StackId
@@ -375,7 +376,7 @@ awsCloudFormationDescribeChangeSet changeSetId = do
   awsSimple "DescribeChangeSet" req $ \resp ->
     ChangeSet
       <$> (resp ^. describeChangeSetResponse_creationTime)
-      <*> pure (resp ^. describeChangeSetResponse_changes)
+      <*> pure (fmap sortChanges $ resp ^. describeChangeSetResponse_changes)
       <*> (ChangeSetName <$> resp ^. describeChangeSetResponse_changeSetName)
       <*> (resp ^. describeChangeSetResponse_executionStatus)
       <*> (ChangeSetId <$> resp ^. describeChangeSetResponse_changeSetId)
@@ -387,6 +388,23 @@ awsCloudFormationDescribeChangeSet changeSetId = do
       <*> pure (resp ^. describeChangeSetResponse_status)
       <*> pure (resp ^. describeChangeSetResponse_statusReason)
       <*> pure resp
+
+sortChanges :: [Change] -> [Change]
+sortChanges = sortByDependencies changeName changeCausedBy
+
+changeName :: Change -> Text
+changeName c = fromMaybe "" $ do
+  ResourceChange' {..} <- resourceChange c
+  logicalResourceId
+
+changeCausedBy :: Change -> [Text]
+changeCausedBy c = fromMaybe [] $ do
+  ResourceChange' {..} <- resourceChange c
+  mapMaybe detailCausingLogicalResourceId <$> details
+
+detailCausingLogicalResourceId :: ResourceChangeDetail -> Maybe Text
+detailCausingLogicalResourceId ResourceChangeDetail' {..} =
+      T.takeWhile (/= '.') <$> causingEntity
 
 awsCloudFormationExecuteChangeSet
   :: (MonadResource m, MonadReader env m, HasAwsEnv env) => ChangeSetId -> m ()
