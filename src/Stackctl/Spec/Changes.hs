@@ -13,6 +13,7 @@ import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
+import Stackctl.ParameterOption
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
@@ -20,6 +21,7 @@ import Stackctl.StackSpecPath
 
 data ChangesOptions = ChangesOptions
   { scoFormat :: Format
+  , scoParameters :: [Parameter]
   , scoOutput :: FilePath
   }
 
@@ -28,6 +30,7 @@ data ChangesOptions = ChangesOptions
 runChangesOptions :: Parser ChangesOptions
 runChangesOptions = ChangesOptions
   <$> formatOption
+  <*> many parameterOption
   <*> argument str
     (  metavar "PATH"
     <> help "Where to write the changes summary"
@@ -56,7 +59,7 @@ runChanges ChangesOptions {..} = do
 
   for_ specs $ \spec -> do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
-      emChangeSet <- createChangeSet spec
+      emChangeSet <- createChangeSet spec scoParameters
 
       case emChangeSet of
         Left err -> do
