@@ -48,12 +48,8 @@ jobs:
   #     - run: cram -v integration/tests
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      # Fix for "error while loading shared libraries: libtinfo.so.5: cannot
-      # open shared object file: No such file or directory"
-      - run: sudo apt-get install -y libncurses5
-
       - uses: actions/checkout@v3
       - uses: haskell/actions/hlint-setup@v2
       - uses: haskell/actions/hlint-run@v2
