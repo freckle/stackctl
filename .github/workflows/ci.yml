@@ -48,7 +48,7 @@ jobs:
   #     - run: cram -v integration/tests
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: haskell/actions/hlint-setup@v2

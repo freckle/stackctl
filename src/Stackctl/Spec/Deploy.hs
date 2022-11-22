@@ -11,7 +11,7 @@ import Blammo.Logging.Logger (pushLogStrLn)
 import qualified Data.Text as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
-import Stackctl.AWS
+import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
 import Stackctl.Action
 import Stackctl.Colors
@@ -38,6 +38,7 @@ runDeployOptions = DeployOptions
     (  long "save-change-sets"
     <> metavar "DIRECTORY"
     <> help "Save executed changesets to DIRECTORY"
+    <> action "directory"
     ))
   <*> flag DeployWithConfirmation DeployWithoutConfirmation
     (  long "no-confirm"
