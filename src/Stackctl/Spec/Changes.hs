@@ -8,7 +8,7 @@ import Stackctl.Prelude
 
 import qualified Data.Text.IO as T
 import Options.Applicative
-import Stackctl.AWS
+import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
@@ -31,6 +31,7 @@ runChangesOptions = ChangesOptions
   <*> argument str
     (  metavar "PATH"
     <> help "Where to write the changes summary"
+    <> action "file"
     )
 
 runChanges

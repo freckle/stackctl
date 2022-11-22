@@ -21,4 +21,5 @@ directoryOption = option str $ mconcat
   , help "Operate on specifications in PATH"
   , value "."
   , showDefault
+  , action "directory"
   ]
