@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.1.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.1.1...main)
+
+## [v1.1.1.1](https://github.com/freckle/stackctl/compare/v1.1.1.0...v1.1.1.1)
+
+- Trigger release
 
 ## [v1.1.1.0](https://github.com/freckle/stackctl/compare/v1.1.0.5...v1.1.1.0)
 
