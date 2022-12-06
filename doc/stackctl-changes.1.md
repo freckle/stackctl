@@ -32,9 +32,16 @@ successful operation.
 
 > Where to write the changes summary.
 >
-> This is a required option to make the interaction with logging explicit. You
-> can pass */dev/stdout* if you want the changes written alongside any logging
-> and don't mind interleaving or ordering problems that may occur.
+> This is a required option to make the interaction with logging explicit. In
+> addition to a filepath, this option recognizes three special values:
+>
+> - **-**: send the changes to *stdout*. This can be useful if you want to pipe
+>   the output somewhere and are either OK with interleaved logging output, or
+>   have worked around it somehow (such as configuring logging to *stderr*)
+> - **@log**, **@logger**: send the changes in the stream alongside other
+>   logging. This is useful if you just want to view the changes and not capture
+>   or process them. Using **@log** instead of **-** will keep things correctly
+>   ordered and prevent interleaving.
 
 # AVAILABLE FORMATS
 
