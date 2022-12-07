@@ -46,7 +46,8 @@ capture = Subcommand
   }
 
 changes
-  :: ( HasAwsScope env
+  :: ( HasLogger env
+     , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
