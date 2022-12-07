@@ -13,6 +13,7 @@ import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
+import Stackctl.Logger
 import Stackctl.ParameterOption
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
@@ -22,7 +23,7 @@ import Stackctl.StackSpecPath
 data ChangesOptions = ChangesOptions
   { scoFormat :: Format
   , scoParameters :: [Parameter]
-  , scoOutput :: FilePath
+  , scoOutput :: Maybe FilePath
   }
 
 -- brittany-disable-next-binding
@@ -31,11 +32,11 @@ runChangesOptions :: Parser ChangesOptions
 runChangesOptions = ChangesOptions
   <$> formatOption
   <*> many parameterOption
-  <*> argument str
+  <*> optional (argument str
     (  metavar "PATH"
-    <> help "Where to write the changes summary"
+    <> help "Write changes summary to PATH"
     <> action "file"
-    )
+    ))
 
 runChanges
   :: ( MonadMask m
@@ -43,6 +44,7 @@ runChanges
      , MonadResource m
      , MonadLogger m
      , MonadReader env m
+     , HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
      , HasDirectoryOption env
@@ -53,7 +55,7 @@ runChanges
   -> m ()
 runChanges ChangesOptions {..} = do
   -- Clear file before starting, as we have to use append for each spec
-  liftIO $ T.writeFile scoOutput ""
+  liftIO $ traverse_ (`T.writeFile` "") scoOutput
 
   specs <- discoverSpecs
 
@@ -70,4 +72,7 @@ runChanges ChangesOptions {..} = do
           let
             name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
             formatted = formatChangeSet colors name scoFormat mChangeSet
-          liftIO $ T.appendFile scoOutput $ formatted <> "\n"
+
+          case scoOutput of
+            Nothing -> pushLogger formatted
+            Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
