@@ -8,6 +8,8 @@ module Stackctl.StackSpec
   , stackSpecCapabilities
   , stackSpecTags
   , buildStackSpec
+  , TemplateBody
+  , templateBodyFromValue
   , writeStackSpec
   , readStackSpec
   , createChangeSet
@@ -18,6 +20,7 @@ import Stackctl.Prelude
 
 import qualified CfnFlip
 import Data.Aeson
+import qualified Data.ByteString.Lazy as BSL
 import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
 import Stackctl.AWS
@@ -25,6 +28,7 @@ import Stackctl.Action
 import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
+import System.FilePath (takeExtension)
 import UnliftIO.Directory (createDirectoryIfMissing)
 
 data StackSpec = StackSpec
@@ -65,20 +69,47 @@ stackSpecTags = maybe [] (map unTagYaml) . ssyTags . ssSpecBody
 buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
 buildStackSpec = StackSpec
 
+data TemplateBody
+  = TemplateText Text
+  | TemplateJson Value
+
+newtype UnexpectedTemplateJson = UnexpectedTemplateJson
+  { _unexpectedTemplateJsonExtension :: String
+  }
+  deriving stock Show
+
+instance Exception UnexpectedTemplateJson where
+  displayException (UnexpectedTemplateJson ext) =
+    "TemplateJson must be written to .yaml or .json, encountered "
+      <> ext
+      <> ". To write to an arbitrary path, use TemplateText."
+
+templateBodyFromValue :: Value -> TemplateBody
+templateBodyFromValue = \case
+  String x -> TemplateText x
+  v -> TemplateJson v
+
+writeTemplateBody :: MonadUnliftIO m => FilePath -> TemplateBody -> m ()
+writeTemplateBody path body = do
+  createDirectoryIfMissing True dir
+
+  case (body, ext) of
+    (TemplateText t, _) -> writeFileUtf8 path t
+    (TemplateJson v, ".yaml") -> CfnFlip.jsonToYamlFile path v
+    (TemplateJson v, ".json") -> writeFileBinary path $ BSL.toStrict $ encode v
+    (TemplateJson _, _) -> throwIO $ UnexpectedTemplateJson ext
+ where
+  dir = takeDirectory path
+  ext = takeExtension path
+
 writeStackSpec
   :: MonadUnliftIO m
   => FilePath -- ^ Parent directory
   -> StackSpec
-  -> Value -- ^ Template body
+  -> TemplateBody
   -> m ()
 writeStackSpec parent stackSpec@StackSpec {..} templateBody = do
-  createDirectoryIfMissing True $ takeDirectory templatePath
-
-  case templateBody of
-    -- Already Yaml
-    String x -> writeFileUtf8 templatePath x
-    _ -> CfnFlip.jsonToYamlFile templatePath templateBody
-
+  writeTemplateBody templatePath templateBody
   createDirectoryIfMissing True $ takeDirectory specPath
   liftIO $ Yaml.encodeFile specPath ssSpecBody
  where
