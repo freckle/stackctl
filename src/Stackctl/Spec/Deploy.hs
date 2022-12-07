@@ -7,7 +7,6 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude
 
-import Blammo.Logging.Logger (pushLogStrLn)
 import qualified Data.Text as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
@@ -17,12 +16,12 @@ import Stackctl.Action
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
+import Stackctl.Logger
 import Stackctl.ParameterOption
 import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
-import System.Log.FastLogger (toLogStr)
 import UnliftIO.Directory (createDirectoryIfMissing)
 
 data DeployOptions = DeployOptions
@@ -229,8 +228,3 @@ formatStackEvent Colors {..} e = do
 
 getLastEventId :: [StackEvent] -> Maybe Text
 getLastEventId = fmap (^. stackEvent_eventId) . listToMaybe
-
-pushLogger :: (MonadIO m, MonadReader env m, HasLogger env) => Text -> m ()
-pushLogger msg = do
-  logger <- view loggerL
-  pushLogStrLn logger $ toLogStr msg
