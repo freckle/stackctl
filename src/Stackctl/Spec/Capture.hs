@@ -11,12 +11,14 @@ import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.Spec.Generate
+import Stackctl.StackSpec
 
 data CaptureOptions = CaptureOptions
   { scoAccountName :: Maybe Text
   , scoTemplatePath :: Maybe FilePath
   , scoStackPath :: Maybe FilePath
   , scoDepends :: Maybe [StackName]
+  , scoTemplateFormat :: TemplateFormat
   , scoStackName :: StackName
   }
 
@@ -47,6 +49,10 @@ runCaptureOptions = CaptureOptions
       <> metavar "STACK"
       <> help "Add a dependency on STACK"
       )))
+    <*> flag TemplateFormatYaml TemplateFormatJson
+      (  long "no-flip"
+      <> help "Don't flip JSON templates to Yaml"
+      )
     <*> (StackName <$> argument str
       (  metavar "STACK"
       <> help "Name of deployed Stack to capture"
@@ -76,6 +82,7 @@ runCapture CaptureOptions {..} = do
   void $ local (awsScopeL %~ setScopeName) $ generate Generate
     { gOutputDirectory = dir
     , gTemplatePath = scoTemplatePath
+    , gTemplateFormat = scoTemplateFormat
     , gStackPath = scoStackPath
     , gStackName = scoStackName
     , gDepends = scoDepends
@@ -83,5 +90,5 @@ runCapture CaptureOptions {..} = do
     , gParameters = parameters stack
     , gCapabilities = capabilities stack
     , gTags = tags stack
-    , gTemplate = template
+    , gTemplateBody = templateBodyFromValue template
     }

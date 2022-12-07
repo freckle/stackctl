@@ -33,6 +33,11 @@ If files already exist at the inferred locations, they will be overwritten.
 
 > Relative path for specification. Default is **${STACK}.yaml**.
 
+**\--no-flip**\
+
+> Don't flip JSON templates to Yaml. This option is ignored if the template is
+> not JSON.
+
 **STACK**\
 
 > Name of Stack to capture.
