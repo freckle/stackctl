@@ -40,6 +40,7 @@ library
       Stackctl.Commands
       Stackctl.DirectoryOption
       Stackctl.FilterOption
+      Stackctl.Logger
       Stackctl.Options
       Stackctl.ParameterOption
       Stackctl.Prelude
