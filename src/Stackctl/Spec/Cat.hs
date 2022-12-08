@@ -6,6 +6,7 @@ module Stackctl.Spec.Cat
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (flushLogger)
 import Data.Aeson
 import Data.Aeson.Lens
 import qualified Data.HashMap.Strict as HashMap
@@ -20,7 +21,6 @@ import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption)
-import Stackctl.Logger
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath

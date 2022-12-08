@@ -7,6 +7,7 @@ module Stackctl.Spec.Deploy
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (pushLoggerLn)
 import qualified Data.Text as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
@@ -16,7 +17,6 @@ import Stackctl.Action
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
-import Stackctl.Logger
 import Stackctl.ParameterOption
 import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
@@ -62,7 +62,6 @@ runDeploy
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
-     , HasColorOption env
      )
   => DeployOptions
   -> m ()
@@ -136,15 +135,14 @@ deployChangeSet
      , MonadReader env m
      , HasLogger env
      , HasAwsEnv env
-     , HasColorOption env
      )
   => DeployConfirmation
   -> ChangeSet
   -> m ()
 deployChangeSet confirmation changeSet = do
-  colors <- getColorsStdout
+  colors <- getColorsLogger
 
-  pushLogger $ formatTTY colors (unStackName stackName) $ Just changeSet
+  pushLoggerLn $ formatTTY colors (unStackName stackName) $ Just changeSet
 
   case confirmation of
     DeployWithConfirmation -> promptContinue
@@ -183,15 +181,14 @@ tailStackEventsSince
      , MonadReader env m
      , HasLogger env
      , HasAwsEnv env
-     , HasColorOption env
      )
   => StackName
   -> Maybe Text -- ^ StackEventId
   -> m a
 tailStackEventsSince stackName mLastId = do
-  colors <- getColorsStdout
+  colors <- getColorsLogger
   events <- awsCloudFormationDescribeStackEvents stackName mLastId
-  traverse_ (pushLogger <=< formatStackEvent colors) $ reverse events
+  traverse_ (pushLoggerLn <=< formatStackEvent colors) $ reverse events
 
   -- Without this small delay before looping, our requests seem to hang
   -- intermittently (without errors) and often we miss events.

@@ -6,6 +6,7 @@ module Stackctl.Spec.Changes
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (pushLoggerLn)
 import qualified Data.Text.IO as T
 import Options.Applicative
 import Stackctl.AWS hiding (action)
@@ -13,7 +14,6 @@ import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
-import Stackctl.Logger
 import Stackctl.ParameterOption
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
@@ -49,7 +49,6 @@ runChanges
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
-     , HasColorOption env
      )
   => ChangesOptions
   -> m ()
@@ -68,11 +67,12 @@ runChanges ChangesOptions {..} = do
           logError $ "Error creating ChangeSet" :# ["error" .= err]
           exitFailure
         Right mChangeSet -> do
-          colors <- getColorsStdout
+          colors <- getColorsLogger -- TODO or PATH
+
           let
             name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
             formatted = formatChangeSet colors name scoFormat mChangeSet
 
           case scoOutput of
-            Nothing -> pushLogger formatted
+            Nothing -> pushLoggerLn formatted
             Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
