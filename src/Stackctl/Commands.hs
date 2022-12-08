@@ -10,7 +10,7 @@ import Stackctl.Prelude
 
 import Stackctl.AWS
 import Stackctl.AWS.Scope
-import Stackctl.ColorOption
+import Stackctl.Colors
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Spec.Capture
@@ -51,7 +51,6 @@ changes
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
-     , HasColorOption env
      )
   => Subcommand ChangesOptions env
 changes = Subcommand
@@ -67,7 +66,6 @@ deploy
      , HasAwsEnv env
      , HasDirectoryOption env
      , HasFilterOption env
-     , HasColorOption env
      )
   => Subcommand DeployOptions env
 deploy = Subcommand

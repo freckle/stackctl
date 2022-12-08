@@ -5,9 +5,9 @@ module Stackctl.Prompt
 
 import Stackctl.Prelude
 
+import Blammo.Logging.Logger (flushLogger)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Stackctl.Logger
 
 prompt
   :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogger env)

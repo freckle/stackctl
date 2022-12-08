@@ -40,7 +40,6 @@ library
       Stackctl.Commands
       Stackctl.DirectoryOption
       Stackctl.FilterOption
-      Stackctl.Logger
       Stackctl.Options
       Stackctl.ParameterOption
       Stackctl.Prelude
@@ -92,7 +91,7 @@ library
       TypeFamilies
   ghc-options: -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
-      Blammo >=1.1.1.0
+      Blammo >=1.1.1.1
     , Glob
     , aeson
     , aeson-casing
@@ -111,7 +110,6 @@ library
     , errors
     , exceptions
     , extra
-    , fast-logger
     , filepath
     , lens
     , lens-aeson
