@@ -67,7 +67,9 @@ runChanges ChangesOptions {..} = do
           logError $ "Error creating ChangeSet" :# ["error" .= err]
           exitFailure
         Right mChangeSet -> do
-          colors <- getColorsLogger -- TODO or PATH
+          colors <- case scoOutput of
+            Nothing -> getColorsLogger
+            Just{} -> pure noColors
 
           let
             name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
