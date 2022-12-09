@@ -75,7 +75,11 @@ runAppT
   -> AppT (App options) m a
   -> m a
 runAppT options f = do
-  envLogSettings <- liftIO LoggingEnv.parse
+  envLogSettings <-
+    liftIO
+    . LoggingEnv.parseWith
+    . setLogSettingsConcurrency (Just 1)
+    $ defaultLogSettings
 
   logger <- newLogger $ adjustLogSettings
     (options ^. colorOptionL)
