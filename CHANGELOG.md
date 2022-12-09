@@ -1,4 +1,11 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.1.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.2.0...main)
+
+## [v1.1.2.0](https://github.com/freckle/stackctl/compare/v1.1.1.1...v1.1.2.0)
+
+- Fix incorrect ordering of log-messages by setting `LOG_CONCURRENCY=1`
+- Fix potential coloring of changes being redirected to a file
+- Make `PATH` optional (again) in `stackctl changes`
+- Add `--no-flip` to `stackctl capture`
 
 ## [v1.1.1.1](https://github.com/freckle/stackctl/compare/v1.1.1.0...v1.1.1.1)
 
