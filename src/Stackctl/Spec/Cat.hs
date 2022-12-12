@@ -8,6 +8,7 @@ import Stackctl.Prelude
 
 import Blammo.Logging.Logger (flushLogger)
 import Data.Aeson
+import qualified Data.Aeson.Key as Key
 import Data.Aeson.Lens
 import qualified Data.HashMap.Strict as HashMap
 import Data.List (sort, sortOn)
@@ -170,7 +171,7 @@ prettyPrintTemplate Colors {..} val = concat
   displayPropertyWith
     :: (FromJSON a, ToJSON a) => (a -> [Text]) -> Text -> [Text]
   displayPropertyWith f k = cyan k <> ": " : fromMaybe [] displayValue
-    where displayValue = val ^? key k . _JSON . to f
+    where displayValue = val ^? key (Key.fromText k) . _JSON . to f
 
 putBoxed :: MonadIO m => Int -> [Text] -> m ()
 putBoxed n xs = do

@@ -1,5 +1,5 @@
 name: stackctl
-version: 1.1.2.0
+version: 1.1.2.1
 github: freckle/stackctl
 license: MIT
 author: Freckle Engineering
@@ -20,6 +20,7 @@ ghc-options:
   - -Weverything
   - -Wno-all-missed-specialisations
   - -Wno-missing-import-lists
+  - -Wno-missing-kind-signatures
   - -Wno-missing-local-signatures
   - -Wno-missing-safe-haskell-mode
   - -Wno-prepositive-qualified-module
