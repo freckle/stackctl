@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.2.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.2.1...main)
+
+## [v1.1.2.1](https://github.com/freckle/stackctl/compare/v1.1.2.0...v1.1.2.1)
+
+- Build with LTS-20.4 / GHC 9.2
 
 ## [v1.1.2.0](https://github.com/freckle/stackctl/compare/v1.1.1.1...v1.1.2.0)
 
