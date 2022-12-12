@@ -1,12 +1,8 @@
-resolver: lts-19.31
+resolver: lts-20.4
 
 extra-deps:
   - Blammo-1.1.1.1
   - cfn-flip-0.1.0.3
-
-  # For Blammo
-  - monad-logger-aeson-0.4.0.2
-  - context-0.2.0.1
 
   - github: brendanhay/amazonka
     commit: f73a957d05f64863e867cf39d0db260718f0fadd # main, as of SSO support
