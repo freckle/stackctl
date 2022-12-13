@@ -52,6 +52,7 @@ library
       Stackctl.Spec.Deploy
       Stackctl.Spec.Discover
       Stackctl.Spec.Generate
+      Stackctl.StackDescription
       Stackctl.StackSpec
       Stackctl.StackSpecPath
       Stackctl.StackSpecYaml
@@ -170,6 +171,7 @@ test-suite spec
   other-modules:
       Stackctl.AWS.CloudFormationSpec
       Stackctl.FilterOptionSpec
+      Stackctl.StackDescriptionSpec
       Stackctl.StackSpecSpec
       Stackctl.StackSpecYamlSpec
       Paths_stackctl

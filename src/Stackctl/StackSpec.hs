@@ -3,6 +3,7 @@ module Stackctl.StackSpec
   , stackSpecSpecPath
   , stackSpecSpecBody
   , stackSpecStackName
+  , stackSpecStackDescription
   , stackSpecActions
   , stackSpecParameters
   , stackSpecCapabilities
@@ -23,8 +24,8 @@ import Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
 import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
-import Stackctl.AWS
 import Stackctl.Action
+import Stackctl.AWS
 import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
@@ -45,6 +46,9 @@ stackSpecSpecBody = ssSpecBody
 
 stackSpecStackName :: StackSpec -> StackName
 stackSpecStackName = stackSpecPathStackName . ssSpecPath
+
+stackSpecStackDescription :: StackSpec -> Maybe StackDescription
+stackSpecStackDescription = ssyDescription . ssSpecBody
 
 stackSpecDepends :: StackSpec -> [StackName]
 stackSpecDepends = fromMaybe [] . ssyDepends . ssSpecBody
@@ -143,6 +147,7 @@ createChangeSet
   -> m (Either Text (Maybe ChangeSet))
 createChangeSet spec parameters = awsCloudFormationCreateChangeSet
   (stackSpecStackName spec)
+  (stackSpecStackDescription spec)
   (stackSpecTemplateFile spec)
   (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
   )

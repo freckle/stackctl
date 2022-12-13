@@ -6,9 +6,9 @@ module Stackctl.Spec.Generate
 
 import Stackctl.Prelude
 
+import Stackctl.Action
 import Stackctl.AWS
 import Stackctl.AWS.Scope
-import Stackctl.Action
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -23,6 +23,7 @@ data Generate = Generate
   , gStackPath :: Maybe FilePath
   -- ^ If not given, will use @{stack-name}.yaml@
   , gStackName :: StackName
+  , gDescription :: Maybe StackDescription
   , gDepends :: Maybe [StackName]
   , gActions :: Maybe [Action]
   , gParameters :: Maybe [Parameter]
@@ -59,7 +60,8 @@ generate Generate {..} = do
   let
     templatePath = fromMaybe defaultTemplatePath gTemplatePath
     specYaml = StackSpecYaml
-      { ssyTemplate = templatePath
+      { ssyDescription = gDescription
+      , ssyTemplate = templatePath
       , ssyDepends = gDepends
       , ssyActions = gActions
       , ssyParameters = map ParameterYaml <$> gParameters
