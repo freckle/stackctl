@@ -29,8 +29,8 @@ import Stackctl.Prelude
 import Data.Aeson
 import Data.Aeson.Casing
 import qualified Data.Text as T
-import Stackctl.Action
 import Stackctl.AWS
+import Stackctl.Action
 
 data StackSpecYaml = StackSpecYaml
   { ssyDescription :: Maybe StackDescription

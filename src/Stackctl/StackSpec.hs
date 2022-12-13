@@ -24,8 +24,8 @@ import Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
 import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
-import Stackctl.Action
 import Stackctl.AWS
+import Stackctl.Action
 import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml

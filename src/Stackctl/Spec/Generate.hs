@@ -6,9 +6,9 @@ module Stackctl.Spec.Generate
 
 import Stackctl.Prelude
 
-import Stackctl.Action
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Action
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
