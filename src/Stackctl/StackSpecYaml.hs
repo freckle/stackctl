@@ -29,11 +29,12 @@ import Stackctl.Prelude
 import Data.Aeson
 import Data.Aeson.Casing
 import qualified Data.Text as T
-import Stackctl.AWS
 import Stackctl.Action
+import Stackctl.AWS
 
 data StackSpecYaml = StackSpecYaml
-  { ssyTemplate :: FilePath
+  { ssyDescription :: Maybe StackDescription
+  , ssyTemplate :: FilePath
   , ssyDepends :: Maybe [StackName]
   , ssyActions :: Maybe [Action]
   , ssyParameters :: Maybe [ParameterYaml]

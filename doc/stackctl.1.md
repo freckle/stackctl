@@ -92,6 +92,8 @@ Its constituent parts are used as follows:
 These files' contents should be:
 
 ```
+Description: <string>
+
 Template: <path>
 
 Depends:
@@ -115,6 +117,14 @@ Tags:
 ```
 
 And these constituent parts are used as follows:
+
+*{.Description}*\
+
+> Optional. Set the Stack's description.
+>
+> This value will be inserted as the *Description* key in the template body on
+> deployment, which becomes the deployed Stack's description. If the template
+> already contains a description, the specification value will be ignored.
 
 *{.Template}*\
 

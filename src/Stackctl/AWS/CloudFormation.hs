@@ -1,10 +1,10 @@
 module Stackctl.AWS.CloudFormation
-  (
-  -- * Stacks
-    Stack(..)
+  ( Stack(..)
+  , stackDescription
   , stackIsRollbackComplete
   , StackId(..)
   , StackName(..)
+  , StackDescription(..)
   , StackEvent(..)
   , ResourceStatus(..)
   , stackEvent_eventId
@@ -95,7 +95,11 @@ import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
 import Stackctl.AWS.Core
 import Stackctl.Sort
+import Stackctl.StackDescription
 import UnliftIO.Exception.Lens (handling_, trying)
+
+stackDescription :: Stack -> Maybe StackDescription
+stackDescription = fmap StackDescription . (^. stack_description)
 
 newtype StackId = StackId
   { unStackId :: Text
@@ -328,17 +332,19 @@ awsCloudFormationCreateChangeSet
      , HasAwsEnv env
      )
   => StackName
+  -> Maybe StackDescription
   -> StackTemplate
   -> [Parameter]
   -> [Capability]
   -> [Tag]
   -> m (Either Text (Maybe ChangeSet))
-awsCloudFormationCreateChangeSet stackName stackTemplate parameters capabilities tags
+awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate parameters capabilities tags
   = fmap (first formatServiceError)
     $ trying (_ServiceError . hasStatus 400)
     $ do
         name <- newChangeSetName
-        templateBody <- readFileUtf8 $ unStackTemplate stackTemplate
+        templateBody <- addStackDescription mStackDescription
+          <$> readFileUtf8 (unStackTemplate stackTemplate)
 
         mStack <- awsCloudFormationDescribeStackMaybe stackName
         let

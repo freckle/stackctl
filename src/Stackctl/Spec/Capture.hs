@@ -85,6 +85,7 @@ runCapture CaptureOptions {..} = do
     , gTemplateFormat = scoTemplateFormat
     , gStackPath = scoStackPath
     , gStackName = scoStackName
+    , gDescription = stackDescription stack
     , gDepends = scoDepends
     , gActions = Nothing
     , gParameters = parameters stack
