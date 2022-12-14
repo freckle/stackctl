@@ -104,16 +104,12 @@ Actions:
     run:
       <action>: <argument...>
 
-Parameters:
-  - ParameterKey: <string>
-    ParameterValue: <string>
+Parameters: Object<string, string|number>
 
 Capabilities:
   - <capability>
 
-Tags:
-  - Key: <string>
-    Value: <string>
+Tags: Object<string, string>
 ```
 
 And these constituent parts are used as follows:
@@ -157,6 +153,29 @@ And these constituent parts are used as follows:
 *{.Parameters}*\
 
 > Optional. Parameters to use when deploying the Stack.
+>
+> The *Parameters* key can be specified in any of 3 forms:
+>
+> ```
+> # Natural (recommended)
+> Parameters:
+>   Foo: Bar
+>   Baz: Bat
+>
+> # CloudFormation (used when Stacks are generated or captured)
+> Parameters:
+>   - ParameterKey: Foo
+>     ParameterValue: Bar
+>   - ParameterKey: Baz
+>     ParameterValue: Bat
+>
+> # CloudGenesis
+> Parameters:
+>   - Key: Foo
+>     Value: Bar
+>   - Key: Baz
+>     Value: Bat
+> ```
 
 *{.Capabilities}*\
 
@@ -165,6 +184,22 @@ And these constituent parts are used as follows:
 *{.Tags}*\
 
 > Optional. Tags to use when deploying the Stack.
+>
+> The *Tags* key can be specified in either of 2 forms:
+>
+> ```
+> # Natural (recommended)
+> Tags:
+>   Foo: Bar
+>   Baz: Bat
+>
+> # CloudFormation / CloudGenesis (used when Stacks are generated or captured)
+> Parameters:
+>   - Key: Foo
+>     Value: Bar
+>   - Key: Baz
+>     Value: Bat
+> ```
 
 ## Example
 
