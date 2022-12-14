@@ -122,35 +122,44 @@ groupTo f = map (f . NE.head &&& NE.toList) . NE.groupAllWith f
 prettyPrintStackSpecYaml :: Colors -> StackName -> StackSpecYaml -> [Text]
 prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
   [ [cyan "Name" <> ": " <> green (unStackName name)]
+  , maybe [] ppDescription ssyDescription
   , [cyan "Template" <> ": " <> green (pack ssyTemplate)]
-  , ppList
-    "Parameters"
-    (ppParameters . map unParameterYaml . unParametersYaml)
-    ssyParameters
+  , ppObject "Parameters" parametersYamlKVs ssyParameters
   , ppList "Capabilities" ppCapabilities ssyCapabilities
-  , ppList "Tags" (ppTags . map unTagYaml . unTagsYaml) ssyTags
+  , ppObject "Tags" tagsYamlKVs ssyTags
   ]
  where
+  ppObject :: Text -> (a -> [(Text, Maybe Text)]) -> Maybe a -> [Text]
+  ppObject label f mA = fromMaybe [] $ do
+    kvs <- f <$> mA
+    pure
+      $ [cyan label <> ":"]
+      <> map
+           (\(k, mV) ->
+             "  " <> cyan k <> ":" <> maybe "" (\v -> " " <> green v) mV
+           )
+           kvs
+
   ppList :: Text -> (a -> [Text]) -> Maybe a -> [Text]
   ppList label f = maybe [] (((cyan label <> ":") :) . f)
 
-  ppParameters = concatMap $ \p ->
-    [ "  - " <> cyan "ParameterKey" <> ": " <> maybe
-      ""
-      green
-      (p ^. parameter_parameterKey)
-    , "    " <> cyan "ParameterValue" <> ": " <> maybe
-      ""
-      toText
-      (p ^. parameter_parameterValue)
-    ]
-
+  ppDescription d =
+    [cyan "Description" <> ": " <> green (unStackDescription d)]
   ppCapabilities = map (("  - " <>) . green . toText)
 
-  ppTags = concatMap $ \tg ->
-    [ "  - " <> cyan "Key" <> ": " <> green (tg ^. tag_key)
-    , "    " <> cyan "Value" <> ": " <> (tg ^. tag_value)
-    ]
+parametersYamlKVs :: ParametersYaml -> [(Text, Maybe Text)]
+parametersYamlKVs = mapMaybe parameterYamlKV . unParametersYaml
+
+parameterYamlKV :: ParameterYaml -> Maybe (Text, Maybe Text)
+parameterYamlKV py = (,) <$> (p ^. parameter_parameterKey) <*> pure
+  (p ^. parameter_parameterValue)
+  where p = unParameterYaml py
+
+tagsYamlKVs :: TagsYaml -> [(Text, Maybe Text)]
+tagsYamlKVs = map (tagKV . unTagYaml) . unTagsYaml
+
+tagKV :: Tag -> (Text, Maybe Text)
+tagKV tg = (tg ^. tag_key, tg ^. tag_value . to Just)
 
 prettyPrintTemplate :: Colors -> Value -> [Text]
 prettyPrintTemplate Colors {..} val = concat
