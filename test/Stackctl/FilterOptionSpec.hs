@@ -20,15 +20,15 @@ spec = do
         option =
           filterOptionFromPaths $ "**/some-path" :| ["**/prefix/*", "**/suffix"]
         specs =
-          [ toSpec "some-path" "some-path"
-          , toSpec "some-other-path" "some-path-other"
-          , toSpec "other-some-path" "other-some-path"
-          , toSpec "prefix-foo" "prefix/foo"
-          , toSpec "prefix-foo-bar" "prefix/foo-bar"
-          , toSpec "prefix-foo-bar-prefix" "prefix/foo-bar/prefix"
-          , toSpec "foo-suffix" "foo/suffix"
-          , toSpec "foo-bar-suffix" "foo/bar/suffix"
-          , toSpec "foo-suffix-bar" "foo/suffix/bar"
+          [ toSpec "some-path" "some-path" Nothing
+          , toSpec "some-other-path" "some-path-other" Nothing
+          , toSpec "other-some-path" "other-some-path" Nothing
+          , toSpec "prefix-foo" "prefix/foo" Nothing
+          , toSpec "prefix-foo-bar" "prefix/foo-bar" Nothing
+          , toSpec "prefix-foo-bar-prefix" "prefix/foo-bar/prefix" Nothing
+          , toSpec "foo-suffix" "foo/suffix" Nothing
+          , toSpec "foo-bar-suffix" "foo/bar/suffix" Nothing
+          , toSpec "foo-suffix-bar" "foo/suffix/bar" Nothing
           ]
 
       map specName (filterStackSpecs option specs)
@@ -39,8 +39,22 @@ spec = do
                           , "foo-bar-suffix"
                           ]
 
-toSpec :: Text -> FilePath -> StackSpec
-toSpec name path = buildStackSpec "." specPath specBody
+    it "filters specs by template too" $ do
+      let
+        option = filterOptionFromPaths $ "templates/x" :| ["**/y/*"]
+        specs =
+          [ toSpec "some-path" "some-path" Nothing
+          , toSpec "some-other-path" "some-path-other" $ Just "x"
+          , toSpec "prefix-foo" "prefix/foo" Nothing
+          , toSpec "other-some-path" "other-some-path" $ Just "z/y/t"
+          , toSpec "prefix-foo-bar" "prefix/foo-bar" Nothing
+          ]
+
+      map specName (filterStackSpecs option specs)
+        `shouldMatchList` ["some-other-path", "other-some-path"]
+
+toSpec :: Text -> FilePath -> Maybe FilePath -> StackSpec
+toSpec name path mTemplate = buildStackSpec "." specPath specBody
  where
   stackName = StackName name
   specPath = stackSpecPath scope stackName path
@@ -48,7 +62,7 @@ toSpec name path = buildStackSpec "." specPath specBody
     { ssyDescription = Nothing
     , ssyDepends = Nothing
     , ssyActions = Nothing
-    , ssyTemplate = ""
+    , ssyTemplate = fromMaybe path mTemplate
     , ssyParameters = Nothing
     , ssyCapabilities = Nothing
     , ssyTags = Nothing

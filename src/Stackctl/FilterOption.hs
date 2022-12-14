@@ -67,4 +67,5 @@ filterStackSpecs fo =
   filter $ \spec -> any (`matchStackSpec` spec) $ unFilterOption fo
 
 matchStackSpec :: Pattern -> StackSpec -> Bool
-matchStackSpec p = match p . stackSpecStackFile
+matchStackSpec p spec =
+  or [match p $ stackSpecStackFile spec, match p $ stackSpecTemplateFile spec]
