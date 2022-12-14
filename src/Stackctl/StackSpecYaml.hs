@@ -130,9 +130,6 @@ newtype TagsYaml = TagsYaml
 instance FromJSON TagsYaml where
   parseJSON = \case
     Object o -> do
-      -- NB. There are simpler ways to do this, but making sure we construct
-      -- things such that we use (.:) to read the value from each key means that
-      -- error messages will include "Parameters.{k}". See specs for an example.
       let
         parseKey k = do
           t <- newTag (Key.toText k) <$> o .: k
