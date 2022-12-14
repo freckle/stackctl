@@ -38,21 +38,21 @@ stackctl - manage CloudFormation Stacks through specifications
 
 **capture**\
 
-> Generate specifications from deployed Stacks.
+> Generate specifications for already-deployed Stacks.
 
 **changes**\
 
-> Show changes between specifications and deployed state.
+> Show changes between on-disk specifications and their deployed state.
 
 **deploy**\
 
-> Make deployed state match specifications.
+> Make deployed state match on-disk specifications.
 
 **version**\
 
 > Print the CLI's version.
 
-See individual man-pages for more details.
+Run **man stackctl \<command\>** for more details.
 
 # Stack Specifications
 
