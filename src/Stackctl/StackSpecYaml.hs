@@ -20,6 +20,9 @@
 --
 module Stackctl.StackSpecYaml
   ( StackSpecYaml(..)
+  , ParametersYaml
+  , parametersYaml
+  , unParametersYaml
   , ParameterYaml
   , parameterYaml
   , unParameterYaml
@@ -30,6 +33,9 @@ import Stackctl.Prelude
 
 import Data.Aeson
 import Data.Aeson.Casing
+import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
+import Data.Aeson.Types (typeMismatch)
 import qualified Data.Text as T
 import Stackctl.Action
 import Stackctl.AWS
@@ -39,7 +45,7 @@ data StackSpecYaml = StackSpecYaml
   , ssyTemplate :: FilePath
   , ssyDepends :: Maybe [StackName]
   , ssyActions :: Maybe [Action]
-  , ssyParameters :: Maybe [ParameterYaml]
+  , ssyParameters :: Maybe ParametersYaml
   , ssyCapabilities :: Maybe [Capability]
   , ssyTags :: Maybe [TagYaml]
   }
@@ -51,6 +57,30 @@ instance FromJSON StackSpecYaml where
 instance ToJSON StackSpecYaml where
   toJSON = genericToJSON $ aesonPrefix id
   toEncoding = genericToEncoding $ aesonPrefix id
+
+newtype ParametersYaml = ParametersYaml
+  { unParametersYaml :: [ParameterYaml]
+  }
+  deriving newtype ToJSON
+
+instance FromJSON ParametersYaml where
+  parseJSON = \case
+    Object o -> do
+      -- NB. There are simpler ways to do this, but making sure we construct
+      -- things such that we use (.:) to read the value from each key means that
+      -- error messages will include "Parameters.{k}". See specs for an example.
+      let parseKey k = ParameterYaml (Key.toText k) <$> o .: k
+      ParametersYaml <$> traverse parseKey (KeyMap.keys o)
+    v@Array{} -> ParametersYaml <$> parseJSON v
+    v -> typeMismatch err v
+   where
+    err =
+      "Object"
+        <> ", list of {ParameterKey, ParameterValue} Objects"
+        <> ", or list of {Key, Value} Objects"
+
+parametersYaml :: [ParameterYaml] -> ParametersYaml
+parametersYaml = ParametersYaml
 
 data ParameterYaml = ParameterYaml
   { _pyKey :: Text
