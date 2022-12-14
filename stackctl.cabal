@@ -5,7 +5,7 @@ cabal-version: 1.18
 -- see: https://github.com/sol/hpack
 
 name:           stackctl
-version:        1.1.2.1
+version:        1.1.2.2
 description:    Please see <https://github.com/freckle/stackctl#readme>
 homepage:       https://github.com/freckle/stackctl#readme
 bug-reports:    https://github.com/freckle/stackctl/issues

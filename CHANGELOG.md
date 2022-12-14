@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.2.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.2.2...main)
+
+## [v1.1.2.2](https://github.com/freckle/stackctl/compare/v1.1.2.1...v1.1.2.2)
+
+- Add support for Stack descriptions
 
 ## [v1.1.2.1](https://github.com/freckle/stackctl/compare/v1.1.2.0...v1.1.2.1)
 
