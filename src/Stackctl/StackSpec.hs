@@ -68,7 +68,7 @@ stackSpecCapabilities :: StackSpec -> [Capability]
 stackSpecCapabilities = fromMaybe [] . ssyCapabilities . ssSpecBody
 
 stackSpecTags :: StackSpec -> [Tag]
-stackSpecTags = maybe [] (map unTagYaml) . ssyTags . ssSpecBody
+stackSpecTags = maybe [] (map unTagYaml . unTagsYaml) . ssyTags . ssSpecBody
 
 buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
 buildStackSpec = StackSpec

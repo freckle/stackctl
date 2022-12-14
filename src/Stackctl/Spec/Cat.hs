@@ -128,7 +128,7 @@ prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
     (ppParameters . map unParameterYaml . unParametersYaml)
     ssyParameters
   , ppList "Capabilities" ppCapabilities ssyCapabilities
-  , ppList "Tags" (ppTags . map unTagYaml) ssyTags
+  , ppList "Tags" (ppTags . map unTagYaml . unTagsYaml) ssyTags
   ]
  where
   ppList :: Text -> (a -> [Text]) -> Maybe a -> [Text]
