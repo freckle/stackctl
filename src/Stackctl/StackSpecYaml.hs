@@ -54,26 +54,26 @@ instance ToJSON StackSpecYaml where
 
 data ParameterYaml = ParameterYaml
   { _pyKey :: Text
-  , _pyValue :: Maybe Text
+  , _pyValue :: Maybe ParameterValue
   }
 
 parameterYaml :: Parameter -> Maybe ParameterYaml
 parameterYaml p = do
   k <- p ^. parameter_parameterKey
-  pure $ ParameterYaml k $ p ^. parameter_parameterKey
+  pure $ ParameterYaml k $ ParameterValue <$> p ^. parameter_parameterKey
 
 unParameterYaml :: ParameterYaml -> Parameter
-unParameterYaml (ParameterYaml k v) = makeParameter k v
+unParameterYaml (ParameterYaml k v) = makeParameter k $ unParameterValue <$> v
 
 instance FromJSON ParameterYaml where
   parseJSON = withObject "Parameter" $ \o ->
-    (build <$> o .: "Name" <*> o .:? "Value")
-      <|> (build <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
-    where build k v = ParameterYaml k $ unParameterValue <$> v
+    (ParameterYaml <$> o .: "Name" <*> o .:? "Value")
+      <|> (ParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
 
 newtype ParameterValue = ParameterValue
   { unParameterValue :: Text
   }
+  deriving newtype ToJSON
 
 instance FromJSON ParameterValue where
   parseJSON = \case
