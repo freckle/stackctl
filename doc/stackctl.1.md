@@ -162,7 +162,7 @@ And these constituent parts are used as follows:
 >   Foo: Bar
 >   Baz: Bat
 >
-> # CloudFormation (used when Stacks are generated or captured)
+> # CloudFormation
 > Parameters:
 >   - ParameterKey: Foo
 >     ParameterValue: Bar
@@ -199,7 +199,7 @@ And these constituent parts are used as follows:
 >   Foo: Bar
 >   Baz: Bat
 >
-> # CloudFormation / CloudGenesis (used when Stacks are generated or captured)
+> # CloudFormation / CloudGenesis
 > Parameters:
 >   - Key: Foo
 >     Value: Bar

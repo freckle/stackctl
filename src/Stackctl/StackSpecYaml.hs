@@ -72,7 +72,7 @@ instance FromJSON ParametersYaml where
       -- NB. There are simpler ways to do this, but making sure we construct
       -- things such that we use (.:) to read the value from each key means that
       -- error messages will include "Parameters.{k}". See specs for an example.
-      let parseKey k = ParameterYaml (Key.toText k) <$> o .: k
+      let parseKey k = ParameterYaml k <$> o .: k
       ParametersYaml <$> traverse parseKey (KeyMap.keys o)
     v@Array{} -> ParametersYaml <$> parseJSON v
     v -> typeMismatch err v
@@ -86,17 +86,22 @@ parametersYaml :: [ParameterYaml] -> ParametersYaml
 parametersYaml = ParametersYaml
 
 data ParameterYaml = ParameterYaml
-  { _pyKey :: Text
+  { _pyKey :: Key
   , _pyValue :: Maybe ParameterValue
   }
 
 parameterYaml :: Parameter -> Maybe ParameterYaml
 parameterYaml p = do
   k <- p ^. parameter_parameterKey
-  pure $ ParameterYaml k $ ParameterValue <$> p ^. parameter_parameterKey
+  pure
+    $ ParameterYaml (Key.fromText k)
+    $ ParameterValue
+    <$> p
+    ^. parameter_parameterKey
 
 unParameterYaml :: ParameterYaml -> Parameter
-unParameterYaml (ParameterYaml k v) = makeParameter k $ unParameterValue <$> v
+unParameterYaml (ParameterYaml k v) =
+  makeParameter (Key.toText k) $ unParameterValue <$> v
 
 instance FromJSON ParameterYaml where
   parseJSON = withObject "Parameter" $ \o ->
@@ -119,8 +124,7 @@ instance ToJSON ParameterYaml where
   toEncoding = pairs . mconcat . parameterPairs
 
 parameterPairs :: KeyValue a => ParameterYaml -> [a]
-parameterPairs (ParameterYaml k v) =
-  ["ParameterKey" .= k, "ParameterValue" .= v]
+parameterPairs (ParameterYaml k v) = [k .= v]
 
 newtype TagsYaml = TagsYaml
   { unTagsYaml :: [TagYaml]
