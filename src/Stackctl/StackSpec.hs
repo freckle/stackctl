@@ -65,13 +65,9 @@ stackSpecStackFile StackSpec {..} =
   FilePath.normalise $ ssSpecRoot </> stackSpecPathFilePath ssSpecPath
 
 -- | Normalized, relative path to the @[{root}/]templates/@ file
-stackSpecTemplateFile :: StackSpec -> StackTemplate
+stackSpecTemplateFile :: StackSpec -> FilePath
 stackSpecTemplateFile StackSpec {..} =
-  StackTemplate
-    $ FilePath.normalise
-    $ ssSpecRoot
-    </> "templates"
-    </> ssyTemplate ssSpecBody
+  FilePath.normalise $ ssSpecRoot </> "templates" </> ssyTemplate ssSpecBody
 
 stackSpecParameters :: StackSpec -> [Parameter]
 stackSpecParameters =
@@ -130,7 +126,7 @@ writeStackSpec parent stackSpec@StackSpec {..} templateBody = do
   createDirectoryIfMissing True $ takeDirectory specPath
   liftIO $ Yaml.encodeFile specPath ssSpecBody
  where
-  templatePath = unStackTemplate $ stackSpecTemplateFile stackSpec
+  templatePath = stackSpecTemplateFile stackSpec
   specPath = parent </> stackSpecPathFilePath ssSpecPath
 
 readStackSpec :: MonadIO m => FilePath -> StackSpecPath -> m StackSpec
@@ -161,7 +157,7 @@ createChangeSet
 createChangeSet spec parameters = awsCloudFormationCreateChangeSet
   (stackSpecStackName spec)
   (stackSpecStackDescription spec)
-  (stackSpecTemplateFile spec)
+  (StackTemplate $ stackSpecTemplateFile spec)
   (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
   )
   (stackSpecCapabilities spec)
