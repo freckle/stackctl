@@ -53,6 +53,25 @@ spec = do
       map specName (filterStackSpecs option specs)
         `shouldMatchList` ["some-other-path", "other-some-path"]
 
+    it "filters specs by name too" $ do
+      let
+        option =
+          filterOptionFromPaths $ "some-name" :| ["**/prefix/*", "templates/x"]
+        specs =
+          [ toSpec "some-name" "some-path" Nothing
+          , toSpec "some-path" "some-path-other" $ Just "x"
+          , toSpec "prefix-foo" "prefix/foo" Nothing
+          , toSpec "other-some-path" "other-some-path" $ Just "z/y/t"
+          , toSpec "prefix-foo-bar" "prefix/foo-bar" Nothing
+          ]
+
+      map specName (filterStackSpecs option specs)
+        `shouldMatchList` [ "some-name"
+                          , "some-path"
+                          , "prefix-foo"
+                          , "prefix-foo-bar"
+                          ]
+
 toSpec :: Text -> FilePath -> Maybe FilePath -> StackSpec
 toSpec name path mTemplate = buildStackSpec "." specPath specBody
  where

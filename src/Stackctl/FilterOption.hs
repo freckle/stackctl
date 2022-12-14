@@ -11,6 +11,7 @@ import Stackctl.Prelude
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Options.Applicative
+import Stackctl.AWS.CloudFormation (StackName(..))
 import Stackctl.StackSpec
 import System.FilePath.Glob
 
@@ -67,5 +68,8 @@ filterStackSpecs fo =
   filter $ \spec -> any (`matchStackSpec` spec) $ unFilterOption fo
 
 matchStackSpec :: Pattern -> StackSpec -> Bool
-matchStackSpec p spec =
-  or [match p $ stackSpecStackFile spec, match p $ stackSpecTemplateFile spec]
+matchStackSpec p spec = or
+  [ match p $ unpack $ unStackName $ stackSpecStackName spec
+  , match p $ stackSpecStackFile spec
+  , match p $ stackSpecTemplateFile spec
+  ]
