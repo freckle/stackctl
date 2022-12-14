@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+
 module Stackctl.FilterOptionSpec
   ( spec
   ) where
@@ -17,8 +19,7 @@ spec = do
   describe "filterStackSpecs" $ do
     it "filters specs matching any of the given patterns" $ do
       let
-        option =
-          filterOptionFromPaths $ "**/some-path" :| ["**/prefix/*", "**/suffix"]
+        Just option = filterOptionFromText "**/some-path,**/prefix/*,**/suffix"
         specs =
           [ toSpec "some-path" "some-path" Nothing
           , toSpec "some-other-path" "some-path-other" Nothing
@@ -37,11 +38,12 @@ spec = do
                           , "prefix-foo-bar"
                           , "foo-suffix"
                           , "foo-bar-suffix"
+                          , "foo-suffix-bar"
                           ]
 
     it "filters specs by template too" $ do
       let
-        option = filterOptionFromPaths $ "templates/x" :| ["**/y/*"]
+        Just option = filterOptionFromText "templates/x,**/y/*"
         specs =
           [ toSpec "some-path" "some-path" Nothing
           , toSpec "some-other-path" "some-path-other" $ Just "x"
@@ -55,8 +57,7 @@ spec = do
 
     it "filters specs by name too" $ do
       let
-        option =
-          filterOptionFromPaths $ "some-name" :| ["**/prefix/*", "templates/x"]
+        Just option = filterOptionFromText "some-name,**/prefix/*,templates/x"
         specs =
           [ toSpec "some-name" "some-path" Nothing
           , toSpec "some-path" "some-path-other" $ Just "x"
@@ -71,6 +72,20 @@ spec = do
                           , "prefix-foo"
                           , "prefix-foo-bar"
                           ]
+
+    it "adds some intuitive fuzziness" $ do
+      let
+        Just option = filterOptionFromText "some/path,file,file.ext"
+        specs =
+          [ toSpec "some-name" "x/some/path/y" Nothing
+          , toSpec "some-path" "some-path/other" $ Just "x"
+          , toSpec "prefix-foo" "prefix/file.json" Nothing
+          , toSpec "other-some-path" "other-some-path" $ Just "z/y/t"
+          , toSpec "prefix-foo-bar" "prefix/foo-bar" Nothing
+          ]
+
+      map specName (filterStackSpecs option specs)
+        `shouldMatchList` ["some-name", "prefix-foo"]
 
 toSpec :: Text -> FilePath -> Maybe FilePath -> StackSpec
 toSpec name path mTemplate = buildStackSpec "." specPath specBody

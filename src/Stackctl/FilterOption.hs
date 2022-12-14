@@ -3,6 +3,7 @@ module Stackctl.FilterOption
   , HasFilterOption(..)
   , filterOption
   , filterOptionFromPaths
+  , filterOptionFromText
   , filterStackSpecs
   ) where
 
@@ -13,6 +14,7 @@ import qualified Data.Text as T
 import Options.Applicative
 import Stackctl.AWS.CloudFormation (StackName(..))
 import Stackctl.StackSpec
+import System.FilePath (hasExtension)
 import System.FilePath.Glob
 
 newtype FilterOption = FilterOption
@@ -41,15 +43,32 @@ filterOption items = option (eitherReader readFilterOption) $ mconcat
 filterOptionFromPaths :: NonEmpty FilePath -> FilterOption
 filterOptionFromPaths = FilterOption . fmap compile
 
-readFilterOption :: String -> Either String FilterOption
-readFilterOption =
-  maybe (Left err) (Right . FilterOption)
+filterOptionFromText :: Text -> Maybe FilterOption
+filterOptionFromText =
+  fmap FilterOption
     . NE.nonEmpty
-    . map (compile . unpack)
+    . concatMap expandPatterns
     . filter (not . T.null)
     . map T.strip
     . T.splitOn ","
-    . pack
+
+expandPatterns :: Text -> [Pattern]
+expandPatterns t = map compile $ s : expanded
+ where
+  expanded
+    | "**" `T.isPrefixOf` t = suffixed
+    | otherwise = map ("**" </>) $ s : suffixed
+
+  suffixed
+    | "*" `T.isSuffixOf` t || hasExtension s = []
+    | otherwise = (s </> "*") : map (s <.>) extensions
+
+  extensions = ["json", "yaml"]
+
+  s = unpack t
+
+readFilterOption :: String -> Either String FilterOption
+readFilterOption = note err . filterOptionFromText . pack
   where err = "Must be non-empty, comma-separated list of non-empty patterns"
 
 showFilterOption :: FilterOption -> String
