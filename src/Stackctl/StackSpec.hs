@@ -62,7 +62,7 @@ stackSpecTemplateFile StackSpec {..} =
 
 stackSpecParameters :: StackSpec -> [Parameter]
 stackSpecParameters =
-  maybe [] (map unParameterYaml) . ssyParameters . ssSpecBody
+  maybe [] (map unParameterYaml . unParametersYaml) . ssyParameters . ssSpecBody
 
 stackSpecCapabilities :: StackSpec -> [Capability]
 stackSpecCapabilities = fromMaybe [] . ssyCapabilities . ssSpecBody

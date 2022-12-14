@@ -123,7 +123,10 @@ prettyPrintStackSpecYaml :: Colors -> StackName -> StackSpecYaml -> [Text]
 prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
   [ [cyan "Name" <> ": " <> green (unStackName name)]
   , [cyan "Template" <> ": " <> green (pack ssyTemplate)]
-  , ppList "Parameters" (ppParameters . map unParameterYaml) ssyParameters
+  , ppList
+    "Parameters"
+    (ppParameters . map unParameterYaml . unParametersYaml)
+    ssyParameters
   , ppList "Capabilities" ppCapabilities ssyCapabilities
   , ppList "Tags" (ppTags . map unTagYaml) ssyTags
   ]
