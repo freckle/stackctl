@@ -66,7 +66,7 @@ generate Generate {..} = do
       , ssyActions = gActions
       , ssyParameters = parametersYaml . mapMaybe parameterYaml <$> gParameters
       , ssyCapabilities = gCapabilities
-      , ssyTags = map TagYaml <$> gTags
+      , ssyTags = tagsYaml . map TagYaml <$> gTags
       }
 
     stackSpec = buildStackSpec gOutputDirectory specPath specYaml

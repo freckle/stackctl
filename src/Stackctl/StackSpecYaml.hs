@@ -26,6 +26,9 @@ module Stackctl.StackSpecYaml
   , ParameterYaml
   , parameterYaml
   , unParameterYaml
+  , TagsYaml
+  , tagsYaml
+  , unTagsYaml
   , TagYaml(..)
   ) where
 
@@ -47,7 +50,7 @@ data StackSpecYaml = StackSpecYaml
   , ssyActions :: Maybe [Action]
   , ssyParameters :: Maybe ParametersYaml
   , ssyCapabilities :: Maybe [Capability]
-  , ssyTags :: Maybe [TagYaml]
+  , ssyTags :: Maybe TagsYaml
   }
   deriving stock Generic
 
@@ -118,6 +121,29 @@ instance ToJSON ParameterYaml where
 parameterPairs :: KeyValue a => ParameterYaml -> [a]
 parameterPairs (ParameterYaml k v) =
   ["ParameterKey" .= k, "ParameterValue" .= v]
+
+newtype TagsYaml = TagsYaml
+  { unTagsYaml :: [TagYaml]
+  }
+  deriving newtype ToJSON
+
+instance FromJSON TagsYaml where
+  parseJSON = \case
+    Object o -> do
+      -- NB. There are simpler ways to do this, but making sure we construct
+      -- things such that we use (.:) to read the value from each key means that
+      -- error messages will include "Parameters.{k}". See specs for an example.
+      let
+        parseKey k = do
+          t <- newTag (Key.toText k) <$> o .: k
+          pure $ TagYaml t
+      TagsYaml <$> traverse parseKey (KeyMap.keys o)
+    v@Array{} -> TagsYaml <$> parseJSON v
+    v -> typeMismatch err v
+    where err = "Object or list of {Key, Value} Objects"
+
+tagsYaml :: [TagYaml] -> TagsYaml
+tagsYaml = TagsYaml
 
 newtype TagYaml = TagYaml
   { unTagYaml :: Tag
