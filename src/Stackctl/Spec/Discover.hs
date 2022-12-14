@@ -10,7 +10,7 @@ import qualified Data.List.NonEmpty as NE
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
-import Stackctl.FilterOption (HasFilterOption(..), filterFilePaths)
+import Stackctl.FilterOption (HasFilterOption(..), filterStackSpecs)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import System.FilePath (isPathSeparator)
@@ -29,7 +29,7 @@ discoverSpecs
 discoverSpecs = do
   dir <- view directoryOptionL
   scope@AwsScope {..} <- view awsScopeL
-  discovered <- globRelativeTo
+  paths <- globRelativeTo
     dir
     [ compile
     $ "stacks"
@@ -52,24 +52,27 @@ discoverSpecs = do
   filterOption <- view filterOptionL
 
   let
-    matched = filterFilePaths filterOption discovered
     toSpecPath = stackSpecPathFromFilePath scope
-    (errs, specPaths) = partitionEithers $ map toSpecPath matched
+    (errs, specPaths) = partitionEithers $ map toSpecPath paths
 
     context =
       [ "path" .= dir
       , "filters" .= filterOption
-      , "discovered" .= length discovered
-      , "matched" .= length matched
+      , "paths" .= length paths
       , "errors" .= length errs
+      , "specs" .= length specPaths
       ]
 
   withThreadContext context $ do
-    logDebug "Discovered specs"
-    when (null matched) $ logWarn "No specs found"
     checkForDuplicateStackNames specPaths
 
-  sortStackSpecs <$> traverse (readStackSpec dir) specPaths
+    specs <-
+      sortStackSpecs
+      . filterStackSpecs filterOption
+      <$> traverse (readStackSpec dir) specPaths
+
+    when (null specs) $ logWarn "No specs found"
+    specs <$ logDebug ("Discovered specs" :# ["matched" .= length specs])
 
 checkForDuplicateStackNames
   :: (MonadIO m, MonadLogger m) => [StackSpecPath] -> m ()
