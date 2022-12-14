@@ -180,6 +180,12 @@ And these constituent parts are used as follows:
 *{.Capabilities}*\
 
 > Optional. Capabilities to use when deploying the Stack.
+>
+> Valid *Capabilities* are,
+>
+> **CAPABILITY_AUTO_EXPAND**,\
+> **CAPABILITY_IAM**, and\
+> **CAPABILITY_NAMED_IAM**
 
 *{.Tags}*\
 
