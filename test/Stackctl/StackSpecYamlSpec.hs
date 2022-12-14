@@ -22,7 +22,7 @@ spec = do
         , "    ParameterValue: Bar\n"
         ]
 
-      let Just [ParameterYaml param] = ssyParameters
+      let Just [param] = map unParameterYaml <$> ssyParameters
       param ^. parameter_parameterKey `shouldBe` Just "Foo"
       param ^. parameter_parameterValue `shouldBe` Just "Bar"
 
@@ -34,7 +34,7 @@ spec = do
         , "    ParameterValue: 80\n"
         ]
 
-      let Just [ParameterYaml param] = ssyParameters
+      let Just [param] = map unParameterYaml <$> ssyParameters
       param ^. parameter_parameterKey `shouldBe` Just "Port"
       param ^. parameter_parameterValue `shouldBe` Just "80"
 
@@ -46,7 +46,7 @@ spec = do
         , "    ParameterValue: 3.14\n"
         ]
 
-      let Just [ParameterYaml param] = ssyParameters
+      let Just [param] = map unParameterYaml <$> ssyParameters
       param ^. parameter_parameterKey `shouldBe` Just "Pie"
       param ^. parameter_parameterValue `shouldBe` Just "3.14"
 
@@ -62,6 +62,26 @@ spec = do
       show ex
         `shouldBe` "AesonException \"Error in $.Parameters[0].ParameterValue: Expected String or Number, got: Bool False\""
 
+    it "handles null Value" $ do
+      StackSpecYaml {..} <- Yaml.decodeThrow $ mconcat
+        [ "Template: foo.yaml\n"
+        , "Parameters:\n"
+        , "  - ParameterKey: Foo\n"
+        , "    ParameterValue: null\n"
+        ]
+
+      let Just [param] = map unParameterYaml <$> ssyParameters
+      param ^. parameter_parameterKey `shouldBe` Just "Foo"
+      param ^. parameter_parameterValue `shouldBe` Nothing
+
+    it "handles missing Value" $ do
+      StackSpecYaml {..} <- Yaml.decodeThrow $ mconcat
+        ["Template: foo.yaml\n", "Parameters:\n", "  - ParameterKey: Foo\n"]
+
+      let Just [param] = map unParameterYaml <$> ssyParameters
+      param ^. parameter_parameterKey `shouldBe` Just "Foo"
+      param ^. parameter_parameterValue `shouldBe` Nothing
+
     it "also accepts CloudGenesis formatted values" $ do
       StackSpecYaml {..} <- Yaml.decodeThrow $ mconcat
         [ "Template: foo.yaml\n"
@@ -70,6 +90,7 @@ spec = do
         , "    Value: Bar\n"
         ]
 
-      let Just [ParameterYaml param] = ssyParameters
+      let Just [param] = map unParameterYaml <$> ssyParameters
       param ^. parameter_parameterKey `shouldBe` Just "Foo"
       param ^. parameter_parameterValue `shouldBe` Just "Bar"
+
