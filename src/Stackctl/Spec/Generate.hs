@@ -64,7 +64,7 @@ generate Generate {..} = do
       , ssyTemplate = templatePath
       , ssyDepends = gDepends
       , ssyActions = gActions
-      , ssyParameters = map ParameterYaml <$> gParameters
+      , ssyParameters = mapMaybe parameterYaml <$> gParameters
       , ssyCapabilities = gCapabilities
       , ssyTags = map TagYaml <$> gTags
       }

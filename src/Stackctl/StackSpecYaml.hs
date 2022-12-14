@@ -20,7 +20,9 @@
 --
 module Stackctl.StackSpecYaml
   ( StackSpecYaml(..)
-  , ParameterYaml(..)
+  , ParameterYaml
+  , parameterYaml
+  , unParameterYaml
   , TagYaml(..)
   ) where
 
@@ -50,16 +52,24 @@ instance ToJSON StackSpecYaml where
   toJSON = genericToJSON $ aesonPrefix id
   toEncoding = genericToEncoding $ aesonPrefix id
 
-newtype ParameterYaml = ParameterYaml
-  { unParameterYaml :: Parameter
+data ParameterYaml = ParameterYaml
+  { _pyKey :: Text
+  , _pyValue :: Maybe Text
   }
+
+parameterYaml :: Parameter -> Maybe ParameterYaml
+parameterYaml p = do
+  k <- p ^. parameter_parameterKey
+  pure $ ParameterYaml k $ p ^. parameter_parameterKey
+
+unParameterYaml :: ParameterYaml -> Parameter
+unParameterYaml (ParameterYaml k v) = makeParameter k v
 
 instance FromJSON ParameterYaml where
   parseJSON = withObject "Parameter" $ \o ->
-    (build <$> o .: "Name" <*> o .: "Value")
-      <|> (build <$> o .: "ParameterKey" <*> o .: "ParameterValue")
-   where
-    build k v = ParameterYaml $ makeParameter k $ Just $ unParameterValue v
+    (build <$> o .: "Name" <*> o .:? "Value")
+      <|> (build <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
+    where build k v = ParameterYaml k $ unParameterValue <$> v
 
 newtype ParameterValue = ParameterValue
   { unParameterValue :: Text
@@ -76,10 +86,8 @@ instance ToJSON ParameterYaml where
   toEncoding = pairs . mconcat . parameterPairs
 
 parameterPairs :: KeyValue a => ParameterYaml -> [a]
-parameterPairs (ParameterYaml p) = fromMaybe [] $ do
-  k <- p ^. parameter_parameterKey
-  v <- p ^. parameter_parameterValue
-  pure ["ParameterKey" .= k, "ParameterValue" .= v]
+parameterPairs (ParameterYaml k v) =
+  ["ParameterKey" .= k, "ParameterValue" .= v]
 
 newtype TagYaml = TagYaml
   { unTagYaml :: Tag
