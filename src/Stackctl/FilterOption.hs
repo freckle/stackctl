@@ -3,7 +3,7 @@ module Stackctl.FilterOption
   , HasFilterOption(..)
   , filterOption
   , filterOptionFromPaths
-  , filterFilePaths
+  , filterStackSpecs
   ) where
 
 import Stackctl.Prelude
@@ -11,6 +11,7 @@ import Stackctl.Prelude
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Options.Applicative
+import Stackctl.StackSpec
 import System.FilePath.Glob
 
 newtype FilterOption = FilterOption
@@ -61,5 +62,9 @@ showFilterOption =
 defaultFilterOption :: FilterOption
 defaultFilterOption = filterOptionFromPaths $ pure "**/*"
 
-filterFilePaths :: FilterOption -> [FilePath] -> [FilePath]
-filterFilePaths fo = filter $ \path -> any (`match` path) $ unFilterOption fo
+filterStackSpecs :: FilterOption -> [StackSpec] -> [StackSpec]
+filterStackSpecs fo =
+  filter $ \spec -> any (`matchStackSpec` spec) $ unFilterOption fo
+
+matchStackSpec :: Pattern -> StackSpec -> Bool
+matchStackSpec p = match p . stackSpecStackFile

@@ -7,6 +7,8 @@ module Stackctl.StackSpec
   , stackSpecActions
   , stackSpecParameters
   , stackSpecCapabilities
+  , stackSpecStackFile
+  , stackSpecTemplateFile
   , stackSpecTags
   , buildStackSpec
   , TemplateBody
@@ -29,6 +31,7 @@ import Stackctl.AWS
 import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
+import qualified System.FilePath as FilePath
 import System.FilePath (takeExtension)
 import UnliftIO.Directory (createDirectoryIfMissing)
 
@@ -56,9 +59,19 @@ stackSpecDepends = fromMaybe [] . ssyDepends . ssSpecBody
 stackSpecActions :: StackSpec -> [Action]
 stackSpecActions = fromMaybe [] . ssyActions . ssSpecBody
 
+-- | Normalized, relative path to the @[{root}/]stacks/@ file
+stackSpecStackFile :: StackSpec -> FilePath
+stackSpecStackFile StackSpec {..} =
+  FilePath.normalise $ ssSpecRoot </> stackSpecPathFilePath ssSpecPath
+
+-- | Normalized, relative path to the @[{root}/]templates/@ file
 stackSpecTemplateFile :: StackSpec -> StackTemplate
 stackSpecTemplateFile StackSpec {..} =
-  StackTemplate $ ssSpecRoot </> "templates" </> ssyTemplate ssSpecBody
+  StackTemplate
+    $ FilePath.normalise
+    $ ssSpecRoot
+    </> "templates"
+    </> ssyTemplate ssSpecBody
 
 stackSpecParameters :: StackSpec -> [Parameter]
 stackSpecParameters =
