@@ -100,7 +100,7 @@ runCat CatOptions {..} = do
         pure $ ssyTemplate body
 
   putTemplate 2 "templates/"
-  for_ (sort $ concat $ concat templates) $ \template -> do
+  for_ (sort $ nubOrd $ concat $ concat templates) $ \template -> do
     val <- Yaml.decodeFileThrow @_ @Value $ dir </> "templates" </> template
 
     putTemplate 4 $ green $ fromString template
