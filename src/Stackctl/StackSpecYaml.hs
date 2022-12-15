@@ -97,7 +97,7 @@ parameterYaml p = do
     $ ParameterYaml (Key.fromText k)
     $ ParameterValue
     <$> p
-    ^. parameter_parameterKey
+    ^. parameter_parameterValue
 
 unParameterYaml :: ParameterYaml -> Parameter
 unParameterYaml (ParameterYaml k v) =
