@@ -1,5 +1,8 @@
 # Stackctl
 
+[![Hackage](https://img.shields.io/hackage/v/stackctl.svg?style=flat)](https://hackage.haskell.org/package/stackctl)
+[![CI](https://github.com/freckle/stackctl/actions/workflows/ci.yml/badge.svg)](https://github.com/freckle/stackctl/actions/workflows/ci.yml)
+
 Manage CloudFormation Stacks through specifications.
 
 ## About
