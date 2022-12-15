@@ -91,15 +91,14 @@ runAppT options f = do
     (options ^. verboseOptionL)
     envLogSettings
 
-  config <- runLoggerLoggingT logger loadConfigOrExit
-  aws <- runLoggerLoggingT logger awsEnvDiscover
+  app <- runResourceT $ runLoggerLoggingT logger $ do
+    aws <- awsEnvDiscover
 
-  let
-    runAws
-      :: MonadUnliftIO m => ReaderT AwsEnv (LoggingT (ResourceT m)) a -> m a
-    runAws = runResourceT . runLoggerLoggingT logger . flip runReaderT aws
-
-  app <- App logger config options <$> runAws fetchAwsScope <*> pure aws
+    App logger
+      <$> loadConfigOrExit
+      <*> pure options
+      <*> runReaderT fetchAwsScope aws
+      <*> pure aws
 
   let
     AwsScope {..} = appAwsScope app
