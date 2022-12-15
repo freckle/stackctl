@@ -28,6 +28,7 @@ import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
 import Stackctl.Action
 import Stackctl.AWS
+import Stackctl.Config (HasConfig(..), applyConfig)
 import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
@@ -79,8 +80,19 @@ stackSpecCapabilities = fromMaybe [] . ssyCapabilities . ssSpecBody
 stackSpecTags :: StackSpec -> [Tag]
 stackSpecTags = maybe [] (map unTagYaml . unTagsYaml) . ssyTags . ssSpecBody
 
-buildStackSpec :: FilePath -> StackSpecPath -> StackSpecYaml -> StackSpec
-buildStackSpec = StackSpec
+buildStackSpec
+  :: (MonadReader env m, HasConfig env)
+  => FilePath
+  -> StackSpecPath
+  -> StackSpecYaml
+  -> m StackSpec
+buildStackSpec dir specPath specBody = do
+  config <- view configL
+  pure StackSpec
+    { ssSpecRoot = dir
+    , ssSpecPath = specPath
+    , ssSpecBody = applyConfig config specBody
+    }
 
 data TemplateBody
   = TemplateText Text
@@ -129,15 +141,14 @@ writeStackSpec parent stackSpec@StackSpec {..} templateBody = do
   templatePath = stackSpecTemplateFile stackSpec
   specPath = parent </> stackSpecPathFilePath ssSpecPath
 
-readStackSpec :: MonadIO m => FilePath -> StackSpecPath -> m StackSpec
+readStackSpec
+  :: (MonadIO m, MonadReader env m, HasConfig env)
+  => FilePath
+  -> StackSpecPath
+  -> m StackSpec
 readStackSpec dir specPath = do
   specBody <- liftIO $ either err pure =<< Yaml.decodeFileEither path
-
-  pure StackSpec
-    { ssSpecRoot = dir
-    , ssSpecPath = specPath
-    , ssSpecBody = specBody
-    }
+  buildStackSpec dir specPath specBody
  where
   path = dir </> stackSpecPathFilePath specPath
   err e =

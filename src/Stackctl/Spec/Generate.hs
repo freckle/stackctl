@@ -9,6 +9,7 @@ import Stackctl.Prelude
 import Stackctl.Action
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Config (HasConfig)
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -41,6 +42,7 @@ generate
      , MonadUnliftIO m
      , MonadLogger m
      , MonadReader env m
+     , HasConfig env
      , HasAwsScope env
      )
   => Generate
@@ -69,7 +71,7 @@ generate Generate {..} = do
       , ssyTags = tagsYaml . map TagYaml <$> gTags
       }
 
-    stackSpec = buildStackSpec gOutputDirectory specPath specYaml
+  stackSpec <- buildStackSpec gOutputDirectory specPath specYaml
 
   withThreadContext ["stackName" .= stackSpecStackName stackSpec] $ do
     logInfo "Generating specification"

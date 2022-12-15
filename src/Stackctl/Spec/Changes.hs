@@ -12,6 +12,7 @@ import Options.Applicative
 import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
 import Stackctl.Colors
+import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.ParameterOption
@@ -47,6 +48,7 @@ runChanges
      , HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
+     , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
      )

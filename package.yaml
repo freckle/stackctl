@@ -79,6 +79,7 @@ library:
     - lens
     - lens-aeson
     - monad-logger
+    - mtl
     - optparse-applicative
     - resourcet
     - rio
@@ -106,6 +107,8 @@ tests:
     main: Spec.hs
     source-dirs: test
     dependencies:
+      - bytestring
       - hspec
+      - mtl
       - stackctl
       - yaml

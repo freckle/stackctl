@@ -20,6 +20,7 @@ import Options.Applicative
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Colors
+import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Spec.Discover
@@ -58,6 +59,7 @@ runCat
      , MonadReader env m
      , HasLogger env
      , HasAwsScope env
+     , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env

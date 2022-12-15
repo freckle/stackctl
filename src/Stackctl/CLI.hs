@@ -13,12 +13,14 @@ import Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.ColorOption
+import Stackctl.Config
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.VerboseOption
 
 data App options = App
   { appLogger :: Logger
+  , appConfig :: Config
   , appOptions :: options
   , appAwsScope :: AwsScope
   , appAwsEnv :: AwsEnv
@@ -29,6 +31,9 @@ optionsL = lens appOptions $ \x y -> x { appOptions = y }
 
 instance HasLogger (App options) where
   loggerL = lens appLogger $ \x y -> x { appLogger = y }
+
+instance HasConfig (App options) where
+  configL = lens appConfig $ \x y -> x { appConfig = y }
 
 instance HasAwsScope (App options) where
   awsScopeL = lens appAwsScope $ \x y -> x { appAwsScope = y }
@@ -86,6 +91,7 @@ runAppT options f = do
     (options ^. verboseOptionL)
     envLogSettings
 
+  config <- runLoggerLoggingT logger loadConfigOrExit
   aws <- runLoggerLoggingT logger awsEnvDiscover
 
   let
@@ -93,7 +99,7 @@ runAppT options f = do
       :: MonadUnliftIO m => ReaderT AwsEnv (LoggingT (ResourceT m)) a -> m a
     runAws = runResourceT . runLoggerLoggingT logger . flip runReaderT aws
 
-  app <- App logger options <$> runAws fetchAwsScope <*> pure aws
+  app <- App logger config options <$> runAws fetchAwsScope <*> pure aws
 
   let
     AwsScope {..} = appAwsScope app

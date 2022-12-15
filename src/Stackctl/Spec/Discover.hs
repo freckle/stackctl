@@ -9,6 +9,7 @@ import Data.List.Extra (dropPrefix)
 import qualified Data.List.NonEmpty as NE
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.FilterOption (HasFilterOption(..), filterStackSpecs)
 import Stackctl.StackSpec
@@ -22,6 +23,7 @@ discoverSpecs
      , MonadLogger m
      , MonadReader env m
      , HasAwsScope env
+     , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
      )

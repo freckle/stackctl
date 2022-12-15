@@ -11,6 +11,7 @@ import Stackctl.Prelude
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Colors
+import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Spec.Capture
@@ -23,6 +24,7 @@ import Stackctl.Version
 cat
   :: ( HasLogger env
      , HasAwsScope env
+     , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
      , HasColorOption env
@@ -36,7 +38,7 @@ cat = Subcommand
   }
 
 capture
-  :: (HasAwsScope env, HasAwsEnv env, HasDirectoryOption env)
+  :: (HasAwsScope env, HasAwsEnv env, HasConfig env, HasDirectoryOption env)
   => Subcommand CaptureOptions env
 capture = Subcommand
   { name = "capture"
@@ -49,6 +51,7 @@ changes
   :: ( HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
+     , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
      )
@@ -64,6 +67,7 @@ deploy
   :: ( HasLogger env
      , HasAwsScope env
      , HasAwsEnv env
+     , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
      )

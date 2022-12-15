@@ -39,6 +39,8 @@ import Data.Aeson.Casing
 import qualified Data.Aeson.Key as Key
 import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Aeson.Types (typeMismatch)
+import qualified Data.HashMap.Strict as HashMap
+import Data.Semigroup (Last(..))
 import qualified Data.Text as T
 import Stackctl.Action
 import Stackctl.AWS
@@ -64,7 +66,18 @@ instance ToJSON StackSpecYaml where
 newtype ParametersYaml = ParametersYaml
   { unParametersYaml :: [ParameterYaml]
   }
+  deriving stock (Eq, Show)
   deriving newtype ToJSON
+
+instance Semigroup ParametersYaml where
+  ParametersYaml as <> ParametersYaml bs =
+    ParametersYaml
+      $ map (uncurry ParameterYaml)
+      $ KeyMap.toList
+      $ KeyMap.fromListWith (<>)
+      $ map (pyKey &&& pyValue)
+      $ bs -- flipped to make sure Last-wins
+      <> as
 
 instance FromJSON ParametersYaml where
   parseJSON = \case
@@ -86,9 +99,10 @@ parametersYaml :: [ParameterYaml] -> ParametersYaml
 parametersYaml = ParametersYaml
 
 data ParameterYaml = ParameterYaml
-  { _pyKey :: Key
-  , _pyValue :: Maybe ParameterValue
+  { pyKey :: Key
+  , pyValue :: Maybe ParameterValue
   }
+  deriving stock (Eq, Show)
 
 parameterYaml :: Parameter -> Maybe ParameterYaml
 parameterYaml p = do
@@ -96,12 +110,13 @@ parameterYaml p = do
   pure
     $ ParameterYaml (Key.fromText k)
     $ ParameterValue
+    . Last
     <$> p
     ^. parameter_parameterValue
 
 unParameterYaml :: ParameterYaml -> Parameter
 unParameterYaml (ParameterYaml k v) =
-  makeParameter (Key.toText k) $ unParameterValue <$> v
+  makeParameter (Key.toText k) $ getLast . unParameterValue <$> v
 
 instance FromJSON ParameterYaml where
   parseJSON = withObject "Parameter" $ \o ->
@@ -109,14 +124,15 @@ instance FromJSON ParameterYaml where
       <|> (ParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
 
 newtype ParameterValue = ParameterValue
-  { unParameterValue :: Text
+  { unParameterValue :: Last Text
   }
-  deriving newtype ToJSON
+  deriving stock (Eq, Show)
+  deriving newtype (Semigroup, ToJSON)
 
 instance FromJSON ParameterValue where
   parseJSON = \case
-    String x -> pure $ ParameterValue x
-    Number x -> pure $ ParameterValue $ dropSuffix ".0" $ pack $ show x
+    String x -> pure $ ParameterValue $ Last x
+    Number x -> pure $ ParameterValue $ Last $ dropSuffix ".0" $ pack $ show x
     x -> fail $ "Expected String or Number, got: " <> show x
 
 instance ToJSON ParameterYaml where
@@ -129,7 +145,21 @@ parameterPairs (ParameterYaml k v) = [k .= v]
 newtype TagsYaml = TagsYaml
   { unTagsYaml :: [TagYaml]
   }
+  deriving stock (Eq, Show)
   deriving newtype ToJSON
+
+instance Semigroup TagsYaml where
+  TagsYaml as <> TagsYaml bs =
+    TagsYaml
+      $ map (TagYaml . uncurry newTag)
+      $ HashMap.toList
+      $ HashMap.fromList
+      $ map (toPair . unTagYaml)
+      $ as
+      <> bs
+   where
+    toPair :: Tag -> (Text, Text)
+    toPair = (^. tag_key) &&& (^. tag_value)
 
 instance FromJSON TagsYaml where
   parseJSON = \case
@@ -149,6 +179,7 @@ tagsYaml = TagsYaml
 newtype TagYaml = TagYaml
   { unTagYaml :: Tag
   }
+  deriving newtype (Eq, Show)
 
 instance FromJSON TagYaml where
   parseJSON = withObject "Tag" $ \o -> do
