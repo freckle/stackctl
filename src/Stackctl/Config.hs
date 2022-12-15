@@ -5,9 +5,7 @@ module Stackctl.Config
   , emptyConfig
   , HasConfig(..)
   , ConfigError(..)
-  , loadConfig
   , loadConfigOrExit
-  , loadConfigFrom
   , loadConfigFromBytes
   , applyConfig
   ) where
@@ -67,9 +65,6 @@ configErrorMessage = \case
   ConfigVersionNotSatisfied rv v ->
     "Incompatible Stackctl version" :# ["current" .= v, "required" .= show rv]
 
-loadConfig :: MonadIO m => m (Either ConfigError Config)
-loadConfig = runExceptT $ loadConfigFrom defaultConfigFile
-
 loadConfigOrExit :: (MonadIO m, MonadLogger m) => m Config
 loadConfigOrExit = either die pure =<< loadConfig
  where
@@ -77,13 +72,13 @@ loadConfigOrExit = either die pure =<< loadConfig
     logError $ configErrorMessage e
     exitFailure
 
-loadConfigFrom :: (MonadIO m, MonadError ConfigError m) => FilePath -> m Config
-loadConfigFrom path = do
-  exists <- doesFileExist path
+loadConfig :: MonadIO m => m (Either ConfigError Config)
+loadConfig = runExceptT $ getConfigFile >>= \case
+  Nothing -> pure emptyConfig
+  Just cf -> loadConfigFrom cf
 
-  if exists
-    then loadConfigFromBytes =<< liftIO (readFileBinary path)
-    else pure emptyConfig
+loadConfigFrom :: (MonadIO m, MonadError ConfigError m) => FilePath -> m Config
+loadConfigFrom path = loadConfigFromBytes =<< liftIO (readFileBinary path)
 
 loadConfigFromBytes :: MonadError ConfigError m => ByteString -> m Config
 loadConfigFromBytes bs = do
@@ -101,5 +96,11 @@ applyConfig config ss@StackSpecYaml {..} = ss
   , ssyTags = configTags config <> ssyTags
   }
 
-defaultConfigFile :: FilePath
-defaultConfigFile = ".stackctl" </> "config.yaml"
+getConfigFile :: MonadIO m => m (Maybe FilePath)
+getConfigFile = listToMaybe <$> filterM
+  doesFileExist
+  [ ".stackctl" </> "config" <.> "yaml"
+  , ".stackctl" </> "config" <.> "yml"
+  , ".stackctl" <.> "yaml"
+  , ".stackctl" <.> "yml"
+  ]
