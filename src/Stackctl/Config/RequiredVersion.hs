@@ -35,7 +35,10 @@ requiredVersionFromText = fromWords . T.words
   fromWords = \case
     [w] -> parseRequiredVersion "=" w
     [op, w] -> parseRequiredVersion op w
-    _ -> Left "TODO"
+    ws ->
+      Left
+        $ show (unpack $ T.unwords ws)
+        <> " did not parse as optional operator and version string"
 
   parseRequiredVersion :: Text -> Text -> Either String RequiredVersion
   parseRequiredVersion op w = do
