@@ -2,6 +2,9 @@ module Stackctl.Config.RequiredVersion
   ( RequiredVersion(..)
   , requiredVersionFromText
   , isRequiredVersionSatisfied
+
+  -- * Exported for testing
+  , (=~)
   ) where
 
 import Stackctl.Prelude
