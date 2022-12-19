@@ -1,4 +1,25 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.2.2...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.3.0...main)
+
+## [v1.1.3.0](https://github.com/freckle/stackctl/compare/v1.1.2.2...v1.1.3.0)
+
+- Repository-local configuration
+
+  See https://github.com/freckle/stackctl/commit/564678203fe70b5c4c46c655dd3daeaafb6de9e0
+
+- Don't duplicate re-used templates in `stackctl-cat`
+- Improve `--filter`
+
+  - Match against stack name and template, in addition to spec path.
+  - Automatically prepend `**/` (unless there is already a leading wildcard) and
+    append `{/*,.yaml,.json}` (unless there is already a trailing wildcard or
+    extension).
+
+  In general, this aims to make `--filter` match more things more intuitively
+  for operators, but still match exactly in programmatic use-cases.
+
+- Various documentation improvements
+- Support more natural `{Key}: {Value}` syntax in `Parameters` and `Tags`
+- Fix bug where we may generate an `{}` element in `Parameters`
 
 ## [v1.1.2.2](https://github.com/freckle/stackctl/compare/v1.1.2.1...v1.1.2.2)
 
