@@ -40,7 +40,7 @@ import qualified Data.Aeson.Key as Key
 import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Aeson.Types (typeMismatch)
 import qualified Data.HashMap.Strict as HashMap
-import Data.Semigroup (Last(..))
+import Data.Monoid (Last(..))
 import qualified Data.Text as T
 import Stackctl.Action
 import Stackctl.AWS
@@ -100,39 +100,38 @@ parametersYaml = ParametersYaml
 
 data ParameterYaml = ParameterYaml
   { pyKey :: Key
-  , pyValue :: Maybe ParameterValue
+  , pyValue :: Last ParameterValue
   }
   deriving stock (Eq, Show)
+
+mkParameterYaml :: Text -> Maybe ParameterValue -> ParameterYaml
+mkParameterYaml k = ParameterYaml (Key.fromText k) . Last
 
 parameterYaml :: Parameter -> Maybe ParameterYaml
 parameterYaml p = do
   k <- p ^. parameter_parameterKey
-  pure
-    $ ParameterYaml (Key.fromText k)
-    $ ParameterValue
-    . Last
-    <$> p
-    ^. parameter_parameterValue
+  let mv = p ^. parameter_parameterValue
+  pure $ mkParameterYaml k $ ParameterValue <$> mv
 
 unParameterYaml :: ParameterYaml -> Parameter
 unParameterYaml (ParameterYaml k v) =
-  makeParameter (Key.toText k) $ getLast . unParameterValue <$> v
+  makeParameter (Key.toText k) $ unParameterValue <$> getLast v
 
 instance FromJSON ParameterYaml where
   parseJSON = withObject "Parameter" $ \o ->
-    (ParameterYaml <$> o .: "Name" <*> o .:? "Value")
-      <|> (ParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
+    (mkParameterYaml <$> o .: "Name" <*> o .:? "Value")
+      <|> (mkParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
 
 newtype ParameterValue = ParameterValue
-  { unParameterValue :: Last Text
+  { unParameterValue :: Text
   }
   deriving stock (Eq, Show)
   deriving newtype (Semigroup, ToJSON)
 
 instance FromJSON ParameterValue where
   parseJSON = \case
-    String x -> pure $ ParameterValue $ Last x
-    Number x -> pure $ ParameterValue $ Last $ dropSuffix ".0" $ pack $ show x
+    String x -> pure $ ParameterValue x
+    Number x -> pure $ ParameterValue $ dropSuffix ".0" $ pack $ show x
     x -> fail $ "Expected String or Number, got: " <> show x
 
 instance ToJSON ParameterYaml where
