@@ -6,6 +6,7 @@ import Stackctl.Prelude
 
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Config (emptyConfig)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
@@ -27,7 +28,8 @@ spec = do
         `shouldBe` ["iam", "roles", "networking", "app"]
 
 toSpec :: Text -> [Text] -> StackSpec
-toSpec name depends = buildStackSpec "." specPath specBody
+toSpec name depends = flip runReader emptyConfig
+  $ buildStackSpec "." specPath specBody
  where
   stackName = StackName name
   specPath = stackSpecPath scope stackName "a/b.yaml"

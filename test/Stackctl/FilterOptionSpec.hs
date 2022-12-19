@@ -8,6 +8,7 @@ import Stackctl.Prelude
 
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Config (emptyConfig)
 import Stackctl.FilterOption
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
@@ -88,7 +89,8 @@ spec = do
         `shouldMatchList` ["some-name", "prefix-foo"]
 
 toSpec :: Text -> FilePath -> Maybe FilePath -> StackSpec
-toSpec name path mTemplate = buildStackSpec "." specPath specBody
+toSpec name path mTemplate = flip runReader emptyConfig
+  $ buildStackSpec "." specPath specBody
  where
   stackName = StackName name
   specPath = stackSpecPath scope stackName path

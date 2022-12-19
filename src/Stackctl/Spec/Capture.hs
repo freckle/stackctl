@@ -9,6 +9,7 @@ import Stackctl.Prelude
 import Options.Applicative
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.Spec.Generate
 import Stackctl.StackSpec
@@ -66,6 +67,7 @@ runCapture
      , MonadReader env m
      , HasAwsScope env
      , HasAwsEnv env
+     , HasConfig env
      , HasDirectoryOption env
      )
   => CaptureOptions

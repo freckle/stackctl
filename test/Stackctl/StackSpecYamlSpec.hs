@@ -116,3 +116,29 @@ spec = do
         Just [param] = map unParameterYaml . unParametersYaml <$> ssyParameters
       param ^. parameter_parameterKey `shouldBe` Just "Foo"
       param ^. parameter_parameterValue `shouldBe` Just "Bar"
+
+  describe "ParametersYaml" $ do
+    it "has overriding Semigroup semantics" $ do
+      let
+        a = parametersYaml []
+        b = parametersYaml
+          $ catMaybes [parameterYaml $ makeParameter "Key" (Just "B")]
+        c = parametersYaml
+          $ catMaybes [parameterYaml $ makeParameter "Key" (Just "C")]
+        d = parametersYaml
+          $ catMaybes [parameterYaml $ makeParameter "Key" Nothing]
+
+      a <> b `shouldBe` b -- keeps keys in B
+      b <> c `shouldBe` c -- C overrides B (Last)
+      c <> d `shouldBe` c -- C overrides D (Just)
+      d <> c `shouldBe` c -- C overrides D (Just)
+
+  describe "TagsYaml" $ do
+    it "has overriding Semigroup semantics" $ do
+      let
+        a = tagsYaml []
+        b = tagsYaml [TagYaml $ newTag "Key" "B"]
+        c = tagsYaml [TagYaml $ newTag "Key" "C"]
+
+      a <> b `shouldBe` b -- keeps keys in B
+      b <> c `shouldBe` c -- C overrides B (Last)
