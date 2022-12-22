@@ -58,10 +58,9 @@ data ActionRun
   deriving stock (Eq, Show)
 
 instance FromJSON ActionRun where
-  parseJSON = withObject "ActionRun" $ \o -> asum
-    [ InvokeLambdaByStackOutput <$> o .: "InvokeLambdaByStackOutput"
-    , InvokeLambdaByStackOutput <$> o .: "InvokeLambdaByName"
-    ]
+  parseJSON = withObject "ActionRun" $ \o ->
+    (InvokeLambdaByStackOutput <$> o .: "InvokeLambdaByStackOutput")
+      <|> (InvokeLambdaByName <$> o .: "InvokeLambdaByName")
 
 instance ToJSON ActionRun where
   toJSON = object . \case
