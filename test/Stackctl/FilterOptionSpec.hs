@@ -88,9 +88,22 @@ spec = do
       map specName (filterStackSpecs option specs)
         `shouldMatchList` ["some-name", "prefix-foo"]
 
+  describe "filterOptionFromPaths" $ do
+    it "finds full paths (e.g. as output by generate)" $ do
+      let
+        option = filterOptionFromPaths
+          $ pure "stacks/1234567890.test-account/us-east-1/stack.yaml"
+        specs =
+          [ toSpec "some-name" "stack.yaml" Nothing
+          , toSpec "other-path" "other-stack.yaml" $ Just "x"
+          ]
+
+      map specName (filterStackSpecs option specs)
+        `shouldMatchList` ["some-name"]
+
 toSpec :: Text -> FilePath -> Maybe FilePath -> StackSpec
 toSpec name path mTemplate = flip runReader emptyConfig
-  $ buildStackSpec "." specPath specBody
+  $ buildStackSpec ".platform/specs" specPath specBody
  where
   stackName = StackName name
   specPath = stackSpecPath scope stackName path
