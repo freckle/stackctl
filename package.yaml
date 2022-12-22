@@ -108,6 +108,7 @@ tests:
     source-dirs: test
     dependencies:
       - QuickCheck
+      - aeson
       - bytestring
       - hspec
       - mtl

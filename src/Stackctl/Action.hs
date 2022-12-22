@@ -31,14 +31,14 @@ data Action = Action
   { on :: ActionOn
   , run :: ActionRun
   }
-  deriving stock Generic
+  deriving stock (Eq, Show, Generic)
   deriving anyclass (FromJSON, ToJSON)
 
 newAction :: ActionOn -> ActionRun -> Action
 newAction = Action
 
 data ActionOn = PostDeploy
-  deriving stock (Eq, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance FromJSON ActionOn where
   parseJSON = withText "ActionOn" $ \case
@@ -55,6 +55,7 @@ instance ToJSON ActionOn where
 data ActionRun
   = InvokeLambdaByStackOutput Text
   | InvokeLambdaByName Text
+  deriving stock (Eq, Show)
 
 instance FromJSON ActionRun where
   parseJSON = withObject "ActionRun" $ \o -> asum

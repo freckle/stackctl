@@ -6,13 +6,29 @@ module Stackctl.StackSpecYamlSpec
 
 import Stackctl.Prelude
 
+import Data.Aeson
 import qualified Data.Yaml as Yaml
 import Stackctl.AWS
 import Stackctl.StackSpecYaml
+import Stackctl.Action
 import Test.Hspec
 
 spec :: Spec
 spec = do
+  describe "From/ToJSON" $ do
+    it "round trips" $ do
+      let yaml = StackSpecYaml
+            { ssyDescription = Just $ StackDescription "Testing Stack"
+            , ssyTemplate = "path/to/template.yaml"
+            , ssyDepends = Just [StackName "a-stack", StackName "another-stack"]
+            , ssyActions = Just [newAction PostDeploy $ InvokeLambdaByName "a-lambda"]
+            , ssyParameters = Just $ parametersYaml $ mapMaybe parameterYaml [makeParameter "PKey" $ Just "PValue"]
+            , ssyCapabilities = Just [Capability_CAPABILITY_IAM]
+            , ssyTags = Just $ tagsYaml [TagYaml $ newTag "TKey" "TValue"]
+            }
+
+      eitherDecode (encode yaml) `shouldBe` Right yaml
+
   describe "decoding Yaml" $ do
     it "reads String parameters" $ do
       StackSpecYaml {..} <- Yaml.decodeThrow $ mconcat

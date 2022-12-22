@@ -111,4 +111,4 @@ awsWithin r = local $ over (awsEnvL . unL) (within r)
 newtype AccountId = AccountId
   { unAccountId :: Text
   }
-  deriving newtype (Eq, Ord, ToJSON)
+  deriving newtype (Eq, Ord, Show, ToJSON)

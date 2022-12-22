@@ -14,7 +14,7 @@ data AwsScope = AwsScope
   , awsAccountName :: Text
   , awsRegion :: Region
   }
-  deriving stock Generic
+  deriving stock (Eq, Show, Generic)
   deriving anyclass ToJSON
 
 class HasAwsScope env where

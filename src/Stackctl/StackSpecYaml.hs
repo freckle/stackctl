@@ -54,7 +54,7 @@ data StackSpecYaml = StackSpecYaml
   , ssyCapabilities :: Maybe [Capability]
   , ssyTags :: Maybe TagsYaml
   }
-  deriving stock Generic
+  deriving stock (Eq, Show, Generic)
 
 instance FromJSON StackSpecYaml where
   parseJSON = genericParseJSON $ aesonPrefix id
