@@ -68,6 +68,13 @@ stackSpecStackFile = stackSpecPathFilePath . ssSpecPath
 stackSpecTemplateFile :: StackSpec -> FilePath
 stackSpecTemplateFile = ("templates" </>) . ssyTemplate . ssSpecBody
 
+stackSpecTemplate :: StackSpec -> StackTemplate
+stackSpecTemplate spec =
+  StackTemplate
+    $ FilePath.normalise
+    $ ssSpecRoot spec
+    </> stackSpecTemplateFile spec
+
 stackSpecParameters :: StackSpec -> [Parameter]
 stackSpecParameters =
   maybe [] (map unParameterYaml . unParametersYaml) . ssyParameters . ssSpecBody
@@ -163,7 +170,7 @@ createChangeSet
 createChangeSet spec parameters = awsCloudFormationCreateChangeSet
   (stackSpecStackName spec)
   (stackSpecStackDescription spec)
-  (StackTemplate $ stackSpecTemplateFile spec)
+  (stackSpecTemplate spec)
   (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
   )
   (stackSpecCapabilities spec)
