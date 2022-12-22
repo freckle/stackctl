@@ -26,7 +26,7 @@ import System.FilePath as X
   (dropExtension, takeBaseName, takeDirectory, (<.>), (</>))
 import UnliftIO.Directory as X (withCurrentDirectory)
 
-{-# ANN module ("HLint: ignore Avoid restricted qualification" :: String) #-}
+{-# ANN module ("HLint: ignore Avoid restricted alias" :: String) #-}
 
 decodeUtf8 :: ByteString -> Text
 decodeUtf8 = decodeUtf8With lenientDecode
