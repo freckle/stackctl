@@ -42,8 +42,8 @@ import Data.Aeson.Types (typeMismatch)
 import qualified Data.HashMap.Strict as HashMap
 import Data.Monoid (Last(..))
 import qualified Data.Text as T
-import Stackctl.AWS
 import Stackctl.Action
+import Stackctl.AWS
 
 data StackSpecYaml = StackSpecYaml
   { ssyDescription :: Maybe StackDescription

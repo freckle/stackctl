@@ -8,8 +8,8 @@ import Stackctl.Prelude
 
 import Data.Aeson
 import qualified Data.Yaml as Yaml
-import Stackctl.AWS
 import Stackctl.Action
+import Stackctl.AWS
 import Stackctl.StackSpecYaml
 import Test.Hspec
 
