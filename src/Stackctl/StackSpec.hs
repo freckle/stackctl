@@ -60,15 +60,13 @@ stackSpecDepends = fromMaybe [] . ssyDepends . ssSpecBody
 stackSpecActions :: StackSpec -> [Action]
 stackSpecActions = fromMaybe [] . ssyActions . ssSpecBody
 
--- | Normalized, relative path to the @[{root}/]stacks/@ file
+-- | Relative path @stacks/...@
 stackSpecStackFile :: StackSpec -> FilePath
-stackSpecStackFile StackSpec {..} =
-  FilePath.normalise $ ssSpecRoot </> stackSpecPathFilePath ssSpecPath
+stackSpecStackFile = stackSpecPathFilePath . ssSpecPath
 
--- | Normalized, relative path to the @[{root}/]templates/@ file
+-- | Relative path @templates/...@
 stackSpecTemplateFile :: StackSpec -> FilePath
-stackSpecTemplateFile StackSpec {..} =
-  FilePath.normalise $ ssSpecRoot </> "templates" </> ssyTemplate ssSpecBody
+stackSpecTemplateFile = ("templates" </>) . ssyTemplate . ssSpecBody
 
 stackSpecParameters :: StackSpec -> [Parameter]
 stackSpecParameters =
@@ -127,19 +125,16 @@ writeTemplateBody path body = do
   dir = takeDirectory path
   ext = takeExtension path
 
-writeStackSpec
-  :: MonadUnliftIO m
-  => FilePath -- ^ Parent directory
-  -> StackSpec
-  -> TemplateBody
-  -> m ()
-writeStackSpec parent stackSpec@StackSpec {..} templateBody = do
+writeStackSpec :: MonadUnliftIO m => StackSpec -> TemplateBody -> m ()
+writeStackSpec stackSpec@StackSpec {..} templateBody = do
   writeTemplateBody templatePath templateBody
   createDirectoryIfMissing True $ takeDirectory specPath
   liftIO $ Yaml.encodeFile specPath ssSpecBody
  where
-  templatePath = stackSpecTemplateFile stackSpec
-  specPath = parent </> stackSpecPathFilePath ssSpecPath
+  templatePath =
+    FilePath.normalise $ ssSpecRoot </> stackSpecTemplateFile stackSpec
+  specPath =
+    FilePath.normalise $ ssSpecRoot </> stackSpecPathFilePath ssSpecPath
 
 readStackSpec
   :: (MonadIO m, MonadReader env m, HasConfig env)

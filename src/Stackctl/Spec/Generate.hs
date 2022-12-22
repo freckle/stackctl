@@ -75,5 +75,5 @@ generate Generate {..} = do
 
   withThreadContext ["stackName" .= stackSpecStackName stackSpec] $ do
     logInfo "Generating specification"
-    writeStackSpec gOutputDirectory stackSpec gTemplateBody
+    writeStackSpec stackSpec gTemplateBody
     pure $ stackSpecPathFilePath specPath
