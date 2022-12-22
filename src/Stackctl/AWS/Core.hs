@@ -1,7 +1,5 @@
 module Stackctl.AWS.Core
-  (
-  -- * AWS via 'MonadReader'
-    AwsEnv
+  ( AwsEnv
   , HasAwsEnv(..)
   , awsEnvDiscover
   , awsSimple
