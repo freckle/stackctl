@@ -42,6 +42,9 @@ data StackSpec = StackSpec
   , ssSpecBody :: StackSpecYaml
   }
 
+stackSpecSpecRoot :: StackSpec -> FilePath
+stackSpecSpecRoot = ssSpecRoot
+
 stackSpecSpecPath :: StackSpec -> StackSpecPath
 stackSpecSpecPath = ssSpecPath
 
@@ -133,15 +136,16 @@ writeTemplateBody path body = do
   ext = takeExtension path
 
 writeStackSpec :: MonadUnliftIO m => StackSpec -> TemplateBody -> m ()
-writeStackSpec stackSpec@StackSpec {..} templateBody = do
+writeStackSpec stackSpec templateBody = do
   writeTemplateBody templatePath templateBody
   createDirectoryIfMissing True $ takeDirectory specPath
-  liftIO $ Yaml.encodeFile specPath ssSpecBody
+  liftIO $ Yaml.encodeFile specPath $ stackSpecSpecBody stackSpec
  where
-  templatePath =
-    FilePath.normalise $ ssSpecRoot </> stackSpecTemplateFile stackSpec
+  templatePath = unStackTemplate $ stackSpecTemplate stackSpec
   specPath =
-    FilePath.normalise $ ssSpecRoot </> stackSpecPathFilePath ssSpecPath
+    FilePath.normalise
+      $ stackSpecSpecRoot stackSpec
+      </> stackSpecStackFile stackSpec
 
 readStackSpec
   :: (MonadIO m, MonadReader env m, HasConfig env)
