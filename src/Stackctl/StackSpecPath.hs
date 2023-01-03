@@ -30,6 +30,7 @@ data StackSpecPath = StackSpecPath
   , sspStackName :: StackName
   , sspPath :: FilePath
   }
+  deriving stock (Eq, Show)
 
 stackSpecPath :: AwsScope -> StackName -> FilePath -> StackSpecPath
 stackSpecPath sspAwsScope@AwsScope {..} sspStackName sspPath = StackSpecPath

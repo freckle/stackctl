@@ -1,7 +1,5 @@
 module Stackctl.AWS.Core
-  (
-  -- * AWS via 'MonadReader'
-    AwsEnv
+  ( AwsEnv
   , HasAwsEnv(..)
   , awsEnvDiscover
   , awsSimple
@@ -111,4 +109,4 @@ awsWithin r = local $ over (awsEnvL . unL) (within r)
 newtype AccountId = AccountId
   { unAccountId :: Text
   }
-  deriving newtype (Eq, Ord, ToJSON)
+  deriving newtype (Eq, Ord, Show, ToJSON)

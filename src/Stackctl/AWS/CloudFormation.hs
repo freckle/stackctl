@@ -115,7 +115,7 @@ newtype StackTemplate = StackTemplate
   { unStackTemplate :: FilePath
   }
   deriving stock (Eq, Show)
-  deriving newtype FromJSON
+  deriving newtype (FromJSON, ToJSON)
 
 data StackDeployResult
   = StackCreateSuccess
@@ -343,10 +343,13 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
     $ trying (_ServiceError . hasStatus 400)
     $ do
         name <- newChangeSetName
+
+        logDebug $ "Reading Template" :# ["path" .= stackTemplate]
         templateBody <- addStackDescription mStackDescription
           <$> readFileUtf8 (unStackTemplate stackTemplate)
 
         mStack <- awsCloudFormationDescribeStackMaybe stackName
+
         let
           changeSetType = fromMaybe ChangeSetType_CREATE $ do
             stack <- mStack
@@ -363,7 +366,9 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
               . (createChangeSet_capabilities ?~ capabilities)
               . (createChangeSet_tags ?~ tags)
 
-        logInfo "Creating changeset..."
+        logInfo
+          $ "Creating changeset..."
+          :# ["name" .= name, "type" .= changeSetType]
         csId <- awsSimple "CreateChangeSet" req (^. createChangeSetResponse_id)
 
         logDebug "Awaiting CREATE_COMPLETE"

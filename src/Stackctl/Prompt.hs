@@ -41,4 +41,4 @@ promptContinue = prompt "Continue (y/n)" parse dispatch
     | x `elem` ["n", "N"] = Right False
     | otherwise = Left $ "Must be y, Y, n, or N (saw " <> x <> ")"
 
-  dispatch b = if b then pure () else exitSuccess
+  dispatch b = unless b exitSuccess

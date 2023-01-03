@@ -54,7 +54,7 @@ data StackSpecYaml = StackSpecYaml
   , ssyCapabilities :: Maybe [Capability]
   , ssyTags :: Maybe TagsYaml
   }
-  deriving stock Generic
+  deriving stock (Eq, Show, Generic)
 
 instance FromJSON StackSpecYaml where
   parseJSON = genericParseJSON $ aesonPrefix id
@@ -67,7 +67,6 @@ newtype ParametersYaml = ParametersYaml
   { unParametersYaml :: [ParameterYaml]
   }
   deriving stock (Eq, Show)
-  deriving newtype ToJSON
 
 instance Semigroup ParametersYaml where
   ParametersYaml as <> ParametersYaml bs =
@@ -95,6 +94,13 @@ instance FromJSON ParametersYaml where
         <> ", list of {ParameterKey, ParameterValue} Objects"
         <> ", or list of {Key, Value} Objects"
 
+instance ToJSON ParametersYaml where
+  toJSON = object . parametersYamlPairs
+  toEncoding = pairs . mconcat . parametersYamlPairs
+
+parametersYamlPairs :: KeyValue kv => ParametersYaml -> [kv]
+parametersYamlPairs = map parameterYamlPair . unParametersYaml
+
 parametersYaml :: [ParameterYaml] -> ParametersYaml
 parametersYaml = ParametersYaml
 
@@ -103,6 +109,14 @@ data ParameterYaml = ParameterYaml
   , pyValue :: Last ParameterValue
   }
   deriving stock (Eq, Show)
+
+instance FromJSON ParameterYaml where
+  parseJSON = withObject "Parameter" $ \o ->
+    (mkParameterYaml <$> o .: "Name" <*> o .:? "Value")
+      <|> (mkParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
+
+parameterYamlPair :: KeyValue kv => ParameterYaml -> kv
+parameterYamlPair ParameterYaml {..} = pyKey .= pyValue
 
 mkParameterYaml :: Text -> Maybe ParameterValue -> ParameterYaml
 mkParameterYaml k = ParameterYaml (Key.fromText k) . Last
@@ -117,11 +131,6 @@ unParameterYaml :: ParameterYaml -> Parameter
 unParameterYaml (ParameterYaml k v) =
   makeParameter (Key.toText k) $ unParameterValue <$> getLast v
 
-instance FromJSON ParameterYaml where
-  parseJSON = withObject "Parameter" $ \o ->
-    (mkParameterYaml <$> o .: "Name" <*> o .:? "Value")
-      <|> (mkParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
-
 newtype ParameterValue = ParameterValue
   { unParameterValue :: Text
   }
@@ -134,18 +143,10 @@ instance FromJSON ParameterValue where
     Number x -> pure $ ParameterValue $ dropSuffix ".0" $ pack $ show x
     x -> fail $ "Expected String or Number, got: " <> show x
 
-instance ToJSON ParameterYaml where
-  toJSON = object . parameterPairs
-  toEncoding = pairs . mconcat . parameterPairs
-
-parameterPairs :: KeyValue a => ParameterYaml -> [a]
-parameterPairs (ParameterYaml k v) = [k .= v]
-
 newtype TagsYaml = TagsYaml
   { unTagsYaml :: [TagYaml]
   }
   deriving stock (Eq, Show)
-  deriving newtype ToJSON
 
 instance Semigroup TagsYaml where
   TagsYaml as <> TagsYaml bs =
@@ -172,6 +173,13 @@ instance FromJSON TagsYaml where
     v -> typeMismatch err v
     where err = "Object or list of {Key, Value} Objects"
 
+instance ToJSON TagsYaml where
+  toJSON = object . tagsYamlPairs
+  toEncoding = pairs . mconcat . tagsYamlPairs
+
+tagsYamlPairs :: KeyValue kv => TagsYaml -> [kv]
+tagsYamlPairs = map tagYamlPair . unTagsYaml
+
 tagsYaml :: [TagYaml] -> TagsYaml
 tagsYaml = TagsYaml
 
@@ -185,12 +193,8 @@ instance FromJSON TagYaml where
     t <- newTag <$> o .: "Key" <*> o .: "Value"
     pure $ TagYaml t
 
-instance ToJSON TagYaml where
-  toJSON = object . tagPairs
-  toEncoding = pairs . mconcat . tagPairs
-
-tagPairs :: KeyValue a => TagYaml -> [a]
-tagPairs (TagYaml t) = ["Key" .= (t ^. tag_key), "Value" .= (t ^. tag_value)]
+tagYamlPair :: KeyValue kv => TagYaml -> kv
+tagYamlPair (TagYaml t) = Key.fromText (t ^. tag_key) .= (t ^. tag_value)
 
 dropSuffix :: Text -> Text -> Text
 dropSuffix suffix t = fromMaybe t $ T.stripSuffix suffix t
