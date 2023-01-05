@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.3.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.3.1...main)
+
+## [v1.1.3.1](https://github.com/freckle/stackctl/compare/v1.1.3.0...v1.1.3.1)
+
+- Fix JSON formatting bugs in generating specification
 
 ## [v1.1.3.0](https://github.com/freckle/stackctl/compare/v1.1.2.2...v1.1.3.0)
 
