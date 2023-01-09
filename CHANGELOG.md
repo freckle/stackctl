@@ -1,4 +1,9 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.1.4.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.2.0.0...main)
+
+## [v1.2.0.0](https://github.com/freckle/stackctl/compare/v1.1.3.1...v1.2.0.0)
+
+- Use more specific types in `Has{Directory,Filter,Color}Option`
+- Add environment variable configuration for `STACKCTL_{DIRECTORY,FILTERS}`
 
 ## [v1.1.4.0](https://github.com/freckle/stackctl/compare/v1.1.3.1...v1.1.4.0)
 
