@@ -87,7 +87,7 @@ runAppT options f = do
     $ defaultLogSettings
 
   logger <- newLogger $ adjustLogSettings
-    (options ^. colorOptionL)
+    (options ^. colorOptionL . to unColorOption)
     (options ^. verboseOptionL)
     envLogSettings
 

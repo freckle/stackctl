@@ -21,7 +21,7 @@ import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.Config (HasConfig)
-import Stackctl.DirectoryOption (HasDirectoryOption(..))
+import Stackctl.DirectoryOption (HasDirectoryOption(..), unDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
@@ -67,7 +67,7 @@ runCat
   => CatOptions
   -> m ()
 runCat CatOptions {..} = do
-  dir <- view directoryOptionL
+  dir <- unDirectoryOption <$> view directoryOptionL
   colors@Colors {..} <- getColorsStdout
   tree <- specTree <$> discoverSpecs
 

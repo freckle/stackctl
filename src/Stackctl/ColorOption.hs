@@ -1,5 +1,6 @@
 module Stackctl.ColorOption
-  ( LogColor(..)
+  ( ColorOption(..)
+  , defaultColorOption
   , HasColorOption(..)
   , colorOption
   , colorHandle
@@ -8,29 +9,38 @@ module Stackctl.ColorOption
 import Stackctl.Prelude
 
 import Blammo.Logging.LogSettings
+import Data.Semigroup (Last(..))
 import Options.Applicative
 
-class HasColorOption env where
-  colorOptionL :: Lens' env LogColor
+newtype ColorOption = ColorOption
+  { unColorOption :: LogColor
+  }
+  deriving Semigroup via Last ColorOption
 
-instance HasColorOption LogColor where
+defaultColorOption :: ColorOption
+defaultColorOption = ColorOption LogColorAuto
+
+class HasColorOption env where
+  colorOptionL :: Lens' env ColorOption
+
+instance HasColorOption ColorOption where
   colorOptionL = id
 
-colorOption :: Parser LogColor
-colorOption = option (eitherReader readLogColor) $ mconcat
+colorOption :: Parser ColorOption
+colorOption = option (eitherReader $ fmap ColorOption . readLogColor) $ mconcat
   [ long "color"
   , help "When to colorize output"
   , metavar "auto|always|never"
-  , value LogColorAuto
-  , showDefaultWith showLogColor
+  , value defaultColorOption
+  , showDefaultWith showColorOption
   ]
 
-showLogColor :: LogColor -> String
-showLogColor = \case
+showColorOption :: ColorOption -> String
+showColorOption co = case unColorOption co of
   LogColorAuto -> "auto"
   LogColorAlways -> "always"
   LogColorNever -> "never"
 
-colorHandle :: MonadIO m => Handle -> LogColor -> m Bool
-colorHandle h lc = shouldColorHandle settings h
-  where settings = setLogSettingsColor lc defaultLogSettings
+colorHandle :: MonadIO m => Handle -> ColorOption -> m Bool
+colorHandle h co = shouldColorHandle settings h
+  where settings = setLogSettingsColor (unColorOption co) defaultLogSettings

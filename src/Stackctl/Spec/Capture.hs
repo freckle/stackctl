@@ -10,7 +10,7 @@ import Options.Applicative
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Config (HasConfig)
-import Stackctl.DirectoryOption (HasDirectoryOption(..))
+import Stackctl.DirectoryOption (HasDirectoryOption(..), unDirectoryOption)
 import Stackctl.Spec.Generate
 import Stackctl.StackSpec
 import System.FilePath.Glob
@@ -74,7 +74,7 @@ runCapture
   => CaptureOptions
   -> m ()
 runCapture CaptureOptions {..} = do
-  dir <- view directoryOptionL
+  dir <- unDirectoryOption <$> view directoryOptionL
 
   let
     setScopeName scope =

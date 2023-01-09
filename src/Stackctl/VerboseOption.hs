@@ -11,6 +11,7 @@ import Blammo.Logging.LogSettings.LogLevels
 import Options.Applicative
 
 newtype Verbosity = Verbosity [()]
+  deriving newtype (Semigroup, Monoid)
 
 verbositySetLogLevels :: Verbosity -> (LogSettings -> LogSettings)
 verbositySetLogLevels (Verbosity bs) = case bs of
