@@ -23,6 +23,11 @@ creates a Change Set and executes it after confirmation.
 > in overriding the Parameter as an empty string. May be specified 0 or more
 > times.
 
+**\-t**, **\--tag** *\<KEY=[VALUE]\>*\
+
+> Override the given Tag for this operation. Omitting *VALUE* will result in
+> overriding the Tag as an empty string. May be specified 0 or more times.
+
 **\--save-change-sets** *\<PATH\>*\
 
 > Save generated Change Sets to **PATH/STACK.json**

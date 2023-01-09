@@ -170,15 +170,16 @@ createChangeSet
      )
   => StackSpec
   -> [Parameter]
+  -> [Tag]
   -> m (Either Text (Maybe ChangeSet))
-createChangeSet spec parameters = awsCloudFormationCreateChangeSet
+createChangeSet spec parameters tags = awsCloudFormationCreateChangeSet
   (stackSpecStackName spec)
   (stackSpecStackDescription spec)
   (stackSpecTemplate spec)
   (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
   )
   (stackSpecCapabilities spec)
-  (stackSpecTags spec)
+  (nubOrdOn (^. tag_key) $ tags <> stackSpecTags spec)
 
 sortStackSpecs :: [StackSpec] -> [StackSpec]
 sortStackSpecs = sortByDependencies stackSpecStackName stackSpecDepends

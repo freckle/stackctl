@@ -23,10 +23,12 @@ import Stackctl.Prompt
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
+import Stackctl.TagOption
 import UnliftIO.Directory (createDirectoryIfMissing)
 
 data DeployOptions = DeployOptions
   { sdoParameters :: [Parameter]
+  , sdoTags :: [Tag]
   , sdoSaveChangeSets :: Maybe FilePath
   , sdoDeployConfirmation :: DeployConfirmation
   , sdoClean :: Bool
@@ -37,6 +39,7 @@ data DeployOptions = DeployOptions
 runDeployOptions :: Parser DeployOptions
 runDeployOptions = DeployOptions
   <$> many parameterOption
+  <*> many tagOption
   <*> optional (strOption
     (  long "save-change-sets"
     <> metavar "DIRECTORY"
@@ -74,7 +77,7 @@ runDeploy DeployOptions {..} = do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
       handleRollbackComplete sdoDeployConfirmation $ stackSpecStackName spec
 
-      emChangeSet <- createChangeSet spec sdoParameters
+      emChangeSet <- createChangeSet spec sdoParameters sdoTags
 
       case emChangeSet of
         Left err -> do
