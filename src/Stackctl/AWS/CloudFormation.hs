@@ -1,5 +1,6 @@
 module Stackctl.AWS.CloudFormation
   ( Stack(..)
+  , stack_stackName
   , stackDescription
   , stackIsRollbackComplete
   , StackId(..)
@@ -35,6 +36,7 @@ module Stackctl.AWS.CloudFormation
   , awsCloudFormationDescribeStackMaybe
   , awsCloudFormationDescribeStackOutputs
   , awsCloudFormationDescribeStackEvents
+  , awsCloudFormationGetStackNamesMatching
   , awsCloudFormationGetMostRecentStackEventId
   , awsCloudFormationDeleteStack
   , awsCloudFormationWait
@@ -70,6 +72,7 @@ import Amazonka.CloudFormation.DescribeStacks
 import Amazonka.CloudFormation.ExecuteChangeSet
 import Amazonka.CloudFormation.GetTemplate
 import Amazonka.CloudFormation.ListChangeSets
+import Amazonka.CloudFormation.ListStacks
 import Amazonka.CloudFormation.Types
 import qualified Amazonka.CloudFormation.Types.ChangeSetSummary as Summary
 import Amazonka.CloudFormation.Waiters
@@ -96,6 +99,7 @@ import qualified Data.UUID.V4 as UUID
 import Stackctl.AWS.Core
 import Stackctl.Sort
 import Stackctl.StackDescription
+import System.FilePath.Glob
 import UnliftIO.Exception.Lens (handling_, trying)
 
 stackDescription :: Stack -> Maybe StackDescription
@@ -211,6 +215,22 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
     .| mapC (fromMaybe [] . (^. describeStackEventsResponse_stackEvents))
     .| concatC
     .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
+    .| sinkList
+
+awsCloudFormationGetStackNamesMatching
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  => Pattern
+  -> m [StackName]
+awsCloudFormationGetStackNamesMatching p = do
+  let req = newListStacks & listStacks_stackStatusFilter ?~ activeStatuses
+
+  runConduit
+    $ awsPaginate req
+    .| concatMapC (^. listStacksResponse_stackSummaries)
+    .| concatC
+    .| mapC (^. stackSummary_stackName)
+    .| filterC ((p `match`) . unpack)
+    .| mapC StackName
     .| sinkList
 
 awsCloudFormationGetMostRecentStackEventId
@@ -462,6 +482,9 @@ stackIsAbandonedCreate stack =
 stackIsRollbackComplete :: Stack -> Bool
 stackIsRollbackComplete stack =
   stack ^. stack_stackStatus == StackStatus_ROLLBACK_COMPLETE
+
+activeStatuses :: [StackStatus]
+activeStatuses = [StackStatus_CREATE_COMPLETE, StackStatus_UPDATE_COMPLETE]
 
 _ValidationError :: AsError a => Getting (First ServiceError) a ServiceError
 _ValidationError =

@@ -13,6 +13,7 @@ import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption(..))
 import Stackctl.Spec.Generate
 import Stackctl.StackSpec
+import System.FilePath.Glob
 
 data CaptureOptions = CaptureOptions
   { scoAccountName :: Maybe Text
@@ -20,7 +21,7 @@ data CaptureOptions = CaptureOptions
   , scoStackPath :: Maybe FilePath
   , scoDepends :: Maybe [StackName]
   , scoTemplateFormat :: TemplateFormat
-  , scoStackName :: StackName
+  , scoStackName :: Pattern
   }
 
 -- brittany-disable-next-binding
@@ -54,10 +55,10 @@ runCaptureOptions = CaptureOptions
       (  long "no-flip"
       <> help "Don't flip JSON templates to Yaml"
       )
-    <*> (StackName <$> argument str
+    <*> strArgument
       (  metavar "STACK"
       <> help "Name of deployed Stack to capture"
-      ))
+      )
 
 runCapture
   :: ( MonadMask m
@@ -74,24 +75,46 @@ runCapture
   -> m ()
 runCapture CaptureOptions {..} = do
   dir <- view directoryOptionL
-  stack <- awsCloudFormationDescribeStack scoStackName
-  template <- awsCloudFormationGetTemplate scoStackName
 
   let
     setScopeName scope =
       maybe scope (\name -> scope { awsAccountName = name }) scoAccountName
 
-  void $ local (awsScopeL %~ setScopeName) $ generate Generate
-    { gOutputDirectory = dir
-    , gTemplatePath = scoTemplatePath
-    , gTemplateFormat = scoTemplateFormat
-    , gStackPath = scoStackPath
-    , gStackName = scoStackName
-    , gDescription = stackDescription stack
-    , gDepends = scoDepends
-    , gActions = Nothing
-    , gParameters = parameters stack
-    , gCapabilities = capabilities stack
-    , gTags = tags stack
-    , gTemplateBody = templateBodyFromValue template
-    }
+    generate' stack template path templatePath = do
+      void $ local (awsScopeL %~ setScopeName) $ generate Generate
+        { gOutputDirectory = dir
+        , gTemplatePath = templatePath
+        , gTemplateFormat = scoTemplateFormat
+        , gStackPath = path
+        , gStackName = StackName $ stack ^. stack_stackName
+        , gDescription = stackDescription stack
+        , gDepends = scoDepends
+        , gActions = Nothing
+        , gParameters = parameters stack
+        , gCapabilities = capabilities stack
+        , gTags = tags stack
+        , gTemplateBody = templateBodyFromValue template
+        }
+
+  results <- awsCloudFormationGetStackNamesMatching scoStackName
+
+  case results of
+    [] -> do
+      logError
+        $ "No Active Stacks match "
+        <> pack (decompile scoStackName)
+        :# []
+      exitFailure
+
+    [stackName] -> do
+      stack <- awsCloudFormationDescribeStack stackName
+      template <- awsCloudFormationGetTemplate stackName
+      generate' stack template scoStackPath scoTemplatePath
+    stackNames -> do
+      logInfo "Capturing multiple matching Stacks"
+      for_ scoStackPath $ \_ -> logWarn "--path option ignored"
+      for_ scoTemplatePath $ \_ -> logWarn "--template-path option ignored"
+      for_ stackNames $ \stackName -> do
+        stack <- awsCloudFormationDescribeStack stackName
+        template <- awsCloudFormationGetTemplate stackName
+        generate' stack template Nothing Nothing
