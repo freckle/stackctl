@@ -7,6 +7,7 @@ module Stackctl.Subcommand
 
 import Stackctl.Prelude
 
+import qualified Env
 import Options.Applicative
 import qualified Stackctl.CLI as CLI
 import Stackctl.Colors
@@ -25,17 +26,24 @@ subcommand Subcommand {..} =
   command (unpack name) (run <$> withInfo description parse)
 
 runSubcommand :: Mod CommandFields (CLI.AppT (CLI.App Options) IO ()) -> IO ()
-runSubcommand = runSubcommand' "Work with Stack specifications" optionsParser
+runSubcommand =
+  runSubcommand' "Work with Stack specifications" envParser optionsParser
+
+-- brittany-disable-next-binding
 
 runSubcommand'
-  :: (HasVerboseOption options, HasColorOption options)
+  :: (Semigroup options, HasVerboseOption options, HasColorOption options)
   => Text
+  -> Env.Parser Env.Error options
   -> Parser options
   -> Mod CommandFields (CLI.AppT (CLI.App options) IO ())
   -> IO ()
-runSubcommand' x op sp = do
-  (options, act) <- execParser $ withInfo x $ (,) <$> op <*> subparser sp
+runSubcommand' title parseEnv parseCLI sp = do
+  (options, act) <- applyEnv
+    <$> Env.parse (Env.header $ unpack title) parseEnv
+    <*> execParser (withInfo title $ (,) <$> parseCLI <*> subparser sp)
   CLI.runAppT options act
+  where applyEnv env = first (env <>)
 
 withInfo :: Text -> Parser a -> ParserInfo a
 withInfo d p = info (p <**> helper) $ progDesc (unpack d) <> fullDesc

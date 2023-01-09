@@ -1,10 +1,13 @@
 module Stackctl.Options
-  ( Options(..)
+  ( Options
+  , envParser
   , optionsParser
   ) where
 
 import Stackctl.Prelude
 
+import Data.Semigroup.Generic
+import qualified Env
 import Options.Applicative
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
@@ -12,29 +15,49 @@ import Stackctl.FilterOption
 import Stackctl.VerboseOption
 
 data Options = Options
-  { oDirectory :: FilePath
-  , oFilterOption :: FilterOption
-  , oColor :: LogColor
+  { oDirectory :: Maybe DirectoryOption
+  , oFilter :: Maybe FilterOption
+  , oColor :: Maybe ColorOption
   , oVerbose :: Verbosity
   }
+  deriving stock Generic
+  deriving Semigroup via GenericSemigroupMonoid Options
+
+directoryL :: Lens' Options (Maybe DirectoryOption)
+directoryL = lens oDirectory $ \x y -> x { oDirectory = y }
+
+filterL :: Lens' Options (Maybe FilterOption)
+filterL = lens oFilter $ \x y -> x { oFilter = y }
+
+colorL :: Lens' Options (Maybe ColorOption)
+colorL = lens oColor $ \x y -> x { oColor = y }
 
 instance HasDirectoryOption Options where
-  directoryOptionL = lens oDirectory $ \x y -> x { oDirectory = y }
-
-instance HasColorOption Options where
-  colorOptionL = lens oColor $ \x y -> x { oColor = y }
+  directoryOptionL = directoryL . maybeLens defaultDirectoryOption
 
 instance HasFilterOption Options where
-  filterOptionL = lens oFilterOption $ \x y -> x { oFilterOption = y }
+  filterOptionL = filterL . maybeLens defaultFilterOption
+
+instance HasColorOption Options where
+  colorOptionL = colorL . maybeLens defaultColorOption
 
 instance HasVerboseOption Options where
   verboseOptionL = lens oVerbose $ \x y -> x { oVerbose = y }
 
 -- brittany-disable-next-binding
 
+envParser :: Env.Parser Env.Error Options
+envParser = Env.prefixed "STACKCTL_" $ Options
+  <$> optional envDirectoryOption
+  <*> optional (envFilterOption "specifications")
+  <*> pure mempty -- use LOG_COLOR
+  <*> pure mempty -- use LOG_LEVEL
+
+-- brittany-disable-next-binding
+
 optionsParser :: Parser Options
 optionsParser = Options
-  <$> directoryOption
-  <*> filterOption "specifications"
-  <*> colorOption
+  <$> optional directoryOption
+  <*> optional (filterOption "specifications")
+  <*> (Just <$> colorOption)
   <*> verboseOption

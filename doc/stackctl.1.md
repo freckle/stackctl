@@ -1,6 +1,6 @@
 % STACKCTL(1) User Manual
 %
-% March 2022
+% January 2023
 
 # NAME
 
@@ -256,6 +256,22 @@ them, wait, stream events, and finally clean up.
 See **stackctl-changes(1)** and **stackctl-deploy(1)**.
 
 # ENVIRONMENT
+
+*STACKCTL_DIRECTORY*\
+
+> Environment-based alternative for *\--directory*.
+
+*STACKCTL_FILTERS*\
+
+> Environment-based alternative for *\--filters*.
+
+*LOG_\**\
+
+> Variables such as *LOG_COLOR* or *LOG_LEVEL* will be respected by the
+> underlying logging framework (Blammo). Please see its documentation for
+> complete details:
+>
+> https://github.com/freckle/blammo#configuration
 
 *AWS_PROFILE*\
 

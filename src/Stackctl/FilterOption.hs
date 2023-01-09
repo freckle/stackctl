@@ -1,6 +1,8 @@
 module Stackctl.FilterOption
   ( FilterOption
+  , defaultFilterOption
   , HasFilterOption(..)
+  , envFilterOption
   , filterOption
   , filterOptionFromPaths
   , filterOptionFromText
@@ -10,7 +12,9 @@ module Stackctl.FilterOption
 import Stackctl.Prelude
 
 import qualified Data.List.NonEmpty as NE
+import Data.Semigroup (Last(..))
 import qualified Data.Text as T
+import qualified Env
 import Options.Applicative
 import Stackctl.AWS.CloudFormation (StackName(..))
 import Stackctl.StackSpec
@@ -20,6 +24,7 @@ import System.FilePath.Glob
 newtype FilterOption = FilterOption
   { unFilterOption :: NonEmpty Pattern
   }
+  deriving Semigroup via Last FilterOption
 
 instance ToJSON FilterOption where
   toJSON = toJSON . showFilterOption
@@ -31,13 +36,19 @@ class HasFilterOption env where
 instance HasFilterOption FilterOption where
   filterOptionL = id
 
+envFilterOption :: String -> Env.Parser Env.Error FilterOption
+envFilterOption items =
+  Env.var (first Env.UnreadError . readFilterOption) "FILTERS"
+    $ Env.help
+    $ "Filter "
+    <> items
+    <> " by patterns"
+
 filterOption :: String -> Parser FilterOption
 filterOption items = option (eitherReader readFilterOption) $ mconcat
   [ long "filter"
   , metavar "PATTERN[,PATTERN]"
   , help $ "Filter " <> items <> " to match PATTERN(s)"
-  , value defaultFilterOption
-  , showDefaultWith showFilterOption
   ]
 
 filterOptionFromPaths :: NonEmpty FilePath -> FilterOption
