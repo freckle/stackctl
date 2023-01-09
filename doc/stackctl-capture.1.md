@@ -43,7 +43,7 @@ If files already exist at the inferred locations, they will be overwritten.
 > Name of Stack to capture.
 >
 > Globs are also supported and all matching Stacks will be captured. When there
-> are multiple Stacks being captured, the **--path** and **--template-path**
+> are multiple Stacks being captured, the **\--path** and **\--template-path**
 > will be ignored and all Stacks will be captured to their inferred paths.
 
 # ENVIRONMENT
