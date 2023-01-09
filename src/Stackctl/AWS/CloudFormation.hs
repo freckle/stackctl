@@ -222,7 +222,7 @@ awsCloudFormationGetStackNamesMatching
   => Pattern
   -> m [StackName]
 awsCloudFormationGetStackNamesMatching p = do
-  let req = newListStacks & listStacks_stackStatusFilter ?~ activeStatuses
+  let req = newListStacks & listStacks_stackStatusFilter ?~ runningStatuses
 
   runConduit
     $ awsPaginate req
@@ -483,8 +483,12 @@ stackIsRollbackComplete :: Stack -> Bool
 stackIsRollbackComplete stack =
   stack ^. stack_stackStatus == StackStatus_ROLLBACK_COMPLETE
 
-activeStatuses :: [StackStatus]
-activeStatuses = [StackStatus_CREATE_COMPLETE, StackStatus_UPDATE_COMPLETE]
+runningStatuses :: [StackStatus]
+runningStatuses =
+  [ StackStatus_CREATE_COMPLETE
+  , StackStatus_UPDATE_COMPLETE
+  , StackStatus_UPDATE_ROLLBACK_COMPLETE
+  ]
 
 _ValidationError :: AsError a => Getting (First ServiceError) a ServiceError
 _ValidationError =
