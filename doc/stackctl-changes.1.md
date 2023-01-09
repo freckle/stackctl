@@ -28,6 +28,11 @@ successful operation.
 > in overriding the Parameter as an empty string. May be specified 0 or more
 > times.
 
+**\-t**, **\--tag** *\<KEY=[VALUE]\>*\
+
+> Override the given Tag for this operation. Omitting *VALUE* will result in
+> overriding the Tag as an empty string. May be specified 0 or more times.
+
 **PATH**\
 
 > Write changes to **PATH**, instead of printing them.

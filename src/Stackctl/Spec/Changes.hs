@@ -20,10 +20,12 @@ import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
+import Stackctl.TagOption
 
 data ChangesOptions = ChangesOptions
   { scoFormat :: Format
   , scoParameters :: [Parameter]
+  , scoTags :: [Tag]
   , scoOutput :: Maybe FilePath
   }
 
@@ -33,6 +35,7 @@ runChangesOptions :: Parser ChangesOptions
 runChangesOptions = ChangesOptions
   <$> formatOption
   <*> many parameterOption
+  <*> many tagOption
   <*> optional (argument str
     (  metavar "PATH"
     <> help "Write changes summary to PATH"
@@ -62,7 +65,7 @@ runChanges ChangesOptions {..} = do
 
   for_ specs $ \spec -> do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
-      emChangeSet <- createChangeSet spec scoParameters
+      emChangeSet <- createChangeSet spec scoParameters scoTags
 
       case emChangeSet of
         Left err -> do

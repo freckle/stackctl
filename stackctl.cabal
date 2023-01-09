@@ -59,6 +59,7 @@ library
       Stackctl.StackSpecPath
       Stackctl.StackSpecYaml
       Stackctl.Subcommand
+      Stackctl.TagOption
       Stackctl.VerboseOption
       Stackctl.Version
       UnliftIO.Exception.Lens
