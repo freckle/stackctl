@@ -1,6 +1,6 @@
 module Stackctl.Spec.Cat
   ( CatOptions(..)
-  , runCatOptions
+  , parseCatOptions
   , runCat
   ) where
 
@@ -36,8 +36,8 @@ data CatOptions = CatOptions
 
 -- brittany-disable-next-binding
 
-runCatOptions :: Parser CatOptions
-runCatOptions = CatOptions
+parseCatOptions :: Parser CatOptions
+parseCatOptions = CatOptions
   <$> switch
     (  long "no-stacks"
     <> help "Only show templates/"
