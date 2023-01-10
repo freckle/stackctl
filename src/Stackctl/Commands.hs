@@ -8,10 +8,7 @@ module Stackctl.Commands
 
 import Stackctl.Prelude
 
-import Stackctl.AWS
-import Stackctl.AWS.Scope
 import Stackctl.Colors
-import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Spec.Capture
@@ -19,70 +16,68 @@ import Stackctl.Spec.Cat
 import Stackctl.Spec.Changes
 import Stackctl.Spec.Deploy
 import Stackctl.Subcommand
+import Stackctl.VerboseOption
 import Stackctl.Version
 
 cat
-  :: ( HasLogger env
-     , HasAwsScope env
-     , HasConfig env
-     , HasDirectoryOption env
-     , HasFilterOption env
-     , HasColorOption env
+  :: ( HasColorOption options
+     , HasVerboseOption options
+     , HasDirectoryOption options
+     , HasFilterOption options
      )
-  => Subcommand CatOptions env
+  => Subcommand options CatOptions
 cat = Subcommand
   { name = "cat"
   , description = "Pretty-print specifications"
   , parse = runCatOptions
-  , run = runCat
+  , run = runAppSubcommand runCat
   }
 
 capture
-  :: (HasAwsScope env, HasAwsEnv env, HasConfig env, HasDirectoryOption env)
-  => Subcommand CaptureOptions env
+  :: ( HasColorOption options
+     , HasVerboseOption options
+     , HasDirectoryOption options
+     )
+  => Subcommand options CaptureOptions
 capture = Subcommand
   { name = "capture"
   , description = "Capture deployed Stacks as specifications"
   , parse = runCaptureOptions
-  , run = runCapture
+  , run = runAppSubcommand runCapture
   }
 
 changes
-  :: ( HasLogger env
-     , HasAwsScope env
-     , HasAwsEnv env
-     , HasConfig env
-     , HasDirectoryOption env
-     , HasFilterOption env
+  :: ( HasColorOption options
+     , HasVerboseOption options
+     , HasDirectoryOption options
+     , HasFilterOption options
      )
-  => Subcommand ChangesOptions env
+  => Subcommand options ChangesOptions
 changes = Subcommand
   { name = "changes"
   , description = "Review changes between specification and deployed state"
   , parse = runChangesOptions
-  , run = runChanges
+  , run = runAppSubcommand runChanges
   }
 
 deploy
-  :: ( HasLogger env
-     , HasAwsScope env
-     , HasAwsEnv env
-     , HasConfig env
-     , HasDirectoryOption env
-     , HasFilterOption env
+  :: ( HasColorOption options
+     , HasVerboseOption options
+     , HasDirectoryOption options
+     , HasFilterOption options
      )
-  => Subcommand DeployOptions env
+  => Subcommand options DeployOptions
 deploy = Subcommand
   { name = "deploy"
   , description = "Deploy specifications"
   , parse = runDeployOptions
-  , run = runDeploy
+  , run = runAppSubcommand runDeploy
   }
 
-version :: Subcommand () env
+version :: Subcommand options ()
 version = Subcommand
   { name = "version"
   , description = "Output the version"
   , parse = pure ()
-  , run = \() -> logVersion
+  , run = \() _ -> logVersion
   }
