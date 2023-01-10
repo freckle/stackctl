@@ -29,7 +29,7 @@ cat
 cat = Subcommand
   { name = "cat"
   , description = "Pretty-print specifications"
-  , parse = runCatOptions
+  , parse = parseCatOptions
   , run = runAppSubcommand runCat
   }
 
@@ -42,7 +42,7 @@ capture
 capture = Subcommand
   { name = "capture"
   , description = "Capture deployed Stacks as specifications"
-  , parse = runCaptureOptions
+  , parse = parseCaptureOptions
   , run = runAppSubcommand runCapture
   }
 
@@ -56,7 +56,7 @@ changes
 changes = Subcommand
   { name = "changes"
   , description = "Review changes between specification and deployed state"
-  , parse = runChangesOptions
+  , parse = parseChangesOptions
   , run = runAppSubcommand runChanges
   }
 
@@ -70,7 +70,7 @@ deploy
 deploy = Subcommand
   { name = "deploy"
   , description = "Deploy specifications"
-  , parse = runDeployOptions
+  , parse = parseDeployOptions
   , run = runAppSubcommand runDeploy
   }
 

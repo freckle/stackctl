@@ -1,6 +1,6 @@
 module Stackctl.Spec.Changes
   ( ChangesOptions(..)
-  , runChangesOptions
+  , parseChangesOptions
   , runChanges
   ) where
 
@@ -31,8 +31,8 @@ data ChangesOptions = ChangesOptions
 
 -- brittany-disable-next-binding
 
-runChangesOptions :: Parser ChangesOptions
-runChangesOptions = ChangesOptions
+parseChangesOptions :: Parser ChangesOptions
+parseChangesOptions = ChangesOptions
   <$> formatOption
   <*> many parameterOption
   <*> many tagOption

@@ -1,6 +1,6 @@
 module Stackctl.Spec.Capture
   ( CaptureOptions(..)
-  , runCaptureOptions
+  , parseCaptureOptions
   , runCapture
   ) where
 
@@ -26,8 +26,8 @@ data CaptureOptions = CaptureOptions
 
 -- brittany-disable-next-binding
 
-runCaptureOptions :: Parser CaptureOptions
-runCaptureOptions = CaptureOptions
+parseCaptureOptions :: Parser CaptureOptions
+parseCaptureOptions = CaptureOptions
     <$> optional (strOption
       (  short 'n'
       <> long "account-name"

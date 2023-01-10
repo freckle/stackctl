@@ -1,7 +1,7 @@
 module Stackctl.Spec.Deploy
   ( DeployOptions(..)
   , DeployConfirmation(..)
-  , runDeployOptions
+  , parseDeployOptions
   , runDeploy
   ) where
 
@@ -36,8 +36,8 @@ data DeployOptions = DeployOptions
 
 -- brittany-disable-next-binding
 
-runDeployOptions :: Parser DeployOptions
-runDeployOptions = DeployOptions
+parseDeployOptions :: Parser DeployOptions
+parseDeployOptions = DeployOptions
   <$> many parameterOption
   <*> many tagOption
   <*> optional (strOption
