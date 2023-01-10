@@ -11,41 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: freckle/stack-cache-action@v2
-
-      - id: stack
-        uses: freckle/stack-action@v3
-        with:
-          stack-arguments: --copy-bins
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: stackctl
-          path: |
-            ${{ steps.stack.outputs.local-bin }}/stackctl
-
-  # TODO
-  # integration-tests:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   environment: development
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-
-  #   steps:
-  #     - uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-  #         aws-region: us-east-1
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-python@v2
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         name: stackctl
-  #         path: /usr/local/bin
-  #     - run: sudo chmod +x /usr/local/bin/stackctl
-  #     - run: pip install cram
-  #     - run: cram -v integration/tests
+      - uses: freckle/stack-action@v3
 
   lint:
     runs-on: ubuntu-20.04
