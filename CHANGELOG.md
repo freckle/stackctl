@@ -1,4 +1,11 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.2.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.3.0.0...main)
+
+## [v1.3.0.0](https://github.com/freckle/stackctl/compare/v1.2.0.1...v1.3.0.0)
+
+- Fix it so commands like `version` don't need a valid AWS environment
+
+  This changes the `Subcommand` interface and so is a major version update for
+  the purposes of those using Stackctl as a library.
 
 ## [v1.2.0.0](https://github.com/freckle/stackctl/compare/v1.1.3.1...v1.2.0.0)
 
