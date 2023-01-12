@@ -59,6 +59,7 @@ library:
   dependencies:
     - Blammo >= 1.1.1.1 # pushLoggerLn, getLoggerShouldColor
     - Glob
+    - QuickCheck
     - aeson
     - aeson-casing
     - aeson-pretty

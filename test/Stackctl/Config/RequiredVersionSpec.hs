@@ -4,6 +4,7 @@ module Stackctl.Config.RequiredVersionSpec
 
 import Stackctl.Prelude
 
+import Data.Aeson (decode, encode)
 import Data.Version
 import Stackctl.Config.RequiredVersion
 import Test.Hspec
@@ -11,6 +12,10 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = do
+  describe "JSON" $ do
+    it "round-trips" $ property $ \rv -> do
+      decode (encode @RequiredVersion rv) `shouldBe` Just rv
+
   describe "requiredVersionFromText" $ do
     it "parses with or without operator" $ do
       requiredVersionFromText "1.2.3-rc1" `shouldSatisfy` isRight

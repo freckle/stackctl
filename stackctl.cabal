@@ -97,6 +97,7 @@ library
   build-depends:
       Blammo >=1.1.1.1
     , Glob
+    , QuickCheck
     , aeson
     , aeson-casing
     , aeson-pretty
