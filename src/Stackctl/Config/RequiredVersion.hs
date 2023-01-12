@@ -1,5 +1,6 @@
 module Stackctl.Config.RequiredVersion
   ( RequiredVersion(..)
+  , RequiredVersionOp(..)
   , requiredVersionToText
   , requiredVersionFromText
   , isRequiredVersionSatisfied
@@ -16,6 +17,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Data.Version hiding (parseVersion)
 import qualified Data.Version as Version
+import Test.QuickCheck
 import Text.ParserCombinators.ReadP (readP_to_S)
 
 data RequiredVersion = RequiredVersion
@@ -23,6 +25,9 @@ data RequiredVersion = RequiredVersion
   , requiredVersionCompareWith :: Version
   }
   deriving stock (Eq, Show)
+
+instance Arbitrary RequiredVersion where
+  arbitrary = RequiredVersion <$> arbitrary <*> arbitrary
 
 instance FromJSON RequiredVersion where
   parseJSON =
@@ -86,7 +91,10 @@ data RequiredVersionOp
   | RequiredVersionGT
   | RequiredVersionGTE
   | RequiredVersionIsh
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Show, Bounded, Enum)
+
+instance Arbitrary RequiredVersionOp where
+  arbitrary = arbitraryBoundedEnum
 
 requiredVersionOpToText :: RequiredVersionOp -> Text
 requiredVersionOpToText = \case
