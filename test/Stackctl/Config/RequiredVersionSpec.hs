@@ -32,6 +32,7 @@ spec = do
 
     it "compares exactly" $ prop (==) Nothing
     it "compares with = " $ prop (==) $ Just "="
+    it "compares with ==" $ prop (==) $ Just "=="
     it "compares with < " $ prop (<) $ Just "<"
     it "compares with <=" $ prop (<=) $ Just "<="
     it "compares with > " $ prop (>) $ Just ">"

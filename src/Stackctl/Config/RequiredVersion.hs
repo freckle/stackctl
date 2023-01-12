@@ -60,6 +60,7 @@ requiredVersionFromText = fromWords . T.words
   parseOp :: Text -> Either String RequiredVersionOp
   parseOp = \case
     "=" -> Right RequiredVersionEQ
+    "==" -> Right RequiredVersionEQ
     "<" -> Right RequiredVersionLT
     "<=" -> Right RequiredVersionLTE
     ">" -> Right RequiredVersionGT
