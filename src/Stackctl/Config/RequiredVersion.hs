@@ -53,14 +53,14 @@ requiredVersionFromText = fromWords . T.words
   parseRequiredVersion op w = RequiredVersion <$> parseOp op <*> parseVersion w
 
   parseOp :: Text -> Either String RequiredVersionOp
-  parseOp op = case op of
+  parseOp = \case
     "=" -> Right RequiredVersionEQ
     "<" -> Right RequiredVersionLT
     "<=" -> Right RequiredVersionLTE
     ">" -> Right RequiredVersionGT
     ">=" -> Right RequiredVersionGTE
     "=~" -> Right RequiredVersionIsh
-    _ ->
+    op ->
       Left
         $ "Invalid comparison operator ("
         <> unpack op
