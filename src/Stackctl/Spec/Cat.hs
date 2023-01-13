@@ -62,7 +62,6 @@ runCat
      , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
-     , HasColorOption env
      )
   => CatOptions
   -> m ()

@@ -87,7 +87,7 @@ runAppT options f = do
     $ defaultLogSettings
 
   logger <- newLogger $ adjustLogSettings
-    (options ^. colorOptionL . to unColorOption)
+    (options ^. colorOptionL)
     (options ^. verboseOptionL)
     envLogSettings
 
@@ -115,5 +115,7 @@ runAppT options f = do
     $ withThreadContext context
     $ unAppT f
 
-adjustLogSettings :: LogColor -> Verbosity -> LogSettings -> LogSettings
-adjustLogSettings lc v = setLogSettingsColor lc . verbositySetLogLevels v
+adjustLogSettings
+  :: Maybe ColorOption -> Verbosity -> LogSettings -> LogSettings
+adjustLogSettings mco v =
+  maybe id (setLogSettingsColor . unColorOption) mco . verbositySetLogLevels v

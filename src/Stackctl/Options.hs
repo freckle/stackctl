@@ -29,9 +29,6 @@ directoryL = lens oDirectory $ \x y -> x { oDirectory = y }
 filterL :: Lens' Options (Maybe FilterOption)
 filterL = lens oFilter $ \x y -> x { oFilter = y }
 
-colorL :: Lens' Options (Maybe ColorOption)
-colorL = lens oColor $ \x y -> x { oColor = y }
-
 instance HasDirectoryOption Options where
   directoryOptionL = directoryL . maybeLens defaultDirectoryOption
 
@@ -39,7 +36,7 @@ instance HasFilterOption Options where
   filterOptionL = filterL . maybeLens defaultFilterOption
 
 instance HasColorOption Options where
-  colorOptionL = colorL . maybeLens defaultColorOption
+  colorOptionL = lens oColor $ \x y -> x { oColor = y }
 
 instance HasVerboseOption Options where
   verboseOptionL = lens oVerbose $ \x y -> x { oVerbose = y }
@@ -59,5 +56,5 @@ optionsParser :: Parser Options
 optionsParser = Options
   <$> optional directoryOption
   <*> optional (filterOption "specifications")
-  <*> (Just <$> colorOption)
+  <*> optional colorOption
   <*> verboseOption
