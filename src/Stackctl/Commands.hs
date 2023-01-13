@@ -8,7 +8,7 @@ module Stackctl.Commands
 
 import Stackctl.Prelude
 
-import Stackctl.Colors
+import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Spec.Capture

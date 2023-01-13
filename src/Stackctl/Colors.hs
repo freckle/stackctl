@@ -1,7 +1,6 @@
 -- | Facilities for colorizing output
 module Stackctl.Colors
   ( Colors(..)
-  , HasColorOption
   , getColorsStdout
   , getColorsLogger
   , noColors
@@ -11,20 +10,18 @@ import Stackctl.Prelude
 
 import Blammo.Logging.Colors
 import Blammo.Logging.Logger
-import Stackctl.ColorOption (HasColorOption(..), colorHandle)
+import Blammo.Logging.LogSettings (shouldColorHandle)
 
 -- | Return 'Colors' based on options and 'stdout'
-getColorsStdout
-  :: (MonadIO m, MonadReader env m, HasColorOption env) => m Colors
+getColorsStdout :: (MonadIO m, MonadReader env m, HasLogger env) => m Colors
 getColorsStdout = getColorsHandle stdout
 
 -- | Return 'Colors' based on options given 'Handle'
 getColorsHandle
-  :: (MonadIO m, MonadReader env m, HasColorOption env) => Handle -> m Colors
+  :: (MonadIO m, MonadReader env m, HasLogger env) => Handle -> m Colors
 getColorsHandle h = do
-  colorOption <- view colorOptionL
-  c <- colorHandle h colorOption
-  pure $ getColors c
+  ls <- view $ loggerL . to getLoggerLogSettings
+  getColors <$> shouldColorHandle ls h
 
 -- | Return 'Colors' consistent with the ambient 'Logger'
 getColorsLogger :: (MonadReader env m, HasLogger env) => m Colors
