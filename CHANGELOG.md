@@ -1,4 +1,10 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.3.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.3.0.1...main)
+
+## [v1.3.0.1](https://github.com/freckle/stackctl/compare/v1.3.0.0...v1.3.0.1)
+
+- Fix bug where `LOG_COLOR` was never respected
+- Also accept `"required_version: == <version>"`
+- Add `Eq`, `ToJSON` instance on `RequiredVersion`
 
 ## [v1.3.0.0](https://github.com/freckle/stackctl/compare/v1.2.0.1...v1.3.0.0)
 
