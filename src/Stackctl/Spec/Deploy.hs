@@ -127,6 +127,7 @@ handleRollbackComplete confirmation stackName = do
         logError "Refusing to delete without confirmation"
         exitFailure
 
+    logInfo $ "Deleting Stack" :# ["stackName" .= stackName]
     result <- awsCloudFormationDeleteStack stackName
 
     case result of
