@@ -75,7 +75,8 @@ runDeploy DeployOptions {..} = do
 
   for_ specs $ \spec -> do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
-      handleRollbackComplete sdoDeployConfirmation $ stackSpecStackName spec
+      checkIfStackRequiresDeletion sdoDeployConfirmation
+        $ stackSpecStackName spec
 
       emChangeSet <- createChangeSet spec sdoParameters sdoTags
 
@@ -102,7 +103,7 @@ data DeployConfirmation
   | DeployWithoutConfirmation
   deriving stock Eq
 
-handleRollbackComplete
+checkIfStackRequiresDeletion
   :: ( MonadUnliftIO m
      , MonadResource m
      , MonadLogger m
@@ -113,12 +114,14 @@ handleRollbackComplete
   => DeployConfirmation
   -> StackName
   -> m ()
-handleRollbackComplete confirmation stackName = do
+checkIfStackRequiresDeletion confirmation stackName = do
   mStack <- awsCloudFormationDescribeStackMaybe stackName
 
-  when (maybe False stackIsRollbackComplete mStack) $ do
-    logWarn
-      "Stack is in ROLLBACK_COMPLETE state and must be deleted before proceeding"
+  for_ (stackStatusRequiresDeletion =<< mStack) $ \status -> do
+    logWarn $ "Stack must be deleted before proceeding" :# ["status" .= status]
+    when (status == StackStatus_ROLLBACK_FAILED)
+      $ logWarn
+          "Stack is in ROLLBACK_FAILED. This may require elevated permissions for the delete to succeed"
 
     case confirmation of
       DeployWithConfirmation -> promptContinue
