@@ -1,6 +1,8 @@
 module Stackctl.Spec.Changes.Format
   ( Format(..)
   , formatOption
+  , OmitFull(..)
+  , omitFullOption
   , formatChangeSet
   , formatTTY
   ) where
@@ -16,6 +18,10 @@ import Stackctl.Colors
 data Format
   = FormatTTY
   | FormatPullRequest
+
+data OmitFull
+  = OmitFull
+  | IncludeFull
 
 formatOption :: Parser Format
 formatOption = option (eitherReader readFormat) $ mconcat
@@ -37,10 +43,19 @@ showFormat = \case
   FormatTTY -> "tty"
   FormatPullRequest -> "pr"
 
-formatChangeSet :: Colors -> Text -> Format -> Maybe ChangeSet -> Text
-formatChangeSet colors name = \case
+-- brittany-disable-next-binding
+
+omitFullOption :: Parser OmitFull
+omitFullOption = flag IncludeFull OmitFull
+  (  long "no-include-full"
+  <> help "Don't include full ChangeSet JSON details"
+  )
+
+formatChangeSet
+  :: Colors -> OmitFull -> Text -> Format -> Maybe ChangeSet -> Text
+formatChangeSet colors omitFull name = \case
   FormatTTY -> formatTTY colors name
-  FormatPullRequest -> formatPullRequest name
+  FormatPullRequest -> formatPullRequest omitFull name
 
 formatTTY :: Colors -> Text -> Maybe ChangeSet -> Text
 formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
@@ -83,15 +98,15 @@ formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
     x@Replacement_Conditional -> yellow (toText x)
     Replacement' x -> x
 
-formatPullRequest :: Text -> Maybe ChangeSet -> Text
-formatPullRequest name mChangeSet =
+formatPullRequest :: OmitFull -> Text -> Maybe ChangeSet -> Text
+formatPullRequest omitFull name mChangeSet =
   emoji
     <> " This PR generates "
     <> description
     <> " for `"
     <> name
     <> "`."
-    <> fromMaybe "" (commentBody <$> mChangeSet <*> rChanges)
+    <> fromMaybe "" (commentBody omitFull <$> mChangeSet <*> rChanges)
     <> "\n"
  where
   emoji = case (mChangeSet, nChanges) of
@@ -112,24 +127,27 @@ formatPullRequest name mChangeSet =
     changes <- csChanges cs
     NE.nonEmpty $ mapMaybe resourceChange changes
 
-commentBody :: ChangeSet -> NonEmpty ResourceChange -> Text
-commentBody cs rcs =
+commentBody :: OmitFull -> ChangeSet -> NonEmpty ResourceChange -> Text
+commentBody omitFull cs rcs =
   mconcat
     $ [ "\n"
       , "\n| Action | Logical Id | Physical Id | Type | Replacement | Scope | Details |"
       , "\n| ---    | ---        | ---         | ---  | ---         | ---   | ---     |"
       ]
     <> map commentTableRow (NE.toList rcs)
-    <> [ "\n"
-       , "\n<details>"
-       , "\n<summary>Full changes</summary>"
-       , "\n"
-       , "\n```json"
-       , "\n" <> changeSetJSON cs
-       , "\n```"
-       , "\n"
-       , "\n</details>"
-       ]
+    <> case omitFull of
+         OmitFull -> []
+         IncludeFull ->
+           [ "\n"
+           , "\n<details>"
+           , "\n<summary>Full changes</summary>"
+           , "\n"
+           , "\n```json"
+           , "\n" <> changeSetJSON cs
+           , "\n```"
+           , "\n"
+           , "\n</details>"
+           ]
 
 commentTableRow :: ResourceChange -> Text
 commentTableRow ResourceChange' {..} = mconcat

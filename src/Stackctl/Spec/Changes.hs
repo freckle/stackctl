@@ -24,6 +24,7 @@ import Stackctl.TagOption
 
 data ChangesOptions = ChangesOptions
   { scoFormat :: Format
+  , scoOmitFull :: OmitFull
   , scoParameters :: [Parameter]
   , scoTags :: [Tag]
   , scoOutput :: Maybe FilePath
@@ -34,6 +35,7 @@ data ChangesOptions = ChangesOptions
 parseChangesOptions :: Parser ChangesOptions
 parseChangesOptions = ChangesOptions
   <$> formatOption
+  <*> omitFullOption
   <*> many parameterOption
   <*> many tagOption
   <*> optional (argument str
@@ -78,7 +80,8 @@ runChanges ChangesOptions {..} = do
 
           let
             name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
-            formatted = formatChangeSet colors name scoFormat mChangeSet
+            formatted =
+              formatChangeSet colors scoOmitFull name scoFormat mChangeSet
 
           case scoOutput of
             Nothing -> pushLoggerLn formatted
