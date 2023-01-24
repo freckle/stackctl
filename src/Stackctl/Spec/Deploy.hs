@@ -118,8 +118,7 @@ handleRollbackComplete confirmation stackName = do
 
   when (maybe False stackIsRollbackComplete mStack) $ do
     logWarn
-      $ "Stack is in ROLLBACK_COMPLETE state and must be deleted before proceeding"
-      :# ["stackName" .= stackName]
+      "Stack is in ROLLBACK_COMPLETE state and must be deleted before proceeding"
 
     case confirmation of
       DeployWithConfirmation -> promptContinue
@@ -127,7 +126,7 @@ handleRollbackComplete confirmation stackName = do
         logError "Refusing to delete without confirmation"
         exitFailure
 
-    logInfo $ "Deleting Stack" :# ["stackName" .= stackName]
+    logInfo "Deleting Stack"
     result <- awsCloudFormationDeleteStack stackName
 
     case result of
