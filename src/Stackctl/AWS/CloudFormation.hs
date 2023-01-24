@@ -2,7 +2,8 @@ module Stackctl.AWS.CloudFormation
   ( Stack(..)
   , stack_stackName
   , stackDescription
-  , stackIsRollbackComplete
+  , stackStatusRequiresDeletion
+  , StackStatus(..)
   , StackId(..)
   , StackName(..)
   , StackDescription(..)
@@ -479,9 +480,14 @@ stackIsAbandonedCreate stack =
   stack ^. stack_stackStatus == StackStatus_REVIEW_IN_PROGRESS && isNothing
     (stack ^. stack_lastUpdatedTime)
 
-stackIsRollbackComplete :: Stack -> Bool
-stackIsRollbackComplete stack =
-  stack ^. stack_stackStatus == StackStatus_ROLLBACK_COMPLETE
+stackStatusRequiresDeletion :: Stack -> Maybe StackStatus
+stackStatusRequiresDeletion stack = status
+  <$ guard (status `elem` requiresDeletionStatuses)
+  where status = stack ^. stack_stackStatus
+
+requiresDeletionStatuses :: [StackStatus]
+requiresDeletionStatuses =
+  [StackStatus_ROLLBACK_COMPLETE, StackStatus_ROLLBACK_FAILED]
 
 runningStatuses :: [StackStatus]
 runningStatuses =
