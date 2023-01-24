@@ -22,6 +22,11 @@ successful operation.
 
 > Output changes in **FORMAT**. See dedicated section.
 
+**\--no-include-full**\
+
+> Don't include full ChangeSet JSON details. This option only applies to the
+> *pr* format.
+
 **\-p**, **\--parameter** *\<KEY=[VALUE]\>*\
 
 > Override the given Parameter for this operation. Omitting *VALUE* will result
