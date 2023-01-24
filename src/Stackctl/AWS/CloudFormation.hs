@@ -3,10 +3,10 @@ module Stackctl.AWS.CloudFormation
   , stack_stackName
   , stackDescription
   , stackStatusRequiresDeletion
-  , StackStatus(..)
   , StackId(..)
   , StackName(..)
   , StackDescription(..)
+  , StackStatus(..)
   , StackEvent(..)
   , ResourceStatus(..)
   , stackEvent_eventId
