@@ -1,4 +1,9 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.3.0.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.3.0.2...main)
+
+## [v1.3.0.2](https://github.com/freckle/stackctl/compare/v1.3.0.1...v1.3.0.2)
+
+- Adjust timeout when invoking Lambdas to allow up to Lambda's own execution
+  timeout (15 minutes).
 
 ## [v1.3.0.1](https://github.com/freckle/stackctl/compare/v1.3.0.0...v1.3.0.1)
 
