@@ -71,7 +71,9 @@ awsLambdaInvoke
 awsLambdaInvoke name payload = do
   logDebug $ "Invoking function" :# ["name" .= name]
 
-  resp <- awsSend $ newInvoke name $ BSL.toStrict $ encode payload
+  -- Match Lambda's own limit (15 minutes) and add some buffer
+  resp <- awsTimeout 905 $ awsSend $ newInvoke name $ BSL.toStrict $ encode
+    payload
 
   let
     status = resp ^. invokeResponse_statusCode

@@ -9,6 +9,7 @@ module Stackctl.AWS.Core
 
   -- * Modifiers on 'AwsEnv'
   , awsWithin
+  , awsTimeout
 
   -- * 'Amazonka' extensions
   , AccountId(..)
@@ -20,7 +21,7 @@ module Stackctl.AWS.Core
   , MonadResource
   ) where
 
-import Stackctl.Prelude
+import Stackctl.Prelude hiding (timeout)
 
 import Amazonka hiding (LogLevel(..))
 import qualified Amazonka as AWS
@@ -105,6 +106,9 @@ awsAwait w req = do
 
 awsWithin :: (MonadReader env m, HasAwsEnv env) => Region -> m a -> m a
 awsWithin r = local $ over (awsEnvL . unL) (within r)
+
+awsTimeout :: (MonadReader env m, HasAwsEnv env) => Seconds -> m a -> m a
+awsTimeout t = local $ over (awsEnvL . unL) (timeout t)
 
 newtype AccountId = AccountId
   { unAccountId :: Text
