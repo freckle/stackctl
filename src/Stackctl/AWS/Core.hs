@@ -6,6 +6,7 @@ module Stackctl.AWS.Core
   , awsSend
   , awsPaginate
   , awsAwait
+  , awsAssumeRole
 
   -- * Modifiers on 'AwsEnv'
   , awsWithin
@@ -25,6 +26,8 @@ import Stackctl.Prelude hiding (timeout)
 
 import Amazonka hiding (LogLevel(..))
 import qualified Amazonka as AWS
+import Amazonka.Auth.Keys (fromSession)
+import Amazonka.STS.AssumeRole
 import Conduit (ConduitM)
 import Control.Monad.Logger (defaultLoc, toLogStr)
 import Control.Monad.Trans.Resource (MonadResource)
@@ -103,6 +106,27 @@ awsAwait
 awsAwait w req = do
   AwsEnv env <- view awsEnvL
   await env w req
+
+awsAssumeRole
+  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  => Text
+  -> Text
+  -> m a
+  -> m a
+awsAssumeRole role sessionName f = do
+  let req = newAssumeRole role sessionName
+
+  assumeEnv <- awsSimple "sts:AssumeRole" req $ \resp -> do
+    creds <- resp ^. assumeRoleResponse_credentials
+    token <- creds ^. authSessionToken
+
+    let
+      accessKeyId = creds ^. authAccessKeyId
+      secretAccessKey = creds ^. authSecretAccessKey
+
+    pure $ fromSession accessKeyId secretAccessKey token
+
+  local (awsEnvL . unL %~ assumeEnv) f
 
 awsWithin :: (MonadReader env m, HasAwsEnv env) => Region -> m a -> m a
 awsWithin r = local $ over (awsEnvL . unL) (within r)
