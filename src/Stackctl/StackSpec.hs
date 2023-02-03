@@ -34,7 +34,7 @@ import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
 import qualified System.FilePath as FilePath
 import System.FilePath (takeExtension)
-import UnliftIO.Directory (createDirectoryIfMissing)
+import UnliftIO.Directory (createDirectoryIfMissing, doesFileExist)
 
 data StackSpec = StackSpec
   { ssSpecRoot :: FilePath
@@ -135,11 +135,29 @@ writeTemplateBody path body = do
   dir = takeDirectory path
   ext = takeExtension path
 
-writeStackSpec :: MonadUnliftIO m => StackSpec -> TemplateBody -> m ()
-writeStackSpec stackSpec templateBody = do
-  writeTemplateBody templatePath templateBody
-  createDirectoryIfMissing True $ takeDirectory specPath
-  liftIO $ Yaml.encodeFile specPath $ stackSpecSpecBody stackSpec
+writeStackSpec
+  :: (MonadUnliftIO m, MonadLogger m)
+  => Bool
+  -> StackSpec
+  -> Maybe TemplateBody
+  -> m ()
+writeStackSpec overwrite stackSpec mTemplateBody = do
+  for_ mTemplateBody $ \templateBody -> do
+    logInfo $ "Writing template" :# ["path" .= templatePath]
+    writeTemplateBody templatePath templateBody
+
+  exists <- doesFileExist specPath
+
+  if exists && not overwrite
+    then do
+      let
+        reason :: Text
+        reason = "file exists and overwrite not set"
+      logInfo $ "Skipping" :# ["path" .= specPath, "reason" .= reason]
+    else do
+      logInfo $ "Writing specification" :# ["path" .= specPath]
+      createDirectoryIfMissing True $ takeDirectory specPath
+      liftIO $ Yaml.encodeFile specPath $ stackSpecSpecBody stackSpec
  where
   templatePath = unStackTemplate $ stackSpecTemplate stackSpec
   specPath =

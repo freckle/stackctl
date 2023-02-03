@@ -1,5 +1,7 @@
 module Stackctl.Spec.Generate
   ( Generate(..)
+  , GenerateSpec(..)
+  , GenerateTemplate(..)
   , generate
   , TemplateFormat(..)
   ) where
@@ -10,28 +12,37 @@ import Stackctl.Action
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Config (HasConfig)
+import Stackctl.DirectoryOption
 import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
 
 data Generate = Generate
-  { gOutputDirectory :: FilePath
-  , gTemplatePath :: Maybe FilePath
-  -- ^ If not given, will use @{stack-name}.(yaml|json)@
-  , gTemplateFormat :: TemplateFormat
-  -- ^ Ignored if 'gTemplatePath' is given
-  , gStackPath :: Maybe FilePath
-  -- ^ If not given, will use @{stack-name}.yaml@
-  , gStackName :: StackName
-  , gDescription :: Maybe StackDescription
+  { gDescription :: Maybe StackDescription
   , gDepends :: Maybe [StackName]
   , gActions :: Maybe [Action]
   , gParameters :: Maybe [Parameter]
   , gCapabilities :: Maybe [Capability]
   , gTags :: Maybe [Tag]
-  , gTemplateBody :: TemplateBody
+  , gSpec :: GenerateSpec
+  , gTemplate :: GenerateTemplate
+  , gOverwrite :: Bool
   }
+
+data GenerateSpec
+  = GenerateSpec StackName
+  -- ^ Generate at an inferred name
+  | GenerateSpecTo StackName FilePath
+  -- ^ Generate to a given path
+
+data GenerateTemplate
+  = GenerateTemplate TemplateBody TemplateFormat
+  -- ^ Generate at an inferred name
+  | GenerateTemplateTo TemplateBody FilePath
+  -- ^ Generate to the given path
+  | UseExistingTemplate FilePath
+  -- ^ Assume template exists
 
 data TemplateFormat
   = TemplateFormatYaml
@@ -44,23 +55,26 @@ generate
      , MonadReader env m
      , HasConfig env
      , HasAwsScope env
+     , HasDirectoryOption env
      )
   => Generate
   -> m FilePath
 generate Generate {..} = do
   let
-    defaultStackPath = unpack (unStackName gStackName) <.> "yaml"
-    defaultTemplatePath =
-      unpack (unStackName gStackName) <.> case gTemplateFormat of
-        TemplateFormatYaml -> "yaml"
-        TemplateFormatJson -> "json"
+    (stackName, stackPath) = case gSpec of
+      GenerateSpec name -> (name, unpack (unStackName name) <> ".yaml")
+      GenerateSpecTo name path -> (name, path)
 
-    stackPath = fromMaybe defaultStackPath gStackPath
+    (mTemplateBody, templatePath) = case gTemplate of
+      GenerateTemplate body format ->
+        ( Just body
+        , case format of
+          TemplateFormatYaml -> unpack (unStackName stackName) <> ".yaml"
+          TemplateFormatJson -> unpack (unStackName stackName) <> ".json"
+        )
+      GenerateTemplateTo body path -> (Just body, path)
+      UseExistingTemplate path -> (Nothing, path)
 
-  specPath <- buildSpecPath gStackName stackPath
-
-  let
-    templatePath = fromMaybe defaultTemplatePath gTemplatePath
     specYaml = StackSpecYaml
       { ssyDescription = gDescription
       , ssyTemplate = templatePath
@@ -71,9 +85,10 @@ generate Generate {..} = do
       , ssyTags = tagsYaml . map TagYaml <$> gTags
       }
 
-  stackSpec <- buildStackSpec gOutputDirectory specPath specYaml
+  dir <- view $ directoryOptionL . to unDirectoryOption
+  specPath <- buildSpecPath stackName stackPath
+  stackSpec <- buildStackSpec dir specPath specYaml
 
   withThreadContext ["stackName" .= stackSpecStackName stackSpec] $ do
-    logInfo "Generating specification"
-    writeStackSpec stackSpec gTemplateBody
+    writeStackSpec gOverwrite stackSpec mTemplateBody
     pure $ stackSpecPathFilePath specPath
