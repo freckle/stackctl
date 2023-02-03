@@ -10,7 +10,7 @@ import Options.Applicative
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Config (HasConfig)
-import Stackctl.DirectoryOption (HasDirectoryOption(..), unDirectoryOption)
+import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.Spec.Generate
 import Stackctl.StackSpec
 import System.FilePath.Glob
@@ -74,26 +74,29 @@ runCapture
   => CaptureOptions
   -> m ()
 runCapture CaptureOptions {..} = do
-  dir <- unDirectoryOption <$> view directoryOptionL
-
   let
     setScopeName scope =
       maybe scope (\name -> scope { awsAccountName = name }) scoAccountName
 
     generate' stack template path templatePath = do
+      let
+        stackName = StackName $ stack ^. stack_stackName
+        templateBody = templateBodyFromValue template
+
       void $ local (awsScopeL %~ setScopeName) $ generate Generate
-        { gOutputDirectory = dir
-        , gTemplatePath = templatePath
-        , gTemplateFormat = scoTemplateFormat
-        , gStackPath = path
-        , gStackName = StackName $ stack ^. stack_stackName
-        , gDescription = stackDescription stack
+        { gDescription = stackDescription stack
         , gDepends = scoDepends
         , gActions = Nothing
         , gParameters = parameters stack
         , gCapabilities = capabilities stack
         , gTags = tags stack
-        , gTemplateBody = templateBodyFromValue template
+        , gSpec = case path of
+          Nothing -> GenerateSpec stackName
+          Just sp -> GenerateSpecTo stackName sp
+        , gTemplate = case templatePath of
+          Nothing -> GenerateTemplate templateBody scoTemplateFormat
+          Just tp -> GenerateTemplateTo templateBody tp
+        , gOverwrite = False
         }
 
   results <- awsCloudFormationGetStackNamesMatching scoStackName
