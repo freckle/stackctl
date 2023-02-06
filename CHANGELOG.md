@@ -1,4 +1,10 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.3.0.2...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.0.0...main)
+
+## [v1.4.0.0](https://github.com/freckle/stackctl/compare/v1.3.0.2...v1.4.0.0)
+
+- Add `awsAssumeRole` for running an action as an assumed role
+- Refactor `Generate` interface to better support generating stacks with
+  pre-existing templates
 
 ## [v1.3.0.2](https://github.com/freckle/stackctl/compare/v1.3.0.1...v1.3.0.2)
 
