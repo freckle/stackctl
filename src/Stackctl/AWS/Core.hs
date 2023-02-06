@@ -110,8 +110,11 @@ awsAwait w req = do
 awsAssumeRole
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => Text
+  -- ^ Role ARN
   -> Text
+  -- ^ Session name
   -> m a
+  -- ^ Action to run as the assumed role
   -> m a
 awsAssumeRole role sessionName f = do
   let req = newAssumeRole role sessionName
