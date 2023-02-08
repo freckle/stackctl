@@ -71,4 +71,3 @@ fetchAwsScope =
     <$> awsGetCallerIdentityAccount
     <*> liftIO (maybe "unknown" pack <$> lookupEnv "AWS_PROFILE")
     <*> awsEc2DescribeFirstAvailabilityZoneRegionName
-
