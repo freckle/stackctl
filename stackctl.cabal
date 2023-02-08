@@ -46,6 +46,7 @@ library
       Stackctl.ParameterOption
       Stackctl.Prelude
       Stackctl.Prompt
+      Stackctl.RemovedStack
       Stackctl.Sort
       Stackctl.Spec.Capture
       Stackctl.Spec.Cat
@@ -127,6 +128,7 @@ library
     , semigroups
     , text
     , time
+    , transformers
     , unliftio
     , unliftio-core
     , unordered-containers
@@ -177,6 +179,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Stackctl.AWS.CloudFormationSpec
+      Stackctl.AWS.ScopeSpec
       Stackctl.Config.RequiredVersionSpec
       Stackctl.ConfigSpec
       Stackctl.FilterOptionSpec

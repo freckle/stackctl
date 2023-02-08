@@ -30,27 +30,8 @@ discoverSpecs
   => m [StackSpec]
 discoverSpecs = do
   dir <- unDirectoryOption <$> view directoryOptionL
-  scope@AwsScope {..} <- view awsScopeL
-  paths <- globRelativeTo
-    dir
-    [ compile
-    $ "stacks"
-    </> unpack (unAccountId awsAccountId)
-    <> ".*"
-    </> unpack (fromRegion awsRegion)
-    <> "**"
-    </> "*"
-    <.> "yaml"
-    , compile
-    $ "stacks"
-    </> "*."
-    <> unpack (unAccountId awsAccountId)
-    </> unpack (fromRegion awsRegion)
-    <> "**"
-    </> "*"
-    <.> "yaml"
-    ]
-
+  scope <- view awsScopeL
+  paths <- globRelativeTo dir $ awsScopeSpecPatterns scope
   filterOption <- view filterOptionL
 
   let

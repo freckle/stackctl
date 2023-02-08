@@ -6,6 +6,7 @@ module Stackctl.FilterOption
   , filterOption
   , filterOptionFromPaths
   , filterOptionFromText
+  , filterOptionToPaths
   , filterStackSpecs
   ) where
 
@@ -92,6 +93,9 @@ showFilterOption =
 
 defaultFilterOption :: FilterOption
 defaultFilterOption = filterOptionFromPaths $ pure "**/*"
+
+filterOptionToPaths :: FilterOption -> [FilePath]
+filterOptionToPaths = map decompile . NE.toList . unFilterOption
 
 filterStackSpecs :: FilterOption -> [StackSpec] -> [StackSpec]
 filterStackSpecs fo =

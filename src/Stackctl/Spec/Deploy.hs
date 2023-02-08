@@ -20,6 +20,7 @@ import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.ParameterOption
 import Stackctl.Prompt
+import Stackctl.RemovedStack
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
@@ -31,6 +32,7 @@ data DeployOptions = DeployOptions
   , sdoTags :: [Tag]
   , sdoSaveChangeSets :: Maybe FilePath
   , sdoDeployConfirmation :: DeployConfirmation
+  , sdoRemovals :: Bool
   , sdoClean :: Bool
   }
 
@@ -50,6 +52,10 @@ parseDeployOptions = DeployOptions
     (  long "no-confirm"
     <> help "Don't confirm changes before executing"
     )
+  <*> (not <$> switch
+    (  long "no-remove"
+    <> help "Don't delete removed Stacks"
+    ))
   <*> switch
     (  long "clean"
     <> help "Remove all changesets from Stack after deploy"
@@ -98,6 +104,35 @@ runDeploy DeployOptions {..} = do
           runActions stackName PostDeploy $ stackSpecActions spec
           when sdoClean $ awsCloudFormationDeleteAllChangeSets stackName
 
+  when sdoRemovals $ do
+    removed <- inferRemovedStacks
+    traverse_ (deleteRemovedStack sdoDeployConfirmation) removed
+
+deleteRemovedStack
+  :: ( MonadMask m
+     , MonadResource m
+     , MonadLogger m
+     , MonadReader env m
+     , HasLogger env
+     , HasAwsEnv env
+     )
+  => DeployConfirmation
+  -> Stack
+  -> m ()
+deleteRemovedStack confirmation stack = do
+  withThreadContext ["stack" .= stackName] $ do
+    colors <- getColorsLogger
+    pushLoggerLn $ formatRemovedStack colors FormatTTY stack
+
+    case confirmation of
+      DeployWithConfirmation -> do
+        promptContinue
+        logInfo "Deleting Stack"
+      DeployWithoutConfirmation -> pure ()
+
+    deleteStack stackName
+  where stackName = StackName $ stack ^. stack_stackName
+
 data DeployConfirmation
   = DeployWithConfirmation
   | DeployWithoutConfirmation
@@ -130,11 +165,18 @@ checkIfStackRequiresDeletion confirmation stackName = do
         exitFailure
 
     logInfo "Deleting Stack"
-    result <- awsCloudFormationDeleteStack stackName
+    deleteStack stackName
 
-    case result of
-      StackDeleteSuccess -> logInfo $ prettyStackDeleteResult result :# []
-      StackDeleteFailure{} -> logWarn $ prettyStackDeleteResult result :# []
+deleteStack
+  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  => StackName
+  -> m ()
+deleteStack stackName = do
+  result <- awsCloudFormationDeleteStack stackName
+
+  case result of
+    StackDeleteSuccess -> logInfo $ prettyStackDeleteResult result :# []
+    StackDeleteFailure{} -> logWarn $ prettyStackDeleteResult result :# []
 
 deployChangeSet
   :: ( MonadUnliftIO m
