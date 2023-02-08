@@ -16,6 +16,7 @@ import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.ParameterOption
+import Stackctl.RemovedStack
 import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
@@ -63,6 +64,15 @@ runChanges ChangesOptions {..} = do
   -- Clear file before starting, as we have to use append for each spec
   liftIO $ traverse_ (`T.writeFile` "") scoOutput
 
+  colors <- case scoOutput of
+    Nothing -> getColorsLogger
+    Just{} -> pure noColors
+
+  let
+    write formatted = case scoOutput of
+      Nothing -> pushLoggerLn formatted
+      Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
+
   specs <- discoverSpecs
 
   for_ specs $ \spec -> do
@@ -74,15 +84,8 @@ runChanges ChangesOptions {..} = do
           logError $ "Error creating ChangeSet" :# ["error" .= err]
           exitFailure
         Right mChangeSet -> do
-          colors <- case scoOutput of
-            Nothing -> getColorsLogger
-            Just{} -> pure noColors
+          let name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
+          write $ formatChangeSet colors scoOmitFull name scoFormat mChangeSet
 
-          let
-            name = pack $ stackSpecPathFilePath $ stackSpecSpecPath spec
-            formatted =
-              formatChangeSet colors scoOmitFull name scoFormat mChangeSet
-
-          case scoOutput of
-            Nothing -> pushLoggerLn formatted
-            Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
+  removed <- inferRemovedStacks
+  traverse_ (write . formatRemovedStack colors scoFormat) removed
