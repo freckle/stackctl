@@ -11,9 +11,9 @@ import Blammo.Logging.Logger (pushLoggerLn)
 import qualified Data.Text as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
+import Stackctl.Action
 import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
-import Stackctl.Action
 import Stackctl.Colors
 import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
