@@ -89,6 +89,7 @@ library:
     - semigroups
     - text
     - time
+    - transformers
     - unliftio
     - unliftio-core
     - unordered-containers

@@ -4,6 +4,7 @@ module Stackctl.Spec.Changes.Format
   , OmitFull(..)
   , omitFullOption
   , formatChangeSet
+  , formatRemovedStack
   , formatTTY
   ) where
 
@@ -56,6 +57,12 @@ formatChangeSet
 formatChangeSet colors omitFull name = \case
   FormatTTY -> formatTTY colors name
   FormatPullRequest -> formatPullRequest omitFull name
+
+formatRemovedStack :: Colors -> Format -> Stack -> Text
+formatRemovedStack Colors {..} format stack = case format of
+  FormatTTY -> red "DELETE" <> " stack " <> cyan name
+  FormatPullRequest -> ":x: This PR will **delete** the stack `" <> name <> "`"
+  where name = stack ^. stack_stackName
 
 formatTTY :: Colors -> Text -> Maybe ChangeSet -> Text
 formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
