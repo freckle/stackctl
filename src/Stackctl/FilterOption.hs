@@ -38,12 +38,14 @@ instance HasFilterOption FilterOption where
   filterOptionL = id
 
 envFilterOption :: String -> Env.Parser Env.Error FilterOption
-envFilterOption items =
-  Env.var (first Env.UnreadError . readFilterOption) "FILTERS"
-    $ Env.help
-    $ "Filter "
-    <> items
-    <> " by patterns"
+envFilterOption items = var "FILTERS" <|> var "FILTER"
+ where
+  var name =
+    Env.var (first Env.UnreadError . readFilterOption) name
+      $ Env.help
+      $ "Filter "
+      <> items
+      <> " by patterns"
 
 filterOption :: String -> Parser FilterOption
 filterOption items = option (eitherReader readFilterOption) $ mconcat

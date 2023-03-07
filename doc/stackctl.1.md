@@ -261,9 +261,9 @@ See **stackctl-changes(1)** and **stackctl-deploy(1)**.
 
 > Environment-based alternative for *\--directory*.
 
-*STACKCTL_FILTERS*\
+*STACKCTL_FILTER*\
 
-> Environment-based alternative for *\--filters*.
+> Environment-based alternative for *\--filter*.
 
 *LOG_\**\
 
