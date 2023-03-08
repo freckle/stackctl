@@ -1,4 +1,9 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.0.1...main)
+
+## [v1.4.0.1](https://github.com/freckle/stackctl/compare/v1.4.0.0...v1.4.0.1)
+
+- Document and read a consistently-named `STACKCTL_FILTER` for `--filter`. For
+  now, the old and incorrect `STACKCTL_FILTERS` will still work.
 
 ## [v1.4.0.0](https://github.com/freckle/stackctl/compare/v1.3.0.2...v1.4.0.0)
 
