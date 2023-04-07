@@ -1,0 +1,10 @@
+stackctl-version(1) - display version information about Stackctl
+================================================================
+
+## SYNOPSIS
+
+`stackctl version`
+
+## OPTIONS
+
+None.

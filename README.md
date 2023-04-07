@@ -72,8 +72,8 @@ Once installed, see:
 - `man 1 stackctl`, or
 - `man 1 stackctl <command>`
 
-The man pages are also available [in-repository](./doc), but contain
-documentation as of `main`, and not your installed version.
+The man pages are also available [online](https://freckle.github.io/stackctl/),
+but contain documentation as of `main`, and not your installed version.
 
 ## Relationship to CloudGenesis
 

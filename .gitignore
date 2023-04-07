@@ -1,3 +1,7 @@
 *.hie
 .stack-work
 dist/
+man/*
+!man/index.txt
+!man/*.css
+!man/*.ronn
