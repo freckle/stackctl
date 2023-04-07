@@ -30,11 +30,9 @@ dist/stackctl/completion/%: dist/stackctl/stackctl
 	mkdir -p ./dist/stackctl/completion
 	./$< --$(@F)-completion-script stackctl > dist/stackctl/completion/$(@F)
 
-PANDOC ?= stack exec pandoc --
-
-dist/stackctl/doc/%: doc/%.md
+dist/stackctl/doc/%: man/%.ronn
 	mkdir -p ./dist/stackctl/doc
-	$(PANDOC) --standalone $< --to man >$@
+	ronn --organization "Freckle Engineering" --roff <"$<" >"$@"
 
 dist/stackctl/Makefile: Makefile
 	mkdir -p dist/stackctl

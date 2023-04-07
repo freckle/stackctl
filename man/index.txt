@@ -1,0 +1,8 @@
+# manuals included in this project:
+stackctl-cat(1) stackctl-cat.1.ronn
+stackctl-capture(1) stackctl-capture.1.ronn
+stackctl-changes(1) stackctl-changes.1.ronn
+stackctl-deploy(1) stackctl-deploy.1.ronn
+stackctl-version(1) stackctl-version.1.ronn
+
+# external manuals
