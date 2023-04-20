@@ -55,6 +55,7 @@ library
       Stackctl.Spec.Deploy
       Stackctl.Spec.Discover
       Stackctl.Spec.Generate
+      Stackctl.Spec.List
       Stackctl.StackDescription
       Stackctl.StackSpec
       Stackctl.StackSpecPath

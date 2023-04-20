@@ -1,0 +1,19 @@
+stackctl-ls(1) - list stack specifications
+==========================================
+
+## SYNOPSIS
+
+`stackctl ls`
+
+## DESCRIPTION
+
+This command locates `stacks/` for the currently-authorized AWS Account and
+Region and lists them.
+
+The key differences between this and stackctl-cat(1) is that this command lists
+things as simple rows and indicates for each spec if a deployed stack exists in
+the first column.
+
+## OPTIONS
+
+None.

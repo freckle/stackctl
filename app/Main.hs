@@ -14,4 +14,5 @@ main =
     <> subcommand Commands.capture
     <> subcommand Commands.changes
     <> subcommand Commands.deploy
+    <> subcommand Commands.list
     <> subcommand Commands.version
