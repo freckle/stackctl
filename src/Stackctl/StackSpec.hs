@@ -1,5 +1,6 @@
 module Stackctl.StackSpec
   ( StackSpec
+  , stackSpecFilePath
   , stackSpecSpecPath
   , stackSpecSpecBody
   , stackSpecStackName
@@ -44,6 +45,10 @@ data StackSpec = StackSpec
 
 stackSpecSpecRoot :: StackSpec -> FilePath
 stackSpecSpecRoot = ssSpecRoot
+
+stackSpecFilePath :: StackSpec -> FilePath
+stackSpecFilePath spec =
+  FilePath.normalise $ stackSpecSpecRoot spec </> stackSpecStackFile spec
 
 stackSpecSpecPath :: StackSpec -> StackSpecPath
 stackSpecSpecPath = ssSpecPath
@@ -160,10 +165,7 @@ writeStackSpec overwrite stackSpec mTemplateBody = do
       liftIO $ Yaml.encodeFile specPath $ stackSpecSpecBody stackSpec
  where
   templatePath = unStackTemplate $ stackSpecTemplate stackSpec
-  specPath =
-    FilePath.normalise
-      $ stackSpecSpecRoot stackSpec
-      </> stackSpecStackFile stackSpec
+  specPath = stackSpecFilePath stackSpec
 
 readStackSpec
   :: (MonadIO m, MonadReader env m, HasConfig env)

@@ -1,9 +1,5 @@
 module Stackctl.Commands
-  ( cat
-  , capture
-  , changes
-  , deploy
-  , version
+  ( module Stackctl.Commands
   ) where
 
 import Stackctl.Prelude
@@ -15,6 +11,7 @@ import Stackctl.Spec.Capture
 import Stackctl.Spec.Cat
 import Stackctl.Spec.Changes
 import Stackctl.Spec.Deploy
+import Stackctl.Spec.List
 import Stackctl.Subcommand
 import Stackctl.VerboseOption
 import Stackctl.Version
@@ -72,6 +69,20 @@ deploy = Subcommand
   , description = "Deploy specifications"
   , parse = parseDeployOptions
   , run = runAppSubcommand runDeploy
+  }
+
+list
+  :: ( HasColorOption options
+     , HasVerboseOption options
+     , HasDirectoryOption options
+     , HasFilterOption options
+     )
+  => Subcommand options ListOptions
+list = Subcommand
+  { name = "ls"
+  , description = "List specifications"
+  , parse = parseListOptions
+  , run = runAppSubcommand runList
   }
 
 version :: Subcommand options ()

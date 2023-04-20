@@ -34,6 +34,9 @@ stackctl(1) - manage CloudFormation Stacks through specifications
   * `deploy`:
     Make deployed state match on-disk specifications.
 
+  * `ls`:
+    List specifications.
+
   * `version`:
     Print the CLI's version.
 
@@ -241,7 +244,7 @@ Freckle Engineering <freckle-engineering@renaissance.com>
 ## SEE ALSO
 
 stackctl-cat(1), stackctl-capture(1), stackctl-changes(1), stackctl-deploy(1),
-stackctl-version(1).
+stackctl-ls(1), stackctl-version(1).
 
 ## ACKNOWLEDGEMENTS
 
