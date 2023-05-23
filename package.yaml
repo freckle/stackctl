@@ -69,6 +69,7 @@ library:
     - amazonka-core
     - amazonka-ec2
     - amazonka-lambda
+    - amazonka-sso
     - amazonka-sts
     - bytestring
     - cfn-flip >= 0.1.0.3 # bugfix for Condition
@@ -90,6 +91,7 @@ library:
     - text
     - time
     - transformers
+    - typed-process
     - unliftio
     - unliftio-core
     - unordered-containers

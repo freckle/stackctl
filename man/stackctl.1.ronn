@@ -20,6 +20,10 @@ stackctl(1) - manage CloudFormation Stacks through specifications
   * `-v`, `--verbose`:
     Log more verbosely
 
+  * `--auto-sso`=<WHEN>:
+    When to automatically run `aws sso login` in response to AWS SSO
+    authorization errors. `always`, `ask`, or `never`. Default is to `ask`.
+
 ## COMMANDS
 
   * `cat`:
@@ -225,6 +229,9 @@ See stackctl-changes(1) and stackctl-deploy(1).
 
 * `STACKCTL_FILTER`:
   Environment-based alternative for `--filter`.
+
+* `STACKCTL_AUTO_SSO`:
+  Environment-based alternative for `--auto-sso`.
 
 * `LOG_*`:
   Variables such as *LOG_COLOR* or *LOG_LEVEL* will be respected by the

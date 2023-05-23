@@ -10,6 +10,7 @@ import Stackctl.Prelude
 import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (ResourceT, runResourceT)
+import Stackctl.AutoSSO
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.ColorOption
@@ -53,6 +54,9 @@ instance HasColorOption options => HasColorOption (App options) where
 instance HasVerboseOption options => HasVerboseOption (App options) where
   verboseOptionL = optionsL . verboseOptionL
 
+instance HasAutoSSOOption options => HasAutoSSOOption (App options) where
+  autoSSOOptionL = optionsL . autoSSOOptionL
+
 newtype AppT app m a = AppT
   { unAppT :: ReaderT app (LoggingT (ResourceT m)) a
   }
@@ -75,6 +79,7 @@ runAppT
      , MonadUnliftIO m
      , HasColorOption options
      , HasVerboseOption options
+     , HasAutoSSOOption options
      )
   => options
   -> AppT (App options) m a
@@ -92,7 +97,7 @@ runAppT options f = do
     envLogSettings
 
   app <- runResourceT $ runLoggerLoggingT logger $ do
-    aws <- awsEnvDiscover
+    aws <- runReaderT (handleAutoSSO options awsEnvDiscover) logger
 
     App logger
       <$> loadConfigOrExit

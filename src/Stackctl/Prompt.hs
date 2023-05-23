@@ -1,6 +1,7 @@
 module Stackctl.Prompt
   ( prompt
   , promptContinue
+  , promptOrExit
   ) where
 
 import Stackctl.Prelude
@@ -34,7 +35,13 @@ prompt message parse dispatch = do
 
 promptContinue
   :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogger env) => m ()
-promptContinue = prompt "Continue (y/n)" parse dispatch
+promptContinue = promptOrExit "Continue"
+
+promptOrExit
+  :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogger env)
+  => Text
+  -> m ()
+promptOrExit msg = prompt (msg <> " (y/n)") parse dispatch
  where
   parse x
     | x `elem` ["y", "Y"] = Right True
