@@ -9,6 +9,7 @@ import Stackctl.Prelude
 import Data.Semigroup.Generic
 import qualified Env
 import Options.Applicative
+import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
@@ -19,6 +20,7 @@ data Options = Options
   , oFilter :: Maybe FilterOption
   , oColor :: Maybe ColorOption
   , oVerbose :: Verbosity
+  , oAutoSSO :: Maybe AutoSSOOption
   }
   deriving stock Generic
   deriving Semigroup via GenericSemigroupMonoid Options
@@ -28,6 +30,9 @@ directoryL = lens oDirectory $ \x y -> x { oDirectory = y }
 
 filterL :: Lens' Options (Maybe FilterOption)
 filterL = lens oFilter $ \x y -> x { oFilter = y }
+
+autoSSOL :: Lens' Options (Maybe AutoSSOOption)
+autoSSOL = lens oAutoSSO $ \x y -> x { oAutoSSO = y }
 
 instance HasDirectoryOption Options where
   directoryOptionL = directoryL . maybeLens defaultDirectoryOption
@@ -41,6 +46,9 @@ instance HasColorOption Options where
 instance HasVerboseOption Options where
   verboseOptionL = lens oVerbose $ \x y -> x { oVerbose = y }
 
+instance HasAutoSSOOption Options where
+  autoSSOOptionL = autoSSOL . maybeLens defaultAutoSSOOption
+
 -- brittany-disable-next-binding
 
 envParser :: Env.Parser Env.Error Options
@@ -49,6 +57,7 @@ envParser = Env.prefixed "STACKCTL_" $ Options
   <*> optional (envFilterOption "specifications")
   <*> pure mempty -- use LOG_COLOR
   <*> pure mempty -- use LOG_LEVEL
+  <*> optional envAutoSSOOption
 
 -- brittany-disable-next-binding
 
@@ -58,3 +67,4 @@ optionsParser = Options
   <*> optional (filterOption "specifications")
   <*> optional colorOption
   <*> verboseOption
+  <*> optional autoSSOOption

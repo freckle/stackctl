@@ -10,6 +10,7 @@ import Stackctl.Prelude
 
 import qualified Env
 import Options.Applicative
+import Stackctl.AutoSSO
 import Stackctl.CLI
 import Stackctl.ColorOption
 import Stackctl.Options
@@ -61,7 +62,10 @@ runSubcommand' title parseEnv parseCLI sp = do
 -- @
 --
 runAppSubcommand
-  :: (HasColorOption options, HasVerboseOption options)
+  :: ( HasColorOption options
+     , HasVerboseOption options
+     , HasAutoSSOOption options
+     )
   => (subOptions -> AppT (App options) IO a)
   -> subOptions
   -> options

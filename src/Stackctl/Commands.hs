@@ -4,6 +4,7 @@ module Stackctl.Commands
 
 import Stackctl.Prelude
 
+import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
@@ -21,6 +22,7 @@ cat
      , HasVerboseOption options
      , HasDirectoryOption options
      , HasFilterOption options
+     , HasAutoSSOOption options
      )
   => Subcommand options CatOptions
 cat = Subcommand
@@ -34,6 +36,7 @@ capture
   :: ( HasColorOption options
      , HasVerboseOption options
      , HasDirectoryOption options
+     , HasAutoSSOOption options
      )
   => Subcommand options CaptureOptions
 capture = Subcommand
@@ -48,6 +51,7 @@ changes
      , HasVerboseOption options
      , HasDirectoryOption options
      , HasFilterOption options
+     , HasAutoSSOOption options
      )
   => Subcommand options ChangesOptions
 changes = Subcommand
@@ -62,6 +66,7 @@ deploy
      , HasVerboseOption options
      , HasDirectoryOption options
      , HasFilterOption options
+     , HasAutoSSOOption options
      )
   => Subcommand options DeployOptions
 deploy = Subcommand
@@ -76,6 +81,7 @@ list
      , HasVerboseOption options
      , HasDirectoryOption options
      , HasFilterOption options
+     , HasAutoSSOOption options
      )
   => Subcommand options ListOptions
 list = Subcommand
