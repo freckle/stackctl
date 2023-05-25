@@ -54,10 +54,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: freckle/stack-cache-action@v2
-      - uses: r-lib/actions/setup-pandoc@v2
+      - run: echo "$HOME/.local/share/gem/ruby/3.0.0/bin" >>"$GITHUB_PATH"
+      - run: gem install --user ronn-ng
       - if: ${{ runner.os == 'macOS' }}
         run: brew install coreutils # need GNU install
-      - run: make install.check PANDOC=pandoc
+      - run: make install.check
       - uses: actions/upload-release-asset@v1
         id: upload-release-asset
         env:
