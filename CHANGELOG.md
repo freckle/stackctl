@@ -1,4 +1,9 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.0.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.2.0...main)
+
+## [v1.4.2.0](https://github.com/freckle/stackctl/compare/v1.4.0.1...v1.4.2.0)
+
+- Add `stackctl-ls` for listing stacks and their deployed status
+- Add `--auto-sso` option for automating `aws sso login` when required
 
 ## [v1.4.0.1](https://github.com/freckle/stackctl/compare/v1.4.0.0...v1.4.0.1)
 
