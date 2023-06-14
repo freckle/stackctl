@@ -58,7 +58,7 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
-    - Blammo >= 1.1.1.1 # pushLoggerLn, getLoggerShouldColor
+    - Blammo >= 1.1.2.1 # getColorsLogger, etc
     - Glob
     - QuickCheck
     - aeson
