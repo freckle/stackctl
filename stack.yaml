@@ -3,6 +3,7 @@ resolver: lts-20.4
 extra-deps:
   - Blammo-1.1.1.1
   - cfn-flip-0.1.0.3
+  - unliftio-0.2.25.0
 
   - github: brendanhay/amazonka
     commit: f73a957d05f64863e867cf39d0db260718f0fadd # main, as of SSO support
