@@ -19,6 +19,13 @@ packages:
   original:
     hackage: cfn-flip-0.1.0.3
 - completed:
+    hackage: unliftio-0.2.25.0@sha256:d015242554890370bcbc3a575019be691d0edc279736ef97d29412fb9d0c4349,3410
+    pantry-tree:
+      sha256: 08c62f256e740e1a78b175907c26cb06439a1b486ceb8021c5a2e4425ebb6c5b
+      size: 2494
+  original:
+    hackage: unliftio-0.2.25.0
+- completed:
     name: amazonka
     pantry-tree:
       sha256: 0257a27c3332e400abc0f4a38f7a875c4a2a04b03ac342d7481e19d9d5665040

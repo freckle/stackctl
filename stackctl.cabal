@@ -1,6 +1,6 @@
 cabal-version: 1.18
 
--- This file has been generated from package.yaml by hpack version 0.35.1.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -65,7 +65,6 @@ library
       Stackctl.TagOption
       Stackctl.VerboseOption
       Stackctl.Version
-      UnliftIO.Exception.Lens
   other-modules:
       Paths_stackctl
   hs-source-dirs:
@@ -133,8 +132,7 @@ library
     , time
     , transformers
     , typed-process
-    , unliftio
-    , unliftio-core
+    , unliftio >=0.2.25.0
     , unordered-containers
     , uuid
     , yaml
