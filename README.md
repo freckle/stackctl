@@ -24,6 +24,7 @@ This project also contains a Haskell library for doing the same.
 - Have `~/.local/bin` on your `$PATH`
 - Have `~/.local/share/man` on your `$MANPATH` (for documentation)
 - If on OSX, `brew install coreutils` (i.e. have `ginstall` available)
+- If on OSX, `brew install jq`
 
 ### Scripted
 
