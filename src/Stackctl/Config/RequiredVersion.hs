@@ -1,11 +1,11 @@
 module Stackctl.Config.RequiredVersion
-  ( RequiredVersion(..)
-  , RequiredVersionOp(..)
+  ( RequiredVersion (..)
+  , RequiredVersionOp (..)
   , requiredVersionToText
   , requiredVersionFromText
   , isRequiredVersionSatisfied
 
-  -- * Exported for testing
+    -- * Exported for testing
   , (=~)
   ) where
 
@@ -39,8 +39,10 @@ instance ToJSON RequiredVersion where
 
 requiredVersionToText :: RequiredVersion -> Text
 requiredVersionToText RequiredVersion {..} =
-  requiredVersionOpToText requiredVersionOp <> " " <> pack
-    (showVersion requiredVersionCompareWith)
+  requiredVersionOpToText requiredVersionOp
+    <> " "
+    <> pack
+      (showVersion requiredVersionCompareWith)
 
 requiredVersionFromText :: Text -> Either String RequiredVersion
 requiredVersionFromText = fromWords . T.words
@@ -78,12 +80,14 @@ requiredVersionFromText = fromWords . T.words
       $ note ("Failed to parse as a version " <> s)
       $ NE.nonEmpty
       $ readP_to_S Version.parseVersion s
-    where s = unpack t
+   where
+    s = unpack t
 
 isRequiredVersionSatisfied :: RequiredVersion -> Version -> Bool
 isRequiredVersionSatisfied RequiredVersion {..} =
   (`requiredVersionCompare` requiredVersionCompareWith)
-  where requiredVersionCompare = requiredVersionOpCompare requiredVersionOp
+ where
+  requiredVersionCompare = requiredVersionOpCompare requiredVersionOp
 
 data RequiredVersionOp
   = RequiredVersionEQ

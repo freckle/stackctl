@@ -1,7 +1,7 @@
 module Stackctl.Spec.Changes.Format
-  ( Format(..)
+  ( Format (..)
   , formatOption
-  , OmitFull(..)
+  , OmitFull (..)
   , omitFullOption
   , formatChangeSet
   , formatRemovedStack
@@ -25,13 +25,15 @@ data OmitFull
   | IncludeFull
 
 formatOption :: Parser Format
-formatOption = option (eitherReader readFormat) $ mconcat
-  [ short 'f'
-  , long "format"
-  , help "Format to output changes in"
-  , value FormatTTY
-  , showDefaultWith showFormat
-  ]
+formatOption =
+  option (eitherReader readFormat)
+    $ mconcat
+      [ short 'f'
+      , long "format"
+      , help "Format to output changes in"
+      , value FormatTTY
+      , showDefaultWith showFormat
+      ]
 
 readFormat :: String -> Either String Format
 readFormat = \case
@@ -47,10 +49,13 @@ showFormat = \case
 -- brittany-disable-next-binding
 
 omitFullOption :: Parser OmitFull
-omitFullOption = flag IncludeFull OmitFull
-  (  long "no-include-full"
-  <> help "Don't include full ChangeSet JSON details"
-  )
+omitFullOption =
+  flag
+    IncludeFull
+    OmitFull
+    ( long "no-include-full"
+        <> help "Don't include full ChangeSet JSON details"
+    )
 
 formatChangeSet
   :: Colors -> OmitFull -> Text -> Format -> Maybe ChangeSet -> Text
@@ -62,16 +67,18 @@ formatRemovedStack :: Colors -> Format -> Stack -> Text
 formatRemovedStack Colors {..} format stack = case format of
   FormatTTY -> red "DELETE" <> " stack " <> cyan name
   FormatPullRequest -> ":x: This PR will **delete** the stack `" <> name <> "`"
-  where name = stack ^. stack_stackName
+ where
+  name = stack ^. stack_stackName
 
 formatTTY :: Colors -> Text -> Maybe ChangeSet -> Text
 formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
   (Nothing, _) -> "No changes for " <> name
   (_, Nothing) -> "Metadata only changes (e.g. Tags or Outputs)"
   (_, Just rcs) ->
-    ("\n" <>) $ (<> "\n") $ mconcat $ ("Changes for " <> cyan name <> ":") : map
-      (("\n  " <>) . formatResourceChange)
-      (NE.toList rcs)
+    ("\n" <>) $ (<> "\n") $ mconcat $ ("Changes for " <> cyan name <> ":")
+      : map
+        (("\n  " <>) . formatResourceChange)
+        (NE.toList rcs)
  where
   rChanges = do
     cs <- mChangeSet
@@ -143,31 +150,32 @@ commentBody omitFull cs rcs =
       ]
     <> map commentTableRow (NE.toList rcs)
     <> case omitFull of
-         OmitFull -> []
-         IncludeFull ->
-           [ "\n"
-           , "\n<details>"
-           , "\n<summary>Full changes</summary>"
-           , "\n"
-           , "\n```json"
-           , "\n" <> changeSetJSON cs
-           , "\n```"
-           , "\n"
-           , "\n</details>"
-           ]
+      OmitFull -> []
+      IncludeFull ->
+        [ "\n"
+        , "\n<details>"
+        , "\n<summary>Full changes</summary>"
+        , "\n"
+        , "\n```json"
+        , "\n" <> changeSetJSON cs
+        , "\n```"
+        , "\n"
+        , "\n</details>"
+        ]
 
 commentTableRow :: ResourceChange -> Text
-commentTableRow ResourceChange' {..} = mconcat
-  [ "\n"
-  , "| " <> maybe "" toText action <> " "
-  , "| " <> maybe "" toText logicalResourceId <> " "
-  , "| " <> maybe "" toText physicalResourceId <> " "
-  , "| " <> maybe "" toText resourceType <> " "
-  , "| " <> maybe "" toText replacement <> " "
-  , "| " <> maybe "" (T.intercalate ", " . map toText) scope <> " "
-  , "| " <> maybe "" (mdList . mapMaybe (formatDetail noColors)) details <> " "
-  , "|"
-  ]
+commentTableRow ResourceChange' {..} =
+  mconcat
+    [ "\n"
+    , "| " <> maybe "" toText action <> " "
+    , "| " <> maybe "" toText logicalResourceId <> " "
+    , "| " <> maybe "" toText physicalResourceId <> " "
+    , "| " <> maybe "" toText resourceType <> " "
+    , "| " <> maybe "" toText replacement <> " "
+    , "| " <> maybe "" (T.intercalate ", " . map toText) scope <> " "
+    , "| " <> maybe "" (mdList . mapMaybe (formatDetail noColors)) details <> " "
+    , "|"
+    ]
 
 mdList :: [Text] -> Text
 mdList xs =

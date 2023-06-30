@@ -39,7 +39,6 @@ spec = do
     it "compares with >=" $ prop (>=) $ Just ">="
     it "compares with =~" $ prop (=~) $ Just "=~"
 
-
   describe "=~" $ do
     it "treats equal versions as satisfying" $ do
       makeVersion [1, 2, 3] =~ makeVersion [1, 2, 3] `shouldBe` True
@@ -83,4 +82,5 @@ runRequiredVersion
   -> Either String Bool
 runRequiredVersion mOperator required current =
   (`isRequiredVersionSatisfied` current) <$> requiredVersionFromText rvText
-  where rvText = maybe "" (<> " ") mOperator <> pack (showVersion required)
+ where
+  rvText = maybe "" (<> " ") mOperator <> pack (showVersion required)

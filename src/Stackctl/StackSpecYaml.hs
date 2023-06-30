@@ -17,9 +17,8 @@
 -- - Key: <string>
 --   Value: <string>
 -- @
---
 module Stackctl.StackSpecYaml
-  ( StackSpecYaml(..)
+  ( StackSpecYaml (..)
   , ParametersYaml
   , parametersYaml
   , unParametersYaml
@@ -29,7 +28,7 @@ module Stackctl.StackSpecYaml
   , TagsYaml
   , tagsYaml
   , unTagsYaml
-  , TagYaml(..)
+  , TagYaml (..)
   ) where
 
 import Stackctl.Prelude
@@ -40,10 +39,10 @@ import qualified Data.Aeson.Key as Key
 import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Aeson.Types (typeMismatch)
 import qualified Data.HashMap.Strict as HashMap
-import Data.Monoid (Last(..))
+import Data.Monoid (Last (..))
 import qualified Data.Text as T
-import Stackctl.Action
 import Stackctl.AWS
+import Stackctl.Action
 
 data StackSpecYaml = StackSpecYaml
   { ssyDescription :: Maybe StackDescription
@@ -86,7 +85,7 @@ instance FromJSON ParametersYaml where
       -- error messages will include "Parameters.{k}". See specs for an example.
       let parseKey k = ParameterYaml k <$> o .: k
       ParametersYaml <$> traverse parseKey (KeyMap.keys o)
-    v@Array{} -> ParametersYaml <$> parseJSON v
+    v@Array {} -> ParametersYaml <$> parseJSON v
     v -> typeMismatch err v
    where
     err =
@@ -164,14 +163,14 @@ instance Semigroup TagsYaml where
 instance FromJSON TagsYaml where
   parseJSON = \case
     Object o -> do
-      let
-        parseKey k = do
-          t <- newTag (Key.toText k) <$> o .: k
-          pure $ TagYaml t
+      let parseKey k = do
+            t <- newTag (Key.toText k) <$> o .: k
+            pure $ TagYaml t
       TagsYaml <$> traverse parseKey (KeyMap.keys o)
-    v@Array{} -> TagsYaml <$> parseJSON v
+    v@Array {} -> TagsYaml <$> parseJSON v
     v -> typeMismatch err v
-    where err = "Object or list of {Key, Value} Objects"
+   where
+    err = "Object or list of {Key, Value} Objects"
 
 instance ToJSON TagsYaml where
   toJSON = object . tagsYamlPairs

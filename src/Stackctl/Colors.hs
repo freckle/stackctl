@@ -1,6 +1,6 @@
 -- | Facilities for colorizing output
 module Stackctl.Colors
-  ( Colors(..)
+  ( Colors (..)
   , getColorsStdout
   , getColorsLogger
   , noColors
@@ -9,8 +9,8 @@ module Stackctl.Colors
 import Stackctl.Prelude
 
 import Blammo.Logging.Colors
-import Blammo.Logging.Logger
 import Blammo.Logging.LogSettings (shouldColorHandle)
+import Blammo.Logging.Logger
 
 -- | Return 'Colors' based on options and 'stdout'
 getColorsStdout :: (MonadIO m, MonadReader env m, HasLogger env) => m Colors

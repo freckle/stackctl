@@ -1,12 +1,12 @@
 module Stackctl.StackDescription
-  ( StackDescription(..)
+  ( StackDescription (..)
   , addStackDescription
   ) where
 
 import Stackctl.Prelude
 
 import Control.Lens ((?~))
-import Data.Aeson (FromJSON, Value(..))
+import Data.Aeson (FromJSON, Value (..))
 import qualified Data.Aeson as JSON
 import Data.Aeson.Lens
 import Data.ByteString.Char8 as BS8
@@ -28,13 +28,15 @@ addStackDescription mStackDescription body = fromMaybe body $ do
   decodeUtf8 <$> case bc of
     BodyContentJSON v -> updateJSON d bs <$ guard (not $ hasDescription v)
     BodyContentYaml v -> updateYaml d bs <$ guard (not $ hasDescription v)
-  where bs = encodeUtf8 body
+ where
+  bs = encodeUtf8 body
 
 getBodyContent :: ByteString -> Maybe BodyContent
-getBodyContent body = asum
-  [ BodyContentJSON . Object <$> JSON.decodeStrict body
-  , hush $ BodyContentYaml . Object <$> Yaml.decodeEither' body
-  ]
+getBodyContent body =
+  asum
+    [ BodyContentJSON . Object <$> JSON.decodeStrict body
+    , hush $ BodyContentYaml . Object <$> Yaml.decodeEither' body
+    ]
 
 -- Inserting a key is easy to do in Yaml without the parsing round-trip that
 -- would strip formatting and comments. But updating a key is hard. To avoid

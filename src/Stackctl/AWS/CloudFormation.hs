@@ -1,23 +1,23 @@
 module Stackctl.AWS.CloudFormation
-  ( Stack(..)
+  ( Stack (..)
   , stack_stackName
   , stackDescription
   , stackStatusRequiresDeletion
-  , StackId(..)
-  , StackName(..)
-  , StackDescription(..)
-  , StackStatus(..)
-  , StackEvent(..)
-  , ResourceStatus(..)
+  , StackId (..)
+  , StackName (..)
+  , StackDescription (..)
+  , StackStatus (..)
+  , StackEvent (..)
+  , ResourceStatus (..)
   , stackEvent_eventId
   , stackEvent_logicalResourceId
   , stackEvent_resourceStatus
   , stackEvent_resourceStatusReason
   , stackEvent_timestamp
-  , StackTemplate(..)
-  , StackDeployResult(..)
+  , StackTemplate (..)
+  , StackDeployResult (..)
   , prettyStackDeployResult
-  , StackDeleteResult(..)
+  , StackDeleteResult (..)
   , prettyStackDeleteResult
   , Parameter
   , parameter_parameterKey
@@ -25,7 +25,7 @@ module Stackctl.AWS.CloudFormation
   , newParameter
   , makeParameter
   , readParameter
-  , Capability(..)
+  , Capability (..)
   , Tag
   , newTag
   , tag_key
@@ -43,20 +43,20 @@ module Stackctl.AWS.CloudFormation
   , awsCloudFormationWait
   , awsCloudFormationGetTemplate
 
-  -- * ChangeSets
-  , ChangeSet(..)
+    -- * ChangeSets
+  , ChangeSet (..)
   , changeSetJSON
-  , ChangeSetId(..)
-  , ChangeSetName(..)
-  , Change(..)
-  , ResourceChange(..)
-  , Replacement(..)
-  , ChangeAction(..)
-  , ResourceAttribute(..)
-  , ResourceChangeDetail(..)
-  , ChangeSource(..)
-  , ResourceTargetDefinition(..)
-  , RequiresRecreation(..)
+  , ChangeSetId (..)
+  , ChangeSetName (..)
+  , Change (..)
+  , ResourceChange (..)
+  , Replacement (..)
+  , ChangeAction (..)
+  , ResourceAttribute (..)
+  , ResourceChangeDetail (..)
+  , ChangeSource (..)
+  , ResourceTargetDefinition (..)
+  , RequiresRecreation (..)
   , awsCloudFormationCreateChangeSet
   , awsCloudFormationExecuteChangeSet
   , awsCloudFormationDeleteAllChangeSets
@@ -80,13 +80,13 @@ import Amazonka.CloudFormation.Waiters
 import Amazonka.Core
   ( AsError
   , ServiceError
-  , _MatchServiceError
-  , _ServiceError
   , hasStatus
   , serviceCode
   , serviceMessage
+  , _MatchServiceError
+  , _ServiceError
   )
-import Amazonka.Waiter (Accept(..))
+import Amazonka.Waiter (Accept (..))
 import Conduit
 import Control.Lens ((?~))
 import Data.Aeson
@@ -127,14 +127,14 @@ data StackDeployResult
   | StackCreateFailure Bool
   | StackUpdateSuccess
   | StackUpdateFailure Bool
-  deriving stock Show
+  deriving stock (Show)
 
 prettyStackDeployResult :: StackDeployResult -> Text
 prettyStackDeployResult = \case
   StackCreateSuccess -> "Created Stack successfully"
-  StackCreateFailure{} -> "Failed to create Stack"
+  StackCreateFailure {} -> "Failed to create Stack"
   StackUpdateSuccess -> "Updated Stack successfully"
-  StackUpdateFailure{} -> "Failed to update Stack"
+  StackUpdateFailure {} -> "Failed to update Stack"
 
 stackCreateResult :: Accept -> StackDeployResult
 stackCreateResult = \case
@@ -155,7 +155,7 @@ data StackDeleteResult
 prettyStackDeleteResult :: StackDeleteResult -> Text
 prettyStackDeleteResult = \case
   StackDeleteSuccess -> "Deleted Stack successfully"
-  StackDeleteFailure{} -> "Failed to delete Stack"
+  StackDeleteFailure {} -> "Failed to delete Stack"
 
 stackDeleteResult :: Accept -> StackDeleteResult
 stackDeleteResult = \case
@@ -174,8 +174,7 @@ newChangeSetName = liftIO $ do
 awsCloudFormationDescribeStack
   :: (MonadResource m, MonadReader env m, HasAwsEnv env) => StackName -> m Stack
 awsCloudFormationDescribeStack stackName = do
-  let
-    req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
+  let req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
   awsSimple "DescribeStack" req $ \resp -> do
     stacks <- resp ^. describeStacksResponse_stacks
@@ -202,14 +201,14 @@ awsCloudFormationDescribeStackOutputs stackName = do
 awsCloudFormationDescribeStackEvents
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)
   => StackName
-  -> Maybe Text -- ^ Last-seen Id
+  -> Maybe Text
+  -- ^ Last-seen Id
   -> m [StackEvent]
 awsCloudFormationDescribeStackEvents stackName mLastId = do
-  let
-    req =
-      newDescribeStackEvents
-        & describeStackEvents_stackName
-        ?~ unStackName stackName
+  let req =
+        newDescribeStackEvents
+          & describeStackEvents_stackName
+          ?~ unStackName stackName
 
   runConduit
     $ awsPaginate req
@@ -277,9 +276,10 @@ awsCloudFormationWait
   => StackName
   -> m StackDeployResult
 awsCloudFormationWait stackName = do
-  either stackCreateResult stackUpdateResult <$> race
-    (awsAwait newStackCreateComplete req)
-    (awsAwait newStackUpdateComplete req)
+  either stackCreateResult stackUpdateResult
+    <$> race
+      (awsAwait newStackCreateComplete req)
+      (awsAwait newStackUpdateComplete req)
  where
   req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
@@ -359,27 +359,27 @@ awsCloudFormationCreateChangeSet
   -> [Capability]
   -> [Tag]
   -> m (Either Text (Maybe ChangeSet))
-awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate parameters capabilities tags
-  = fmap (first formatServiceError)
+awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate parameters capabilities tags =
+  fmap (first formatServiceError)
     $ trying (_ServiceError . hasStatus 400)
     $ do
-        name <- newChangeSetName
+      name <- newChangeSetName
 
-        logDebug $ "Reading Template" :# ["path" .= stackTemplate]
-        templateBody <- addStackDescription mStackDescription
+      logDebug $ "Reading Template" :# ["path" .= stackTemplate]
+      templateBody <-
+        addStackDescription mStackDescription
           <$> readFileUtf8 (unStackTemplate stackTemplate)
 
-        mStack <- awsCloudFormationDescribeStackMaybe stackName
+      mStack <- awsCloudFormationDescribeStackMaybe stackName
 
-        let
-          changeSetType = fromMaybe ChangeSetType_CREATE $ do
+      let changeSetType = fromMaybe ChangeSetType_CREATE $ do
             stack <- mStack
-            pure $ if stackIsAbandonedCreate stack
-              then ChangeSetType_CREATE
-              else ChangeSetType_UPDATE
+            pure
+              $ if stackIsAbandonedCreate stack
+                then ChangeSetType_CREATE
+                else ChangeSetType_UPDATE
 
-        let
-          req =
+      let req =
             newCreateChangeSet (unStackName stackName) (unChangeSetName name)
               & (createChangeSet_changeSetType ?~ changeSetType)
               . (createChangeSet_templateBody ?~ templateBody)
@@ -387,17 +387,17 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
               . (createChangeSet_capabilities ?~ capabilities)
               . (createChangeSet_tags ?~ tags)
 
-        logInfo
-          $ "Creating changeset..."
-          :# ["name" .= name, "type" .= changeSetType]
-        csId <- awsSimple "CreateChangeSet" req (^. createChangeSetResponse_id)
+      logInfo
+        $ "Creating changeset..."
+        :# ["name" .= name, "type" .= changeSetType]
+      csId <- awsSimple "CreateChangeSet" req (^. createChangeSetResponse_id)
 
-        logDebug "Awaiting CREATE_COMPLETE"
-        void $ awsAwait newChangeSetCreateComplete $ newDescribeChangeSet csId
+      logDebug "Awaiting CREATE_COMPLETE"
+      void $ awsAwait newChangeSetCreateComplete $ newDescribeChangeSet csId
 
-        logInfo "Retrieving changeset..."
-        cs <- awsCloudFormationDescribeChangeSet $ ChangeSetId csId
-        pure $ cs <$ guard (not $ changeSetFailed cs)
+      logInfo "Retrieving changeset..."
+      cs <- awsCloudFormationDescribeChangeSet $ ChangeSetId csId
+      pure $ cs <$ guard (not $ changeSetFailed cs)
 
 awsCloudFormationDescribeChangeSet
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)
@@ -452,15 +452,15 @@ awsCloudFormationDeleteAllChangeSets stackName = do
   runConduit
     $ awsPaginate (newListChangeSets $ unStackName stackName)
     .| concatMapC
-         (\resp -> fromMaybe [] $ do
-           ss <- resp ^. listChangeSetsResponse_summaries
-           pure $ mapMaybe Summary.changeSetId ss
-         )
+      ( \resp -> fromMaybe [] $ do
+          ss <- resp ^. listChangeSetsResponse_summaries
+          pure $ mapMaybe Summary.changeSetId ss
+      )
     .| mapM_C
-         (\csId -> do
-           logInfo $ "Enqueing delete" :# ["changeSetId" .= csId]
-           void $ awsSend $ newDeleteChangeSet csId
-         )
+      ( \csId -> do
+          logInfo $ "Enqueing delete" :# ["changeSetId" .= csId]
+          void $ awsSend $ newDeleteChangeSet csId
+      )
 
 -- | Did we abandoned this Stack's first ever ChangeSet?
 --
@@ -474,16 +474,20 @@ awsCloudFormationDeleteAllChangeSets stackName = do
 -- Our hueristic for finding these is under review but with no previous
 -- updates (no lastUpdatedTime), presumably meaning it's still in its /first/
 -- review.
---
 stackIsAbandonedCreate :: Stack -> Bool
 stackIsAbandonedCreate stack =
-  stack ^. stack_stackStatus == StackStatus_REVIEW_IN_PROGRESS && isNothing
-    (stack ^. stack_lastUpdatedTime)
+  stack
+    ^. stack_stackStatus
+    == StackStatus_REVIEW_IN_PROGRESS
+    && isNothing
+      (stack ^. stack_lastUpdatedTime)
 
 stackStatusRequiresDeletion :: Stack -> Maybe StackStatus
-stackStatusRequiresDeletion stack = status
-  <$ guard (status `elem` requiresDeletionStatuses)
-  where status = stack ^. stack_stackStatus
+stackStatusRequiresDeletion stack =
+  status
+    <$ guard (status `elem` requiresDeletionStatuses)
+ where
+  status = stack ^. stack_stackStatus
 
 requiresDeletionStatuses :: [StackStatus]
 requiresDeletionStatuses =
@@ -501,7 +505,8 @@ _ValidationError =
   _MatchServiceError defaultService "ValidationError" . hasStatus 400
 
 formatServiceError :: ServiceError -> Text
-formatServiceError e = mconcat
-  [ toText $ e ^. serviceCode
-  , maybe "" ((": " <>) . toText) $ e ^. serviceMessage
-  ]
+formatServiceError e =
+  mconcat
+    [ toText $ e ^. serviceCode
+    , maybe "" ((": " <>) . toText) $ e ^. serviceMessage
+    ]

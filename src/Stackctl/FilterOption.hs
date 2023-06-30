@@ -1,7 +1,7 @@
 module Stackctl.FilterOption
   ( FilterOption
   , defaultFilterOption
-  , HasFilterOption(..)
+  , HasFilterOption (..)
   , envFilterOption
   , filterOption
   , filterOptionFromPaths
@@ -13,11 +13,11 @@ module Stackctl.FilterOption
 import Stackctl.Prelude
 
 import qualified Data.List.NonEmpty as NE
-import Data.Semigroup (Last(..))
+import Data.Semigroup (Last (..))
 import qualified Data.Text as T
 import qualified Env
 import Options.Applicative
-import Stackctl.AWS.CloudFormation (StackName(..))
+import Stackctl.AWS.CloudFormation (StackName (..))
 import Stackctl.StackSpec
 import System.FilePath (hasExtension)
 import System.FilePath.Glob
@@ -25,7 +25,7 @@ import System.FilePath.Glob
 newtype FilterOption = FilterOption
   { unFilterOption :: NonEmpty Pattern
   }
-  deriving Semigroup via Last FilterOption
+  deriving (Semigroup) via Last FilterOption
 
 instance ToJSON FilterOption where
   toJSON = toJSON . showFilterOption
@@ -48,11 +48,13 @@ envFilterOption items = var "FILTERS" <|> var "FILTER"
       <> " by patterns"
 
 filterOption :: String -> Parser FilterOption
-filterOption items = option (eitherReader readFilterOption) $ mconcat
-  [ long "filter"
-  , metavar "PATTERN[,PATTERN]"
-  , help $ "Filter " <> items <> " to match PATTERN(s)"
-  ]
+filterOption items =
+  option (eitherReader readFilterOption)
+    $ mconcat
+      [ long "filter"
+      , metavar "PATTERN[,PATTERN]"
+      , help $ "Filter " <> items <> " to match PATTERN(s)"
+      ]
 
 filterOptionFromPaths :: NonEmpty FilePath -> FilterOption
 filterOptionFromPaths = FilterOption . fmap compile
@@ -83,7 +85,8 @@ expandPatterns t = map compile $ s : expanded
 
 readFilterOption :: String -> Either String FilterOption
 readFilterOption = note err . filterOptionFromText . pack
-  where err = "Must be non-empty, comma-separated list of non-empty patterns"
+ where
+  err = "Must be non-empty, comma-separated list of non-empty patterns"
 
 showFilterOption :: FilterOption -> String
 showFilterOption =
@@ -104,8 +107,9 @@ filterStackSpecs fo =
   filter $ \spec -> any (`matchStackSpec` spec) $ unFilterOption fo
 
 matchStackSpec :: Pattern -> StackSpec -> Bool
-matchStackSpec p spec = or
-  [ match p $ unpack $ unStackName $ stackSpecStackName spec
-  , match p $ stackSpecStackFile spec
-  , match p $ stackSpecTemplateFile spec
-  ]
+matchStackSpec p spec =
+  or
+    [ match p $ unpack $ unStackName $ stackSpecStackName spec
+    , match p $ stackSpecStackFile spec
+    , match p $ stackSpecTemplateFile spec
+    ]

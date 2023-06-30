@@ -1,22 +1,22 @@
 module Stackctl.DirectoryOption
-  ( DirectoryOption(..)
+  ( DirectoryOption (..)
   , defaultDirectoryOption
-  , HasDirectoryOption(..)
+  , HasDirectoryOption (..)
   , envDirectoryOption
   , directoryOption
   ) where
 
 import Stackctl.Prelude
 
-import Data.Semigroup (Last(..))
+import Data.Semigroup (Last (..))
 import qualified Env
 import Options.Applicative
 
 newtype DirectoryOption = DirectoryOption
   { unDirectoryOption :: FilePath
   }
-  deriving newtype IsString
-  deriving Semigroup via Last DirectoryOption
+  deriving newtype (IsString)
+  deriving (Semigroup) via Last DirectoryOption
 
 defaultDirectoryOption :: DirectoryOption
 defaultDirectoryOption = "."
@@ -28,14 +28,17 @@ instance HasDirectoryOption DirectoryOption where
   directoryOptionL = id
 
 envDirectoryOption :: Env.Parser Env.Error DirectoryOption
-envDirectoryOption = Env.var (Env.str <=< Env.nonempty) "DIRECTORY"
-  $ Env.help "Operate on specifications in this directory"
+envDirectoryOption =
+  Env.var (Env.str <=< Env.nonempty) "DIRECTORY"
+    $ Env.help "Operate on specifications in this directory"
 
 directoryOption :: Parser DirectoryOption
-directoryOption = option str $ mconcat
-  [ short 'd'
-  , long "directory"
-  , metavar "PATH"
-  , help "Operate on specifications in PATH"
-  , action "directory"
-  ]
+directoryOption =
+  option str
+    $ mconcat
+      [ short 'd'
+      , long "directory"
+      , metavar "PATH"
+      , help "Operate on specifications in PATH"
+      , action "directory"
+      ]

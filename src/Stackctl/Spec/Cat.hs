@@ -1,5 +1,5 @@
 module Stackctl.Spec.Cat
-  ( CatOptions(..)
+  ( CatOptions (..)
   , parseCatOptions
   , runCat
   ) where
@@ -21,7 +21,7 @@ import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.Config (HasConfig)
-import Stackctl.DirectoryOption (HasDirectoryOption(..), unDirectoryOption)
+import Stackctl.DirectoryOption (HasDirectoryOption (..), unDirectoryOption)
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
@@ -37,20 +37,21 @@ data CatOptions = CatOptions
 -- brittany-disable-next-binding
 
 parseCatOptions :: Parser CatOptions
-parseCatOptions = CatOptions
-  <$> switch
-    (  long "no-stacks"
-    <> help "Only show templates/"
-    )
-  <*> switch
-    (  long "no-templates"
-    <> help "Only show stacks/"
-    )
-  <*> switch
-    (  short 'b'
-    <> long "brief"
-    <> help "Don't show file contents, only paths"
-    )
+parseCatOptions =
+  CatOptions
+    <$> switch
+      ( long "no-stacks"
+          <> help "Only show templates/"
+      )
+    <*> switch
+      ( long "no-templates"
+          <> help "Only show stacks/"
+      )
+    <*> switch
+      ( short 'b'
+          <> long "brief"
+          <> help "Don't show file contents, only paths"
+      )
 
 runCat
   :: ( MonadMask m
@@ -114,21 +115,23 @@ specTree = map (second groupRegion) . groupAccount
   groupRegion = groupTo (stackSpecPathRegion . stackSpecSpecPath)
 
   groupAccount :: [StackSpec] -> [((AccountId, Text), [StackSpec])]
-  groupAccount = groupTo
-    ((stackSpecPathAccountId &&& stackSpecPathAccountName) . stackSpecSpecPath)
+  groupAccount =
+    groupTo
+      ((stackSpecPathAccountId &&& stackSpecPathAccountName) . stackSpecSpecPath)
 
 groupTo :: Ord b => (a -> b) -> [a] -> [(b, [a])]
 groupTo f = map (f . NE.head &&& NE.toList) . NE.groupAllWith f
 
 prettyPrintStackSpecYaml :: Colors -> StackName -> StackSpecYaml -> [Text]
-prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
-  [ [cyan "Name" <> ": " <> green (unStackName name)]
-  , maybe [] ppDescription ssyDescription
-  , [cyan "Template" <> ": " <> green (pack ssyTemplate)]
-  , ppObject "Parameters" parametersYamlKVs ssyParameters
-  , ppList "Capabilities" ppCapabilities ssyCapabilities
-  , ppObject "Tags" tagsYamlKVs ssyTags
-  ]
+prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} =
+  concat
+    [ [cyan "Name" <> ": " <> green (unStackName name)]
+    , maybe [] ppDescription ssyDescription
+    , [cyan "Template" <> ": " <> green (pack ssyTemplate)]
+    , ppObject "Parameters" parametersYamlKVs ssyParameters
+    , ppList "Capabilities" ppCapabilities ssyCapabilities
+    , ppObject "Tags" tagsYamlKVs ssyTags
+    ]
  where
   ppObject :: Text -> (a -> [(Text, Maybe Text)]) -> Maybe a -> [Text]
   ppObject label f mA = fromMaybe [] $ do
@@ -136,10 +139,10 @@ prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} = concat
     pure
       $ [cyan label <> ":"]
       <> map
-           (\(k, mV) ->
-             "  " <> cyan k <> ":" <> maybe "" (\v -> " " <> green v) mV
-           )
-           kvs
+        ( \(k, mV) ->
+            "  " <> cyan k <> ":" <> maybe "" (\v -> " " <> green v) mV
+        )
+        kvs
 
   ppList :: Text -> (a -> [Text]) -> Maybe a -> [Text]
   ppList label f = maybe [] (((cyan label <> ":") :) . f)
@@ -152,9 +155,13 @@ parametersYamlKVs :: ParametersYaml -> [(Text, Maybe Text)]
 parametersYamlKVs = mapMaybe parameterYamlKV . unParametersYaml
 
 parameterYamlKV :: ParameterYaml -> Maybe (Text, Maybe Text)
-parameterYamlKV py = (,) <$> (p ^. parameter_parameterKey) <*> pure
-  (p ^. parameter_parameterValue)
-  where p = unParameterYaml py
+parameterYamlKV py =
+  (,)
+    <$> (p ^. parameter_parameterKey)
+    <*> pure
+      (p ^. parameter_parameterValue)
+ where
+  p = unParameterYaml py
 
 tagsYamlKVs :: TagsYaml -> [(Text, Maybe Text)]
 tagsYamlKVs = map (tagKV . unTagYaml) . unTagsYaml
@@ -163,12 +170,13 @@ tagKV :: Tag -> (Text, Maybe Text)
 tagKV tg = (tg ^. tag_key, tg ^. tag_value . to Just)
 
 prettyPrintTemplate :: Colors -> Value -> [Text]
-prettyPrintTemplate Colors {..} val = concat
-  [ displayTextProperty "Description"
-  , displayObjectProperty "Parameters"
-  , displayObjectProperty "Resources"
-  , displayObjectProperty "Outputs"
-  ]
+prettyPrintTemplate Colors {..} val =
+  concat
+    [ displayTextProperty "Description"
+    , displayObjectProperty "Parameters"
+    , displayObjectProperty "Resources"
+    , displayObjectProperty "Outputs"
+    ]
  where
   displayTextProperty :: Text -> [Text]
   displayTextProperty = displayPropertyWith
@@ -184,7 +192,8 @@ prettyPrintTemplate Colors {..} val = concat
   displayPropertyWith
     :: (FromJSON a, ToJSON a) => (a -> [Text]) -> Text -> [Text]
   displayPropertyWith f k = cyan k <> ": " : fromMaybe [] displayValue
-    where displayValue = val ^? key (Key.fromText k) . _JSON . to f
+   where
+    displayValue = val ^? key (Key.fromText k) . _JSON . to f
 
 putBoxed :: MonadIO m => Int -> [Text] -> m ()
 putBoxed n xs = do
@@ -194,4 +203,5 @@ putBoxed n xs = do
 
 put :: MonadIO m => Int -> Text -> m ()
 put n = liftIO . T.putStrLn . (indent <>)
-  where indent = mconcat $ replicate n " "
+ where
+  indent = mconcat $ replicate n " "

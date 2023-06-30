@@ -91,8 +91,9 @@ spec = do
   describe "filterOptionFromPaths" $ do
     it "finds full paths (e.g. as output by generate)" $ do
       let
-        option = filterOptionFromPaths
-          $ pure "stacks/1234567890.test-account/us-east-1/stack.yaml"
+        option =
+          filterOptionFromPaths
+            $ pure "stacks/1234567890.test-account/us-east-1/stack.yaml"
         specs =
           [ toSpec "some-name" "stack.yaml" Nothing
           , toSpec "other-path" "other-stack.yaml" $ Just "x"
@@ -102,26 +103,29 @@ spec = do
         `shouldMatchList` ["some-name"]
 
 toSpec :: Text -> FilePath -> Maybe FilePath -> StackSpec
-toSpec name path mTemplate = flip runReader emptyConfig
-  $ buildStackSpec ".platform/specs" specPath specBody
+toSpec name path mTemplate =
+  flip runReader emptyConfig
+    $ buildStackSpec ".platform/specs" specPath specBody
  where
   stackName = StackName name
   specPath = stackSpecPath scope stackName path
-  specBody = StackSpecYaml
-    { ssyDescription = Nothing
-    , ssyDepends = Nothing
-    , ssyActions = Nothing
-    , ssyTemplate = fromMaybe path mTemplate
-    , ssyParameters = Nothing
-    , ssyCapabilities = Nothing
-    , ssyTags = Nothing
-    }
+  specBody =
+    StackSpecYaml
+      { ssyDescription = Nothing
+      , ssyDepends = Nothing
+      , ssyActions = Nothing
+      , ssyTemplate = fromMaybe path mTemplate
+      , ssyParameters = Nothing
+      , ssyCapabilities = Nothing
+      , ssyTags = Nothing
+      }
 
-  scope = AwsScope
-    { awsAccountId = AccountId "1234567890"
-    , awsAccountName = "test-account"
-    , awsRegion = Region' "us-east-1"
-    }
+  scope =
+    AwsScope
+      { awsAccountId = AccountId "1234567890"
+      , awsAccountName = "test-account"
+      , awsRegion = Region' "us-east-1"
+      }
 
 specName :: StackSpec -> Text
 specName = unStackName . stackSpecStackName

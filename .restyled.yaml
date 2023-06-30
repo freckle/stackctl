@@ -1,6 +1,8 @@
 restylers_version: dev
 restylers:
-  - brittany
+  - fourmolu
+  - stylish-haskell:
+      enabled: false
   - prettier-markdown:
       enabled: false
   - whitespace:

@@ -27,14 +27,14 @@ import Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
 import Data.List.Extra (nubOrdOn)
 import qualified Data.Yaml as Yaml
-import Stackctl.Action
 import Stackctl.AWS
-import Stackctl.Config (HasConfig(..), applyConfig)
+import Stackctl.Action
+import Stackctl.Config (HasConfig (..), applyConfig)
 import Stackctl.Sort
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
-import qualified System.FilePath as FilePath
 import System.FilePath (takeExtension)
+import qualified System.FilePath as FilePath
 import UnliftIO.Directory (createDirectoryIfMissing, doesFileExist)
 
 data StackSpec = StackSpec
@@ -101,11 +101,12 @@ buildStackSpec
   -> m StackSpec
 buildStackSpec dir specPath specBody = do
   config <- view configL
-  pure StackSpec
-    { ssSpecRoot = dir
-    , ssSpecPath = specPath
-    , ssSpecBody = applyConfig config specBody
-    }
+  pure
+    StackSpec
+      { ssSpecRoot = dir
+      , ssSpecPath = specPath
+      , ssSpecBody = applyConfig config specBody
+      }
 
 data TemplateBody
   = TemplateText Text
@@ -114,7 +115,7 @@ data TemplateBody
 newtype UnexpectedTemplateJson = UnexpectedTemplateJson
   { _unexpectedTemplateJsonExtension :: String
   }
-  deriving stock Show
+  deriving stock (Show)
 
 instance Exception UnexpectedTemplateJson where
   displayException (UnexpectedTemplateJson ext) =
@@ -192,14 +193,15 @@ createChangeSet
   -> [Parameter]
   -> [Tag]
   -> m (Either Text (Maybe ChangeSet))
-createChangeSet spec parameters tags = awsCloudFormationCreateChangeSet
-  (stackSpecStackName spec)
-  (stackSpecStackDescription spec)
-  (stackSpecTemplate spec)
-  (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
-  )
-  (stackSpecCapabilities spec)
-  (nubOrdOn (^. tag_key) $ tags <> stackSpecTags spec)
+createChangeSet spec parameters tags =
+  awsCloudFormationCreateChangeSet
+    (stackSpecStackName spec)
+    (stackSpecStackDescription spec)
+    (stackSpecTemplate spec)
+    ( nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
+    )
+    (stackSpecCapabilities spec)
+    (nubOrdOn (^. tag_key) $ tags <> stackSpecTags spec)
 
 sortStackSpecs :: [StackSpec] -> [StackSpec]
 sortStackSpecs = sortByDependencies stackSpecStackName stackSpecDepends

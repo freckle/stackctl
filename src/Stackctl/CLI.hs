@@ -10,9 +10,9 @@ import Stackctl.Prelude
 import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (ResourceT, runResourceT)
-import Stackctl.AutoSSO
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.Config
 import Stackctl.DirectoryOption
@@ -28,19 +28,19 @@ data App options = App
   }
 
 optionsL :: Lens' (App options) options
-optionsL = lens appOptions $ \x y -> x { appOptions = y }
+optionsL = lens appOptions $ \x y -> x {appOptions = y}
 
 instance HasLogger (App options) where
-  loggerL = lens appLogger $ \x y -> x { appLogger = y }
+  loggerL = lens appLogger $ \x y -> x {appLogger = y}
 
 instance HasConfig (App options) where
-  configL = lens appConfig $ \x y -> x { appConfig = y }
+  configL = lens appConfig $ \x y -> x {appConfig = y}
 
 instance HasAwsScope (App options) where
-  awsScopeL = lens appAwsScope $ \x y -> x { appAwsScope = y }
+  awsScopeL = lens appAwsScope $ \x y -> x {appAwsScope = y}
 
 instance HasAwsEnv (App options) where
-  awsEnvL = lens appAwsEnv $ \x y -> x { appAwsEnv = y }
+  awsEnvL = lens appAwsEnv $ \x y -> x {appAwsEnv = y}
 
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
@@ -87,14 +87,16 @@ runAppT
 runAppT options f = do
   envLogSettings <-
     liftIO
-    . LoggingEnv.parseWith
-    . setLogSettingsConcurrency (Just 1)
-    $ defaultLogSettings
+      . LoggingEnv.parseWith
+      . setLogSettingsConcurrency (Just 1)
+      $ defaultLogSettings
 
-  logger <- newLogger $ adjustLogSettings
-    (options ^. colorOptionL)
-    (options ^. verboseOptionL)
-    envLogSettings
+  logger <-
+    newLogger
+      $ adjustLogSettings
+        (options ^. colorOptionL)
+        (options ^. verboseOptionL)
+        envLogSettings
 
   app <- runResourceT $ runLoggerLoggingT logger $ do
     aws <- runReaderT (handleAutoSSO options awsEnvDiscover) logger

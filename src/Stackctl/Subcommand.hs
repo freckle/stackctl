@@ -1,5 +1,5 @@
 module Stackctl.Subcommand
-  ( Subcommand(..)
+  ( Subcommand (..)
   , subcommand
   , runSubcommand
   , runSubcommand'
@@ -42,12 +42,14 @@ runSubcommand'
   -> Mod CommandFields (options -> IO a)
   -> IO a
 runSubcommand' title parseEnv parseCLI sp = do
-  (options, act) <- applyEnv
-    <$> Env.parse (Env.header $ unpack title) parseEnv
-    <*> execParser (withInfo title $ (,) <$> parseCLI <*> subparser sp)
+  (options, act) <-
+    applyEnv
+      <$> Env.parse (Env.header $ unpack title) parseEnv
+      <*> execParser (withInfo title $ (,) <$> parseCLI <*> subparser sp)
 
   act options
-  where applyEnv env = first (env <>)
+ where
+  applyEnv env = first (env <>)
 
 -- | Use this in the 'run' member of a 'Subcommand' that wants 'AppT'
 --
@@ -60,7 +62,6 @@ runSubcommand' title parseEnv parseCLI sp = do
 -- runFoo :: (MonadReader env m, HasAws env) => FooOptions -> m ()
 -- runFoo = undefined
 -- @
---
 runAppSubcommand
   :: ( HasColorOption options
      , HasVerboseOption options

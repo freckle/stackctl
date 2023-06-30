@@ -5,7 +5,7 @@ module Stackctl.Prelude
   ) where
 
 import RIO as X hiding
-  ( LogLevel(..)
+  ( LogLevel (..)
   , LogSource
   , logDebug
   , logDebugS
@@ -21,10 +21,15 @@ import RIO as X hiding
 
 import Blammo.Logging as X
 import Control.Error.Util as X (hush, note)
-import Data.Aeson as X (ToJSON(..), object)
+import Data.Aeson as X (ToJSON (..), object)
 import Data.Text as X (pack, unpack)
 import System.FilePath as X
-  (dropExtension, takeBaseName, takeDirectory, (<.>), (</>))
+  ( dropExtension
+  , takeBaseName
+  , takeDirectory
+  , (<.>)
+  , (</>)
+  )
 import UnliftIO.Directory as X (withCurrentDirectory)
 
 {-# ANN module ("HLint: ignore Avoid restricted alias" :: String) #-}

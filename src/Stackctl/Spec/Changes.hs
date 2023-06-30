@@ -1,5 +1,5 @@
 module Stackctl.Spec.Changes
-  ( ChangesOptions(..)
+  ( ChangesOptions (..)
   , parseChangesOptions
   , runChanges
   ) where
@@ -34,16 +34,20 @@ data ChangesOptions = ChangesOptions
 -- brittany-disable-next-binding
 
 parseChangesOptions :: Parser ChangesOptions
-parseChangesOptions = ChangesOptions
-  <$> formatOption
-  <*> omitFullOption
-  <*> many parameterOption
-  <*> many tagOption
-  <*> optional (argument str
-    (  metavar "PATH"
-    <> help "Write changes summary to PATH"
-    <> action "file"
-    ))
+parseChangesOptions =
+  ChangesOptions
+    <$> formatOption
+    <*> omitFullOption
+    <*> many parameterOption
+    <*> many tagOption
+    <*> optional
+      ( argument
+          str
+          ( metavar "PATH"
+              <> help "Write changes summary to PATH"
+              <> action "file"
+          )
+      )
 
 runChanges
   :: ( MonadMask m
@@ -66,12 +70,11 @@ runChanges ChangesOptions {..} = do
 
   colors <- case scoOutput of
     Nothing -> getColorsLogger
-    Just{} -> pure noColors
+    Just {} -> pure noColors
 
-  let
-    write formatted = case scoOutput of
-      Nothing -> pushLoggerLn formatted
-      Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
+  let write formatted = case scoOutput of
+        Nothing -> pushLoggerLn formatted
+        Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
 
   specs <- discoverSpecs
 
