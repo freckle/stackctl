@@ -84,6 +84,10 @@ runDeploy
   => DeployOptions
   -> m ()
 runDeploy DeployOptions {..} = do
+  when sdoRemovals $ do
+    removed <- inferRemovedStacks
+    traverse_ (deleteRemovedStack sdoDeployConfirmation) removed
+
   specs <- discoverSpecs
 
   for_ specs $ \spec -> do
@@ -110,10 +114,6 @@ runDeploy DeployOptions {..} = do
           deployChangeSet sdoDeployConfirmation changeSet
           runActions stackName PostDeploy $ stackSpecActions spec
           when sdoClean $ awsCloudFormationDeleteAllChangeSets stackName
-
-  when sdoRemovals $ do
-    removed <- inferRemovedStacks
-    traverse_ (deleteRemovedStack sdoDeployConfirmation) removed
 
 deleteRemovedStack
   :: ( MonadMask m
