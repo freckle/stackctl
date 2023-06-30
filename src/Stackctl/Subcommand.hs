@@ -10,6 +10,7 @@ import Stackctl.Prelude
 
 import qualified Env
 import Options.Applicative
+import Stackctl.AWS (handlingServiceError)
 import Stackctl.AutoSSO
 import Stackctl.CLI
 import Stackctl.ColorOption
@@ -71,7 +72,10 @@ runAppSubcommand
   -> subOptions
   -> options
   -> IO a
-runAppSubcommand f subOptions options = runAppT options $ f subOptions
+runAppSubcommand f subOptions options =
+  runAppT options
+    $ handlingServiceError
+    $ f subOptions
 
 withInfo :: Text -> Parser a -> ParserInfo a
 withInfo d p = info (p <**> helper) $ progDesc (unpack d) <> fullDesc

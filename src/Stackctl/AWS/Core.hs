@@ -15,6 +15,9 @@ module Stackctl.AWS.Core
     -- * 'Amazonka' extensions
   , AccountId (..)
 
+    -- * Error-handling
+  , handlingServiceError
+
     -- * 'Amazonka'/'ResourceT' re-exports
   , Region (..)
   , FromText (..)
@@ -143,3 +146,21 @@ newtype AccountId = AccountId
   { unAccountId :: Text
   }
   deriving newtype (Eq, Ord, Show, ToJSON)
+
+-- | Handle 'ServiceError', log it and 'exitFailure'
+--
+-- This is useful at the top-level of the app, where we'd be crashing anyway. It
+-- makes things more readable and easier to debug.
+handlingServiceError :: (MonadUnliftIO m, MonadLogger m) => m a -> m a
+handlingServiceError =
+  handleJust @_ @SomeException (^? _ServiceError) $ \e -> do
+    logError
+      $ "Exiting due to AWS Service error"
+      :# [ "code" .= fromErrorCode (e ^. serviceCode)
+         , "message" .= fmap fromErrorMessage (e ^. serviceMessage)
+         , "requestId" .= fmap fromRequestId (e ^. serviceRequestId)
+         ]
+    exitFailure
+
+fromErrorCode :: ErrorCode -> Text
+fromErrorCode (ErrorCode x) = x
