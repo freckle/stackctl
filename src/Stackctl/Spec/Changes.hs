@@ -76,9 +76,7 @@ runChanges ChangesOptions {..} = do
         Nothing -> pushLoggerLn formatted
         Just p -> liftIO $ T.appendFile p $ formatted <> "\n"
 
-  specs <- discoverSpecs
-
-  for_ specs $ \spec -> do
+  forEachSpec_ $ \spec -> do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
       emChangeSet <- createChangeSet spec scoParameters scoTags
 

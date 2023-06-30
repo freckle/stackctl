@@ -40,10 +40,9 @@ runList
   => ListOptions
   -> m ()
 runList _ = do
-  specs <- discoverSpecs
   Colors {..} <- getColorsLogger
 
-  for_ specs $ \spec -> do
+  forEachSpec_ $ \spec -> do
     let
       path = stackSpecFilePath spec
       name = stackSpecStackName spec

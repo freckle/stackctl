@@ -88,9 +88,7 @@ runDeploy DeployOptions {..} = do
     removed <- inferRemovedStacks
     traverse_ (deleteRemovedStack sdoDeployConfirmation) removed
 
-  specs <- discoverSpecs
-
-  for_ specs $ \spec -> do
+  forEachSpec_ $ \spec -> do
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
       checkIfStackRequiresDeletion sdoDeployConfirmation
         $ stackSpecStackName spec
