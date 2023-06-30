@@ -1,5 +1,6 @@
 module Stackctl.Spec.Discover
-  ( discoverSpecs
+  ( forEachSpec_
+  , discoverSpecs
   , buildSpecPath
   ) where
 
@@ -16,6 +17,20 @@ import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import System.FilePath (isPathSeparator)
 import System.FilePath.Glob
+
+forEachSpec_
+  :: ( MonadMask m
+     , MonadResource m
+     , MonadLogger m
+     , MonadReader env m
+     , HasAwsScope env
+     , HasConfig env
+     , HasDirectoryOption env
+     , HasFilterOption env
+     )
+  => (StackSpec -> m ())
+  -> m ()
+forEachSpec_ f = traverse_ f =<< discoverSpecs
 
 discoverSpecs
   :: ( MonadMask m
