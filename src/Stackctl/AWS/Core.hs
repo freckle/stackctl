@@ -1,6 +1,6 @@
 module Stackctl.AWS.Core
   ( AwsEnv
-  , HasAwsEnv(..)
+  , HasAwsEnv (..)
   , awsEnvDiscover
   , awsSimple
   , awsSend
@@ -8,23 +8,23 @@ module Stackctl.AWS.Core
   , awsAwait
   , awsAssumeRole
 
-  -- * Modifiers on 'AwsEnv'
+    -- * Modifiers on 'AwsEnv'
   , awsWithin
   , awsTimeout
 
-  -- * 'Amazonka' extensions
-  , AccountId(..)
+    -- * 'Amazonka' extensions
+  , AccountId (..)
 
-  -- * 'Amazonka'/'ResourceT' re-exports
-  , Region(..)
-  , FromText(..)
-  , ToText(..)
+    -- * 'Amazonka'/'ResourceT' re-exports
+  , Region (..)
+  , FromText (..)
+  , ToText (..)
   , MonadResource
   ) where
 
 import Stackctl.Prelude hiding (timeout)
 
-import Amazonka hiding (LogLevel(..))
+import Amazonka hiding (LogLevel (..))
 import qualified Amazonka as AWS
 import Amazonka.Auth.Keys (fromSession)
 import Amazonka.STS.AssumeRole
@@ -38,7 +38,7 @@ newtype AwsEnv = AwsEnv
   }
 
 unL :: Lens' AwsEnv Env
-unL = lens unAwsEnv $ \x y -> x { unAwsEnv = y }
+unL = lens unAwsEnv $ \x y -> x {unAwsEnv = y}
 
 awsEnvDiscover :: MonadLoggerIO m => m AwsEnv
 awsEnvDiscover = do
@@ -48,19 +48,20 @@ awsEnvDiscover = do
 configureLogging :: MonadLoggerIO m => Env -> m Env
 configureLogging env = do
   loggerIO <- askLoggerIO
-  pure $ env
-    { AWS.envLogger = \level msg -> do
-      loggerIO
-        defaultLoc -- TODO: there may be a way to get a CallStack/Loc
-        "Amazonka"
-        (case level of
-          AWS.Info -> LevelInfo
-          AWS.Error -> LevelError
-          AWS.Debug -> LevelDebug
-          AWS.Trace -> LevelOther "trace"
-        )
-        (toLogStr msg)
-    }
+  pure
+    $ env
+      { AWS.envLogger = \level msg -> do
+          loggerIO
+            defaultLoc -- TODO: there may be a way to get a CallStack/Loc
+            "Amazonka"
+            ( case level of
+                AWS.Info -> LevelInfo
+                AWS.Error -> LevelError
+                AWS.Debug -> LevelDebug
+                AWS.Trace -> LevelOther "trace"
+            )
+            (toLogStr msg)
+      }
 
 class HasAwsEnv env where
   awsEnvL :: Lens' env AwsEnv
@@ -77,7 +78,8 @@ awsSimple
 awsSimple name req post = do
   resp <- awsSend req
   maybe (throwString err) pure $ post resp
-  where err = unpack name <> " successful, but processing the response failed"
+ where
+  err = unpack name <> " successful, but processing the response failed"
 
 awsSend
   :: (MonadResource m, MonadReader env m, HasAwsEnv env, AWSRequest a)

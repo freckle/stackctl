@@ -1,5 +1,5 @@
 module Stackctl.Spec.List
-  ( ListOptions(..)
+  ( ListOptions (..)
   , parseListOptions
   , runList
   ) where
@@ -12,7 +12,7 @@ import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Colors
 import Stackctl.Config (HasConfig)
-import Stackctl.DirectoryOption (HasDirectoryOption(..))
+import Stackctl.DirectoryOption (HasDirectoryOption (..))
 import Stackctl.FilterOption (HasFilterOption)
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec

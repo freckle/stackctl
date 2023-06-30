@@ -11,12 +11,11 @@
 --     run:
 --       InvokeLambdaByStackOutput: OnDeployFunction
 -- @
---
 module Stackctl.Action
   ( Action
   , newAction
-  , ActionOn(..)
-  , ActionRun(..)
+  , ActionOn (..)
+  , ActionRun (..)
   , runActions
   ) where
 
@@ -63,18 +62,20 @@ instance FromJSON ActionRun where
       <|> (InvokeLambdaByName <$> o .: "InvokeLambdaByName")
 
 instance ToJSON ActionRun where
-  toJSON = object . \case
-    InvokeLambdaByStackOutput name -> ["InvokeLambdaByStackOutput" .= name]
-    InvokeLambdaByName name -> ["InvokeLambdaByName" .= name]
-  toEncoding = pairs . \case
-    InvokeLambdaByStackOutput name -> "InvokeLambdaByStackOutput" .= name
-    InvokeLambdaByName name -> "InvokeLambdaByName" .= name
+  toJSON =
+    object . \case
+      InvokeLambdaByStackOutput name -> ["InvokeLambdaByStackOutput" .= name]
+      InvokeLambdaByName name -> ["InvokeLambdaByName" .= name]
+  toEncoding =
+    pairs . \case
+      InvokeLambdaByStackOutput name -> "InvokeLambdaByStackOutput" .= name
+      InvokeLambdaByName name -> "InvokeLambdaByName" .= name
 
 data ActionFailure
   = NoSuchOutput
   | InvokeLambdaFailure
-  deriving stock Show
-  deriving anyclass Exception
+  deriving stock (Show)
+  deriving anyclass (Exception)
 
 runActions
   :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
@@ -86,14 +87,14 @@ runActions stackName on =
   traverse_ (runAction stackName) . filter (`shouldRunOn` on)
 
 shouldRunOn :: Action -> ActionOn -> Bool
-shouldRunOn Action { on } on' = on == on'
+shouldRunOn Action {on} on' = on == on'
 
 runAction
   :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
   => StackName
   -> Action
   -> m ()
-runAction stackName Action { on, run } = do
+runAction stackName Action {on, run} = do
   logInfo $ "Running action" :# ["on" .= on, "run" .= run]
 
   case run of

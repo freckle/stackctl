@@ -3,7 +3,7 @@
 module Stackctl.StackSpecPath
   ( StackSpecPath
 
-  -- * Fields
+    -- * Fields
   , stackSpecPathAccountId
   , stackSpecPathAccountName
   , stackSpecPathRegion
@@ -11,7 +11,7 @@ module Stackctl.StackSpecPath
   , stackSpecPathBasePath
   , stackSpecPathFilePath
 
-  -- * Construction
+    -- * Construction
   , stackSpecPath
   , stackSpecPathFromFilePath
   ) where
@@ -33,12 +33,13 @@ data StackSpecPath = StackSpecPath
   deriving stock (Eq, Show)
 
 stackSpecPath :: AwsScope -> StackName -> FilePath -> StackSpecPath
-stackSpecPath sspAwsScope@AwsScope {..} sspStackName sspPath = StackSpecPath
-  { sspAwsScope
-  , sspAccountPathPart
-  , sspStackName
-  , sspPath
-  }
+stackSpecPath sspAwsScope@AwsScope {..} sspStackName sspPath =
+  StackSpecPath
+    { sspAwsScope
+    , sspAccountPathPart
+    , sspStackName
+    , sspPath
+    }
  where
   sspAccountPathPart =
     unpack $ unAccountId awsAccountId <> "." <> awsAccountName
@@ -71,7 +72,8 @@ stackSpecPathFilePath path =
 
 stackSpecPathFromFilePath
   :: AwsScope
-  -> FilePath -- ^ Must be relative, @stacks/@
+  -> FilePath
+  -- ^ Must be relative, @stacks/@
   -> Either String StackSpecPath
 stackSpecPathFromFilePath awsScope@AwsScope {..} path =
   case splitDirectories path of
@@ -94,17 +96,17 @@ stackSpecPathFromFilePath awsScope@AwsScope {..} path =
 
       stackName <-
         maybe (Left "Must end in .yaml") (Right . StackName)
-        $ T.stripSuffix ".yaml"
-        $ T.intercalate "-"
-        $ map pack rest
+          $ T.stripSuffix ".yaml"
+          $ T.intercalate "-"
+          $ map pack rest
 
-      Right $ StackSpecPath
-        { sspAwsScope = awsScope { awsAccountName = accountName }
-        , sspAccountPathPart = pathAccount
-        , sspStackName = stackName
-        , sspPath = joinPath rest
-        }
-
+      Right
+        $ StackSpecPath
+          { sspAwsScope = awsScope {awsAccountName = accountName}
+          , sspAccountPathPart = pathAccount
+          , sspStackName = stackName
+          , sspPath = joinPath rest
+          }
     _ -> Left $ "Path is not stacks/././.: " <> path
 
 -- | Handle @{account-name}.{account-id}@ or @{account-id}.{account-name}@
@@ -116,4 +118,5 @@ parseAccountPath path = case second (T.drop 1) $ T.breakOn "." $ pack path of
     Left
       $ "Path matches neither {account-id}.{account-name}, nor {account-name}.{account-id}: "
       <> path
-  where isAccountId x = T.length x == 12 && T.all isDigit x
+ where
+  isAccountId x = T.length x == 12 && T.all isDigit x

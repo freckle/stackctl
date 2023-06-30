@@ -12,12 +12,12 @@ import Test.Hspec
 spec :: Spec
 spec = do
   describe "awsScopeSpecStackName" $ do
-    let
-      scope = AwsScope
-        { awsAccountId = AccountId "123"
-        , awsAccountName = "testing"
-        , awsRegion = "us-east-1"
-        }
+    let scope =
+          AwsScope
+            { awsAccountId = AccountId "123"
+            , awsAccountName = "testing"
+            , awsRegion = "us-east-1"
+            }
 
     it "parses full paths to stacks in the current scope" $ do
       awsScopeSpecStackName scope "stacks/123.testing/us-east-1/foo.yaml"

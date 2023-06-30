@@ -19,15 +19,15 @@ spec :: Spec
 spec = do
   describe "loadConfigFromBytes" $ do
     it "loads a valid config" $ do
-      let
-        result = loadConfigFromLines
-          [ "required_version: " <> BS8.pack (showVersion Paths.version)
-          , "defaults:"
-          , "  parameters:"
-          , "    Some: Parameter"
-          , "  tags:"
-          , "    Some: Tag"
-          ]
+      let result =
+            loadConfigFromLines
+              [ "required_version: " <> BS8.pack (showVersion Paths.version)
+              , "defaults:"
+              , "  parameters:"
+              , "    Some: Parameter"
+              , "  tags:"
+              , "    Some: Tag"
+              ]
 
       case result of
         Left err -> do
@@ -42,15 +42,16 @@ spec = do
   describe "applyConfig" $ do
     it "defaults missing Tags" $ do
       let
-        specYaml = StackSpecYaml
-          { ssyDescription = Nothing
-          , ssyTemplate = ""
-          , ssyDepends = Nothing
-          , ssyActions = Nothing
-          , ssyParameters = Nothing
-          , ssyCapabilities = Nothing
-          , ssyTags = Just $ toTagsYaml [("Hi", "There"), ("Keep", "Me")]
-          }
+        specYaml =
+          StackSpecYaml
+            { ssyDescription = Nothing
+            , ssyTemplate = ""
+            , ssyDepends = Nothing
+            , ssyActions = Nothing
+            , ssyParameters = Nothing
+            , ssyCapabilities = Nothing
+            , ssyTags = Just $ toTagsYaml [("Hi", "There"), ("Keep", "Me")]
+            }
 
         Right config =
           loadConfigFromBytes
@@ -61,8 +62,9 @@ spec = do
 
         Just tags = ssyTags (applyConfig config specYaml)
 
-      tags `shouldBe` toTagsYaml
-        [("From", "Defaults"), ("Hi", "There"), ("Keep", "Me")]
+      tags
+        `shouldBe` toTagsYaml
+          [("From", "Defaults"), ("Hi", "There"), ("Keep", "Me")]
 
 loadConfigFromLines :: MonadError ConfigError m => [ByteString] -> m Config
 loadConfigFromLines = loadConfigFromBytes . mconcat . map (<> "\n")

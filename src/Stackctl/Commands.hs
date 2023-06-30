@@ -25,12 +25,13 @@ cat
      , HasAutoSSOOption options
      )
   => Subcommand options CatOptions
-cat = Subcommand
-  { name = "cat"
-  , description = "Pretty-print specifications"
-  , parse = parseCatOptions
-  , run = runAppSubcommand runCat
-  }
+cat =
+  Subcommand
+    { name = "cat"
+    , description = "Pretty-print specifications"
+    , parse = parseCatOptions
+    , run = runAppSubcommand runCat
+    }
 
 capture
   :: ( HasColorOption options
@@ -39,12 +40,13 @@ capture
      , HasAutoSSOOption options
      )
   => Subcommand options CaptureOptions
-capture = Subcommand
-  { name = "capture"
-  , description = "Capture deployed Stacks as specifications"
-  , parse = parseCaptureOptions
-  , run = runAppSubcommand runCapture
-  }
+capture =
+  Subcommand
+    { name = "capture"
+    , description = "Capture deployed Stacks as specifications"
+    , parse = parseCaptureOptions
+    , run = runAppSubcommand runCapture
+    }
 
 changes
   :: ( HasColorOption options
@@ -54,12 +56,13 @@ changes
      , HasAutoSSOOption options
      )
   => Subcommand options ChangesOptions
-changes = Subcommand
-  { name = "changes"
-  , description = "Review changes between specification and deployed state"
-  , parse = parseChangesOptions
-  , run = runAppSubcommand runChanges
-  }
+changes =
+  Subcommand
+    { name = "changes"
+    , description = "Review changes between specification and deployed state"
+    , parse = parseChangesOptions
+    , run = runAppSubcommand runChanges
+    }
 
 deploy
   :: ( HasColorOption options
@@ -69,12 +72,13 @@ deploy
      , HasAutoSSOOption options
      )
   => Subcommand options DeployOptions
-deploy = Subcommand
-  { name = "deploy"
-  , description = "Deploy specifications"
-  , parse = parseDeployOptions
-  , run = runAppSubcommand runDeploy
-  }
+deploy =
+  Subcommand
+    { name = "deploy"
+    , description = "Deploy specifications"
+    , parse = parseDeployOptions
+    , run = runAppSubcommand runDeploy
+    }
 
 list
   :: ( HasColorOption options
@@ -84,17 +88,19 @@ list
      , HasAutoSSOOption options
      )
   => Subcommand options ListOptions
-list = Subcommand
-  { name = "ls"
-  , description = "List specifications"
-  , parse = parseListOptions
-  , run = runAppSubcommand runList
-  }
+list =
+  Subcommand
+    { name = "ls"
+    , description = "List specifications"
+    , parse = parseListOptions
+    , run = runAppSubcommand runList
+    }
 
 version :: Subcommand options ()
-version = Subcommand
-  { name = "version"
-  , description = "Output the version"
-  , parse = pure ()
-  , run = \() _ -> logVersion
-  }
+version =
+  Subcommand
+    { name = "version"
+    , description = "Output the version"
+    , parse = pure ()
+    , run = \() _ -> logVersion
+    }

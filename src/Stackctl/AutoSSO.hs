@@ -1,7 +1,7 @@
 module Stackctl.AutoSSO
   ( AutoSSOOption
   , defaultAutoSSOOption
-  , HasAutoSSOOption(..)
+  , HasAutoSSOOption (..)
   , autoSSOOption
   , envAutoSSOOption
   , handleAutoSSO
@@ -10,8 +10,8 @@ module Stackctl.AutoSSO
 import Stackctl.Prelude
 
 import Amazonka.SSO (_UnauthorizedException)
-import Amazonka.Types (Error, ErrorMessage(..), serviceMessage)
-import Data.Semigroup (Last(..))
+import Amazonka.Types (Error, ErrorMessage (..), serviceMessage)
+import Data.Semigroup (Last (..))
 import qualified Env
 import Options.Applicative
 import Stackctl.Prompt
@@ -21,7 +21,7 @@ data AutoSSOOption
   = AutoSSOAlways
   | AutoSSOAsk
   | AutoSSONever
-  deriving Semigroup via Last AutoSSOOption
+  deriving (Semigroup) via Last AutoSSOOption
 
 defaultAutoSSOOption :: AutoSSOOption
 defaultAutoSSOOption = AutoSSOAsk
@@ -38,12 +38,14 @@ class HasAutoSSOOption env where
   autoSSOOptionL :: Lens' env AutoSSOOption
 
 autoSSOOption :: Parser AutoSSOOption
-autoSSOOption = option (eitherReader readAutoSSO)
-  $ mconcat [long "auto-sso", help autoSSOHelp, metavar "WHEN"]
+autoSSOOption =
+  option (eitherReader readAutoSSO)
+    $ mconcat [long "auto-sso", help autoSSOHelp, metavar "WHEN"]
 
 envAutoSSOOption :: Env.Parser Env.Error AutoSSOOption
-envAutoSSOOption = Env.var (first Env.UnreadError . readAutoSSO) "AUTO_SSO"
-  $ Env.help autoSSOHelp
+envAutoSSOOption =
+  Env.var (first Env.UnreadError . readAutoSSO) "AUTO_SSO"
+    $ Env.help autoSSOHelp
 
 autoSSOHelp :: IsString a => a
 autoSSOHelp = "Automatically run aws-sso-login if necessary?"

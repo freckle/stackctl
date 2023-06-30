@@ -10,8 +10,8 @@ import qualified Data.List.NonEmpty as NE
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Config (HasConfig)
-import Stackctl.DirectoryOption (HasDirectoryOption(..), unDirectoryOption)
-import Stackctl.FilterOption (HasFilterOption(..), filterStackSpecs)
+import Stackctl.DirectoryOption (HasDirectoryOption (..), unDirectoryOption)
+import Stackctl.FilterOption (HasFilterOption (..), filterStackSpecs)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import System.FilePath (isPathSeparator)
@@ -51,8 +51,8 @@ discoverSpecs = do
 
     specs <-
       sortStackSpecs
-      . filterStackSpecs filterOption
-      <$> traverse (readStackSpec dir) specPaths
+        . filterStackSpecs filterOption
+        <$> traverse (readStackSpec dir) specPaths
 
     when (null specs) $ logWarn "No specs found"
     specs <$ logDebug ("Discovered specs" :# ["matched" .= length specs])

@@ -1,5 +1,5 @@
 module Stackctl.Spec.Capture
-  ( CaptureOptions(..)
+  ( CaptureOptions (..)
   , parseCaptureOptions
   , runCapture
   ) where
@@ -27,37 +27,51 @@ data CaptureOptions = CaptureOptions
 -- brittany-disable-next-binding
 
 parseCaptureOptions :: Parser CaptureOptions
-parseCaptureOptions = CaptureOptions
-    <$> optional (strOption
-      (  short 'n'
-      <> long "account-name"
-      <> metavar "NAME"
-      <> help "Account name to use in generated files"
-      ))
-    <*> optional (strOption
-      (  short 't'
-      <> long "template-path"
-      <> metavar "PATH"
-      <> help "Write Template to PATH. Default is based on STACK"
-      ))
-    <*> optional (strOption
-      (  short 'p'
-      <> long "path"
-      <> metavar "PATH"
-      <> help "Write specification to PATH. Default is based on STACK"
-      ))
-    <*> optional (some (StackName <$> strOption
-      (  long "depend"
-      <> metavar "STACK"
-      <> help "Add a dependency on STACK"
-      )))
-    <*> flag TemplateFormatYaml TemplateFormatJson
-      (  long "no-flip"
-      <> help "Don't flip JSON templates to Yaml"
+parseCaptureOptions =
+  CaptureOptions
+    <$> optional
+      ( strOption
+          ( short 'n'
+              <> long "account-name"
+              <> metavar "NAME"
+              <> help "Account name to use in generated files"
+          )
+      )
+    <*> optional
+      ( strOption
+          ( short 't'
+              <> long "template-path"
+              <> metavar "PATH"
+              <> help "Write Template to PATH. Default is based on STACK"
+          )
+      )
+    <*> optional
+      ( strOption
+          ( short 'p'
+              <> long "path"
+              <> metavar "PATH"
+              <> help "Write specification to PATH. Default is based on STACK"
+          )
+      )
+    <*> optional
+      ( some
+          ( StackName
+              <$> strOption
+                ( long "depend"
+                    <> metavar "STACK"
+                    <> help "Add a dependency on STACK"
+                )
+          )
+      )
+    <*> flag
+      TemplateFormatYaml
+      TemplateFormatJson
+      ( long "no-flip"
+          <> help "Don't flip JSON templates to Yaml"
       )
     <*> strArgument
-      (  metavar "STACK"
-      <> help "Name of deployed Stack to capture"
+      ( metavar "STACK"
+          <> help "Name of deployed Stack to capture"
       )
 
 runCapture
@@ -76,28 +90,31 @@ runCapture
 runCapture CaptureOptions {..} = do
   let
     setScopeName scope =
-      maybe scope (\name -> scope { awsAccountName = name }) scoAccountName
+      maybe scope (\name -> scope {awsAccountName = name}) scoAccountName
 
     generate' stack template path templatePath = do
       let
         stackName = StackName $ stack ^. stack_stackName
         templateBody = templateBodyFromValue template
 
-      void $ local (awsScopeL %~ setScopeName) $ generate Generate
-        { gDescription = stackDescription stack
-        , gDepends = scoDepends
-        , gActions = Nothing
-        , gParameters = parameters stack
-        , gCapabilities = capabilities stack
-        , gTags = tags stack
-        , gSpec = case path of
-          Nothing -> GenerateSpec stackName
-          Just sp -> GenerateSpecTo stackName sp
-        , gTemplate = case templatePath of
-          Nothing -> GenerateTemplate templateBody scoTemplateFormat
-          Just tp -> GenerateTemplateTo templateBody tp
-        , gOverwrite = False
-        }
+      void
+        $ local (awsScopeL %~ setScopeName)
+        $ generate
+          Generate
+            { gDescription = stackDescription stack
+            , gDepends = scoDepends
+            , gActions = Nothing
+            , gParameters = parameters stack
+            , gCapabilities = capabilities stack
+            , gTags = tags stack
+            , gSpec = case path of
+                Nothing -> GenerateSpec stackName
+                Just sp -> GenerateSpecTo stackName sp
+            , gTemplate = case templatePath of
+                Nothing -> GenerateTemplate templateBody scoTemplateFormat
+                Just tp -> GenerateTemplateTo templateBody tp
+            , gOverwrite = False
+            }
 
   results <- awsCloudFormationGetStackNamesMatching scoStackName
 
@@ -108,7 +125,6 @@ runCapture CaptureOptions {..} = do
         <> pack (decompile scoStackName)
         :# []
       exitFailure
-
     [stackName] -> do
       stack <- awsCloudFormationDescribeStack stackName
       template <- awsCloudFormationGetTemplate stackName

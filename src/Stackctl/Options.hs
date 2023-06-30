@@ -22,17 +22,17 @@ data Options = Options
   , oVerbose :: Verbosity
   , oAutoSSO :: Maybe AutoSSOOption
   }
-  deriving stock Generic
-  deriving Semigroup via GenericSemigroupMonoid Options
+  deriving stock (Generic)
+  deriving (Semigroup) via GenericSemigroupMonoid Options
 
 directoryL :: Lens' Options (Maybe DirectoryOption)
-directoryL = lens oDirectory $ \x y -> x { oDirectory = y }
+directoryL = lens oDirectory $ \x y -> x {oDirectory = y}
 
 filterL :: Lens' Options (Maybe FilterOption)
-filterL = lens oFilter $ \x y -> x { oFilter = y }
+filterL = lens oFilter $ \x y -> x {oFilter = y}
 
 autoSSOL :: Lens' Options (Maybe AutoSSOOption)
-autoSSOL = lens oAutoSSO $ \x y -> x { oAutoSSO = y }
+autoSSOL = lens oAutoSSO $ \x y -> x {oAutoSSO = y}
 
 instance HasDirectoryOption Options where
   directoryOptionL = directoryL . maybeLens defaultDirectoryOption
@@ -41,10 +41,10 @@ instance HasFilterOption Options where
   filterOptionL = filterL . maybeLens defaultFilterOption
 
 instance HasColorOption Options where
-  colorOptionL = lens oColor $ \x y -> x { oColor = y }
+  colorOptionL = lens oColor $ \x y -> x {oColor = y}
 
 instance HasVerboseOption Options where
-  verboseOptionL = lens oVerbose $ \x y -> x { oVerbose = y }
+  verboseOptionL = lens oVerbose $ \x y -> x {oVerbose = y}
 
 instance HasAutoSSOOption Options where
   autoSSOOptionL = autoSSOL . maybeLens defaultAutoSSOOption
@@ -52,19 +52,22 @@ instance HasAutoSSOOption Options where
 -- brittany-disable-next-binding
 
 envParser :: Env.Parser Env.Error Options
-envParser = Env.prefixed "STACKCTL_" $ Options
-  <$> optional envDirectoryOption
-  <*> optional (envFilterOption "specifications")
-  <*> pure mempty -- use LOG_COLOR
-  <*> pure mempty -- use LOG_LEVEL
-  <*> optional envAutoSSOOption
+envParser =
+  Env.prefixed "STACKCTL_"
+    $ Options
+    <$> optional envDirectoryOption
+    <*> optional (envFilterOption "specifications")
+    <*> pure mempty -- use LOG_COLOR
+    <*> pure mempty -- use LOG_LEVEL
+    <*> optional envAutoSSOOption
 
 -- brittany-disable-next-binding
 
 optionsParser :: Parser Options
-optionsParser = Options
-  <$> optional directoryOption
-  <*> optional (filterOption "specifications")
-  <*> optional colorOption
-  <*> verboseOption
-  <*> optional autoSSOOption
+optionsParser =
+  Options
+    <$> optional directoryOption
+    <*> optional (filterOption "specifications")
+    <*> optional colorOption
+    <*> verboseOption
+    <*> optional autoSSOOption

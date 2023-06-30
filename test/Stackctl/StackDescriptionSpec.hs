@@ -26,8 +26,8 @@ spec = do
 
       it "does not clobber or duplicate an existing Description" $ do
         addStackDescription
-            aDescription
-            "Resources: []\nDescription: Existing description\n"
+          aDescription
+          "Resources: []\nDescription: Existing description\n"
           `shouldBe` "Resources: []\nDescription: Existing description\n"
 
     context "JSON" $ do
@@ -37,6 +37,6 @@ spec = do
 
       it "does not clobber or duplicate an existing Description" $ do
         addStackDescription
-            aDescription
-            "{\"Resources\":[],\"Description\":\"Existing description\"}"
+          aDescription
+          "{\"Resources\":[],\"Description\":\"Existing description\"}"
           `shouldBe` "{\"Resources\":[],\"Description\":\"Existing description\"}"

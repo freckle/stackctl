@@ -1,6 +1,6 @@
 module Stackctl.Spec.Deploy
-  ( DeployOptions(..)
-  , DeployConfirmation(..)
+  ( DeployOptions (..)
+  , DeployConfirmation (..)
   , parseDeployOptions
   , runDeploy
   ) where
@@ -11,9 +11,9 @@ import Blammo.Logging.Logger (pushLoggerLn)
 import qualified Data.Text as T
 import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
 import Options.Applicative
-import Stackctl.Action
 import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
+import Stackctl.Action
 import Stackctl.Colors
 import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
@@ -39,27 +39,34 @@ data DeployOptions = DeployOptions
 -- brittany-disable-next-binding
 
 parseDeployOptions :: Parser DeployOptions
-parseDeployOptions = DeployOptions
-  <$> many parameterOption
-  <*> many tagOption
-  <*> optional (strOption
-    (  long "save-change-sets"
-    <> metavar "DIRECTORY"
-    <> help "Save executed changesets to DIRECTORY"
-    <> action "directory"
-    ))
-  <*> flag DeployWithConfirmation DeployWithoutConfirmation
-    (  long "no-confirm"
-    <> help "Don't confirm changes before executing"
-    )
-  <*> (not <$> switch
-    (  long "no-remove"
-    <> help "Don't delete removed Stacks"
-    ))
-  <*> switch
-    (  long "clean"
-    <> help "Remove all changesets from Stack after deploy"
-    )
+parseDeployOptions =
+  DeployOptions
+    <$> many parameterOption
+    <*> many tagOption
+    <*> optional
+      ( strOption
+          ( long "save-change-sets"
+              <> metavar "DIRECTORY"
+              <> help "Save executed changesets to DIRECTORY"
+              <> action "directory"
+          )
+      )
+    <*> flag
+      DeployWithConfirmation
+      DeployWithoutConfirmation
+      ( long "no-confirm"
+          <> help "Don't confirm changes before executing"
+      )
+    <*> ( not
+            <$> switch
+              ( long "no-remove"
+                  <> help "Don't delete removed Stacks"
+              )
+        )
+    <*> switch
+      ( long "clean"
+          <> help "Remove all changesets from Stack after deploy"
+      )
 
 runDeploy
   :: ( MonadMask m
@@ -131,12 +138,13 @@ deleteRemovedStack confirmation stack = do
       DeployWithoutConfirmation -> pure ()
 
     deleteStack stackName
-  where stackName = StackName $ stack ^. stack_stackName
+ where
+  stackName = StackName $ stack ^. stack_stackName
 
 data DeployConfirmation
   = DeployWithConfirmation
   | DeployWithoutConfirmation
-  deriving stock Eq
+  deriving stock (Eq)
 
 checkIfStackRequiresDeletion
   :: ( MonadUnliftIO m
@@ -156,7 +164,7 @@ checkIfStackRequiresDeletion confirmation stackName = do
     logWarn $ "Stack must be deleted before proceeding" :# ["status" .= status]
     when (status == StackStatus_ROLLBACK_FAILED)
       $ logWarn
-          "Stack is in ROLLBACK_FAILED. This may require elevated permissions for the delete to succeed"
+        "Stack is in ROLLBACK_FAILED. This may require elevated permissions for the delete to succeed"
 
     case confirmation of
       DeployWithConfirmation -> promptContinue
@@ -176,7 +184,7 @@ deleteStack stackName = do
 
   case result of
     StackDeleteSuccess -> logInfo $ prettyStackDeleteResult result :# []
-    StackDeleteFailure{} -> logWarn $ prettyStackDeleteResult result :# []
+    StackDeleteFailure {} -> logWarn $ prettyStackDeleteResult result :# []
 
 deployChangeSet
   :: ( MonadUnliftIO m
@@ -218,9 +226,9 @@ deployChangeSet confirmation changeSet = do
 
   case result of
     StackCreateSuccess -> onSuccess
-    StackCreateFailure{} -> onFailure
+    StackCreateFailure {} -> onFailure
     StackUpdateSuccess -> onSuccess
-    StackUpdateFailure{} -> onFailure
+    StackUpdateFailure {} -> onFailure
  where
   stackName = csStackName changeSet
   changeSetId = csChangeSetId changeSet
@@ -233,7 +241,8 @@ tailStackEventsSince
      , HasAwsEnv env
      )
   => StackName
-  -> Maybe Text -- ^ StackEventId
+  -> Maybe Text
+  -- ^ StackEventId
   -> m a
 tailStackEventsSince stackName mLastId = do
   colors <- getColorsLogger
@@ -251,18 +260,21 @@ tailStackEventsSince stackName mLastId = do
 formatStackEvent :: MonadIO m => Colors -> StackEvent -> m Text
 formatStackEvent Colors {..} e = do
   timestamp <-
-    liftIO $ formatTime defaultTimeLocale "%F %T %Z" <$> utcToLocalZonedTime
-      (e ^. stackEvent_timestamp)
+    liftIO
+      $ formatTime defaultTimeLocale "%F %T %Z"
+      <$> utcToLocalZonedTime
+        (e ^. stackEvent_timestamp)
 
-  pure $ mconcat
-    [ fromString timestamp
-    , " | "
-    , maybe "" colorStatus $ e ^. stackEvent_resourceStatus
-    , maybe "" (magenta . (" " <>)) $ e ^. stackEvent_logicalResourceId
-    , maybe "" ((\x -> " (" <> x <> ")") . T.strip)
-    $ e
-    ^. stackEvent_resourceStatusReason
-    ]
+  pure
+    $ mconcat
+      [ fromString timestamp
+      , " | "
+      , maybe "" colorStatus $ e ^. stackEvent_resourceStatus
+      , maybe "" (magenta . (" " <>)) $ e ^. stackEvent_logicalResourceId
+      , maybe "" ((\x -> " (" <> x <> ")") . T.strip)
+          $ e
+          ^. stackEvent_resourceStatusReason
+      ]
  where
   colorStatus = \case
     ResourceStatus' x

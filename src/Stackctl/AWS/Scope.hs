@@ -1,8 +1,8 @@
 module Stackctl.AWS.Scope
-  ( AwsScope(..)
+  ( AwsScope (..)
   , awsScopeSpecPatterns
   , awsScopeSpecStackName
-  , HasAwsScope(..)
+  , HasAwsScope (..)
   , fetchAwsScope
   ) where
 
@@ -20,26 +20,26 @@ data AwsScope = AwsScope
   , awsRegion :: Region
   }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass ToJSON
+  deriving anyclass (ToJSON)
 
 awsScopeSpecPatterns :: AwsScope -> [Pattern]
 awsScopeSpecPatterns AwsScope {..} =
   [ compile
-    $ "stacks"
-    </> unpack (unAccountId awsAccountId)
-    <> ".*"
-    </> unpack (fromRegion awsRegion)
-    <> "**"
-    </> "*"
-    <.> "yaml"
+      $ "stacks"
+      </> unpack (unAccountId awsAccountId)
+      <> ".*"
+      </> unpack (fromRegion awsRegion)
+      <> "**"
+      </> "*"
+      <.> "yaml"
   , compile
-    $ "stacks"
-    </> "*."
-    <> unpack (unAccountId awsAccountId)
-    </> unpack (fromRegion awsRegion)
-    <> "**"
-    </> "*"
-    <.> "yaml"
+      $ "stacks"
+      </> "*."
+      <> unpack (unAccountId awsAccountId)
+      </> unpack (fromRegion awsRegion)
+      <> "**"
+      </> "*"
+      <.> "yaml"
   ]
 
 awsScopeSpecStackName :: AwsScope -> FilePath -> Maybe StackName
@@ -49,13 +49,13 @@ awsScopeSpecStackName scope path = do
   -- once we've guarded that the path matches our scope patterns, we can play it
   -- pretty fast and loose with the "parsing" step
   pure
-    $ path                -- stacks/account/region/x/y.yaml
-    & splitPath           -- [stacks/, account/, region/, x/, y.yaml]
-    & drop 3              -- [x, y.yaml]
-    & joinPath            -- x/y.yaml
-    & dropExtension       -- x/y
+    $ path -- stacks/account/region/x/y.yaml
+    & splitPath -- [stacks/, account/, region/, x/, y.yaml]
+    & drop 3 -- [x, y.yaml]
+    & joinPath -- x/y.yaml
+    & dropExtension -- x/y
     & pack
-    & T.replace "/" "-"   -- x-y
+    & T.replace "/" "-" -- x-y
     & StackName
 
 class HasAwsScope env where

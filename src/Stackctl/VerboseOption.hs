@@ -1,7 +1,7 @@
 module Stackctl.VerboseOption
   ( Verbosity
   , verbositySetLogLevels
-  , HasVerboseOption(..)
+  , HasVerboseOption (..)
   , verboseOption
   ) where
 
@@ -31,8 +31,12 @@ instance HasVerboseOption Verbosity where
   verboseOptionL = id
 
 verboseOption :: Parser Verbosity
-verboseOption = fmap Verbosity $ many $ flag' () $ mconcat
-  [ short 'v'
-  , long "verbose"
-  , help "Increase verbosity (can be passed multiple times)"
-  ]
+verboseOption =
+  fmap Verbosity
+    $ many
+    $ flag' ()
+    $ mconcat
+      [ short 'v'
+      , long "verbose"
+      , help "Increase verbosity (can be passed multiple times)"
+      ]

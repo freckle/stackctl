@@ -1,16 +1,16 @@
 module Stackctl.Spec.Generate
-  ( Generate(..)
-  , GenerateSpec(..)
-  , GenerateTemplate(..)
+  ( Generate (..)
+  , GenerateSpec (..)
+  , GenerateTemplate (..)
   , generate
-  , TemplateFormat(..)
+  , TemplateFormat (..)
   ) where
 
 import Stackctl.Prelude
 
-import Stackctl.Action
 import Stackctl.AWS
 import Stackctl.AWS.Scope
+import Stackctl.Action
 import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption
 import Stackctl.Spec.Discover (buildSpecPath)
@@ -31,18 +31,18 @@ data Generate = Generate
   }
 
 data GenerateSpec
-  = GenerateSpec StackName
-  -- ^ Generate at an inferred name
-  | GenerateSpecTo StackName FilePath
-  -- ^ Generate to a given path
+  = -- | Generate at an inferred name
+    GenerateSpec StackName
+  | -- | Generate to a given path
+    GenerateSpecTo StackName FilePath
 
 data GenerateTemplate
-  = GenerateTemplate TemplateBody TemplateFormat
-  -- ^ Generate at an inferred name
-  | GenerateTemplateTo TemplateBody FilePath
-  -- ^ Generate to the given path
-  | UseExistingTemplate FilePath
-  -- ^ Assume template exists
+  = -- | Generate at an inferred name
+    GenerateTemplate TemplateBody TemplateFormat
+  | -- | Generate to the given path
+    GenerateTemplateTo TemplateBody FilePath
+  | -- | Assume template exists
+    UseExistingTemplate FilePath
 
 data TemplateFormat
   = TemplateFormatYaml
@@ -69,21 +69,22 @@ generate Generate {..} = do
       GenerateTemplate body format ->
         ( Just body
         , case format of
-          TemplateFormatYaml -> unpack (unStackName stackName) <> ".yaml"
-          TemplateFormatJson -> unpack (unStackName stackName) <> ".json"
+            TemplateFormatYaml -> unpack (unStackName stackName) <> ".yaml"
+            TemplateFormatJson -> unpack (unStackName stackName) <> ".json"
         )
       GenerateTemplateTo body path -> (Just body, path)
       UseExistingTemplate path -> (Nothing, path)
 
-    specYaml = StackSpecYaml
-      { ssyDescription = gDescription
-      , ssyTemplate = templatePath
-      , ssyDepends = gDepends
-      , ssyActions = gActions
-      , ssyParameters = parametersYaml . mapMaybe parameterYaml <$> gParameters
-      , ssyCapabilities = gCapabilities
-      , ssyTags = tagsYaml . map TagYaml <$> gTags
-      }
+    specYaml =
+      StackSpecYaml
+        { ssyDescription = gDescription
+        , ssyTemplate = templatePath
+        , ssyDepends = gDepends
+        , ssyActions = gActions
+        , ssyParameters = parametersYaml . mapMaybe parameterYaml <$> gParameters
+        , ssyCapabilities = gCapabilities
+        , ssyTags = tagsYaml . map TagYaml <$> gTags
+        }
 
   dir <- view $ directoryOptionL . to unDirectoryOption
   specPath <- buildSpecPath stackName stackPath

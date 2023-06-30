@@ -5,7 +5,7 @@ module Stackctl.RemovedStack
 import Stackctl.Prelude
 
 import Control.Error.Util (hoistMaybe)
-import Control.Monad.Trans.Maybe (MaybeT(..), runMaybeT)
+import Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
 import Stackctl.AWS.CloudFormation
 import Stackctl.AWS.Core
 import Stackctl.AWS.Scope

@@ -1,10 +1,10 @@
 module Stackctl.Config
-  ( Config(..)
+  ( Config (..)
   , configParameters
   , configTags
   , emptyConfig
-  , HasConfig(..)
-  , ConfigError(..)
+  , HasConfig (..)
+  , ConfigError (..)
   , loadConfigOrExit
   , loadConfigFromBytes
   , applyConfig
@@ -25,8 +25,8 @@ data Config = Config
   { required_version :: Maybe RequiredVersion
   , defaults :: Maybe Defaults
   }
-  deriving stock Generic
-  deriving anyclass FromJSON
+  deriving stock (Generic)
+  deriving anyclass (FromJSON)
 
 configParameters :: Config -> Maybe ParametersYaml
 configParameters = parameters <=< defaults
@@ -41,8 +41,8 @@ data Defaults = Defaults
   { parameters :: Maybe ParametersYaml
   , tags :: Maybe TagsYaml
   }
-  deriving stock Generic
-  deriving anyclass FromJSON
+  deriving stock (Generic)
+  deriving anyclass (FromJSON)
 
 class HasConfig env where
   configL :: Lens' env Config
@@ -54,7 +54,7 @@ data ConfigError
   = ConfigInvalidYaml Yaml.ParseException
   | ConfigInvalid (NonEmpty Text)
   | ConfigVersionNotSatisfied RequiredVersion Version
-  deriving stock Show
+  deriving stock (Show)
 
 configErrorMessage :: ConfigError -> Message
 configErrorMessage = \case
@@ -73,9 +73,10 @@ loadConfigOrExit = either die pure =<< loadConfig
     exitFailure
 
 loadConfig :: MonadIO m => m (Either ConfigError Config)
-loadConfig = runExceptT $ getConfigFile >>= \case
-  Nothing -> pure emptyConfig
-  Just cf -> loadConfigFrom cf
+loadConfig =
+  runExceptT $ getConfigFile >>= \case
+    Nothing -> pure emptyConfig
+    Just cf -> loadConfigFrom cf
 
 loadConfigFrom :: (MonadIO m, MonadError ConfigError m) => FilePath -> m Config
 loadConfigFrom path = loadConfigFromBytes =<< liftIO (readFileBinary path)
@@ -91,16 +92,19 @@ loadConfigFromBytes bs = do
       $ ConfigVersionNotSatisfied rv Paths.version
 
 applyConfig :: Config -> StackSpecYaml -> StackSpecYaml
-applyConfig config ss@StackSpecYaml {..} = ss
-  { ssyParameters = configParameters config <> ssyParameters
-  , ssyTags = configTags config <> ssyTags
-  }
+applyConfig config ss@StackSpecYaml {..} =
+  ss
+    { ssyParameters = configParameters config <> ssyParameters
+    , ssyTags = configTags config <> ssyTags
+    }
 
 getConfigFile :: MonadIO m => m (Maybe FilePath)
-getConfigFile = listToMaybe <$> filterM
-  doesFileExist
-  [ ".stackctl" </> "config" <.> "yaml"
-  , ".stackctl" </> "config" <.> "yml"
-  , ".stackctl" <.> "yaml"
-  , ".stackctl" <.> "yml"
-  ]
+getConfigFile =
+  listToMaybe
+    <$> filterM
+      doesFileExist
+      [ ".stackctl" </> "config" <.> "yaml"
+      , ".stackctl" </> "config" <.> "yml"
+      , ".stackctl" <.> "yaml"
+      , ".stackctl" <.> "yml"
+      ]

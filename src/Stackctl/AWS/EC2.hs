@@ -5,7 +5,7 @@ module Stackctl.AWS.EC2
 import Stackctl.Prelude
 
 import Amazonka.EC2.DescribeAvailabilityZones
-import Amazonka.EC2.Types (AvailabilityZone(..))
+import Amazonka.EC2.Types (AvailabilityZone (..))
 import Stackctl.AWS.Core
 
 awsEc2DescribeFirstAvailabilityZoneRegionName
