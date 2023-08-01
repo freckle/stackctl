@@ -113,10 +113,13 @@ tests:
     main: Spec.hs
     source-dirs: test
     dependencies:
+      - Glob
       - QuickCheck
       - aeson
       - bytestring
+      - filepath
       - hspec
+      - hspec-golden >= 0.2.1.0
       - mtl
       - stackctl
       - yaml

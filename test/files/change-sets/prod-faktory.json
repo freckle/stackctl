@@ -1,0 +1,1114 @@
+{
+  "capabilities": [
+    "CAPABILITY_IAM"
+  ],
+  "changeSetId": "arn:aws:cloudformation:us-east-1:999999999999:changeSet/stackctl-202307312011-484b4202-2b16-44d5-ad51-673ec8ec057e/87b2b49a-5bac-4202-ba2f-25e2a4f18315",
+  "changeSetName": "stackctl-202307312011-484b4202-2b16-44d5-ad51-673ec8ec057e",
+  "changes": [
+    {
+      "resourceChange": {
+        "action": "Add",
+        "changeSetId": null,
+        "details": null,
+        "logicalResourceId": "ASGDepends",
+        "moduleInfo": null,
+        "physicalResourceId": null,
+        "replacement": null,
+        "resourceType": "AWS::CloudFormation::WaitConditionHandle",
+        "scope": null
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "ASGLambdaExecutionRole",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-ASGLambdaExecutionRole-U9NPRW10WHGZ",
+        "replacement": "False",
+        "resourceType": "AWS::IAM::Role",
+        "scope": [
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "FunctionName",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "ASGLifecycleLambdaFunction.Arn",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "FunctionName",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "ASGLambdaInvokePermission",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-ASGLambdaInvokePermission-1475JOG38K6P",
+        "replacement": "Conditional",
+        "resourceType": "AWS::Lambda::Permission",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": "ASGLifecycleLambdaFunction.Arn",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "Endpoint",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "Endpoint",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "ASGLambdaSNSSubscription",
+        "moduleInfo": null,
+        "physicalResourceId": "arn:aws:sns:us-east-1:999999999999:prod-faktory-ecs-cluster-ASGSNSTopic-1GZCULO2RMPPZ:4fec6f06-f72b-488b-9d97-c7a4621be7ca",
+        "replacement": "Conditional",
+        "resourceType": "AWS::SNS::Subscription",
+        "scope": [
+          "Properties"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "Role",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "ASGLambdaExecutionRole.Arn",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "Role",
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "ASGLifecycleLambdaFunction",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-ASGLifecycleLambdaFunctio-C1RAZ4U57W7R",
+        "replacement": "False",
+        "resourceType": "AWS::Lambda::Function",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": "ASGLifecycleLambdaFunction.Arn",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "Subscription",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "Subscription",
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "ASGSNSTopic",
+        "moduleInfo": null,
+        "physicalResourceId": "arn:aws:sns:us-east-1:999999999999:prod-faktory-ecs-cluster-ASGSNSTopic-1GZCULO2RMPPZ",
+        "replacement": "False",
+        "resourceType": "AWS::SNS::Topic",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "SNSLambdaRole.Arn",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "RoleARN",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "RoleARN",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "AutoScalingGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "AutoScalingGroupName",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "ASGTerminateHook",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-ASGTerminateHook-18CDA25XDPELR",
+        "replacement": "Conditional",
+        "resourceType": "AWS::AutoScaling::LifecycleHook",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": "LaunchConfiguration",
+            "changeSource": "ResourceReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "LaunchConfigurationName",
+              "requiresRecreation": "Conditionally"
+            }
+          },
+          {
+            "causingEntity": "NLBTargetGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "TargetGroupARNs",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "VPCZoneIdentifier",
+              "requiresRecreation": "Conditionally"
+            }
+          },
+          {
+            "causingEntity": "Environment",
+            "changeSource": "ParameterReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "AutoScalingGroup",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-AutoScalingGroup-13NOD2PK314EV",
+        "replacement": "Conditional",
+        "resourceType": "AWS::AutoScaling::AutoScalingGroup",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "GroupDescription",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroupIngress",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "IngressTo",
+            "changeSource": "ParameterReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroupIngress",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "VpcId",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": "Name",
+            "changeSource": "ParameterReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "GroupDescription",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": "IngressFrom",
+            "changeSource": "ParameterReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroupIngress",
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "ClusterSecurityGroup",
+        "moduleInfo": null,
+        "physicalResourceId": "sg-04a524560191c2e42",
+        "replacement": "True",
+        "resourceType": "AWS::EC2::SecurityGroup",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "ECSCluster",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory",
+        "replacement": "False",
+        "resourceType": "AWS::ECS::Cluster",
+        "scope": [
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "EFSFileSystem",
+        "moduleInfo": null,
+        "physicalResourceId": "fs-9529dc77",
+        "replacement": "False",
+        "resourceType": "AWS::EFS::FileSystem",
+        "scope": [
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "EFSSecurityGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroups",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "SubnetId",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "EFSMountTarget",
+        "moduleInfo": null,
+        "physicalResourceId": "fsmt-e4d41504",
+        "replacement": "True",
+        "resourceType": "AWS::EFS::MountTarget",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": "ClusterSecurityGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroupIngress",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroupIngress",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "VpcId",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "EFSSecurityGroup",
+        "moduleInfo": null,
+        "physicalResourceId": "sg-07bd7bd588bafb48b",
+        "replacement": "True",
+        "resourceType": "AWS::EC2::SecurityGroup",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "InstanceProfile",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-InstanceProfile-1W0KE43Y2TWDU",
+        "replacement": "False",
+        "resourceType": "AWS::IAM::InstanceProfile",
+        "scope": [
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "Policies",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "InstanceRole",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-InstanceRole-1EEWHD4VKB56Y",
+        "replacement": "False",
+        "resourceType": "AWS::IAM::Role",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "ImageId",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "UserData",
+              "requiresRecreation": "Always"
+            }
+          },
+          {
+            "causingEntity": "ClusterSecurityGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "SecurityGroups",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "LaunchConfiguration",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-LaunchConfiguration-Mko0Jp8XTuKr",
+        "replacement": "True",
+        "resourceType": "AWS::AutoScaling::LaunchConfiguration",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": "NLB.CanonicalHostedZoneID",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "AliasTarget",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "AliasTarget",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "NLB.DNSName",
+            "changeSource": "ResourceAttribute",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "AliasTarget",
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "NLBDNSAliasRecord",
+        "moduleInfo": null,
+        "physicalResourceId": "faktory-internal.freckle.com",
+        "replacement": "False",
+        "resourceType": "AWS::Route53::RecordSet",
+        "scope": [
+          "Properties"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": "NLBTargetGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "DefaultActions",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "NLBListener",
+        "moduleInfo": null,
+        "physicalResourceId": "arn:aws:elasticloadbalancing:us-east-1:999999999999:listener/net/prod-fa-NLB-HHEBROLH5J6T/6b647d08dcc2d594/80372abc7d907982",
+        "replacement": "False",
+        "resourceType": "AWS::ElasticLoadBalancingV2::Listener",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "VpcId",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "NLBTargetGroup",
+        "moduleInfo": null,
+        "physicalResourceId": "arn:aws:elasticloadbalancing:us-east-1:999999999999:targetgroup/prod-NLBTa-RNPHZHDRPVIZ/73c88e6d9e0e5b01",
+        "replacement": "True",
+        "resourceType": "AWS::ElasticLoadBalancingV2::TargetGroup",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": "DirectModification",
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Properties",
+              "name": "Subnets",
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "NLB",
+        "moduleInfo": null,
+        "physicalResourceId": "arn:aws:elasticloadbalancing:us-east-1:999999999999:loadbalancer/net/prod-fa-NLB-HHEBROLH5J6T/6b647d08dcc2d594",
+        "replacement": "False",
+        "resourceType": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          }
+        ],
+        "logicalResourceId": "SNSLambdaRole",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-faktory-ecs-cluster-SNSLambdaRole-YSXPOSGWHAYA",
+        "replacement": "False",
+        "resourceType": "AWS::IAM::Role",
+        "scope": [
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "AutoScalingGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "AutoScalingGroupName",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "ScaleDownScheduledAction",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-Scale-1KE1OLZRQSSXA",
+        "replacement": "Conditional",
+        "resourceType": "AWS::AutoScaling::ScheduledAction",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    },
+    {
+      "resourceChange": {
+        "action": "Modify",
+        "changeSetId": null,
+        "details": [
+          {
+            "causingEntity": null,
+            "changeSource": null,
+            "evaluation": "Static",
+            "target": {
+              "attribute": "Tags",
+              "name": null,
+              "requiresRecreation": "Never"
+            }
+          },
+          {
+            "causingEntity": "AutoScalingGroup",
+            "changeSource": "ResourceReference",
+            "evaluation": "Dynamic",
+            "target": {
+              "attribute": "Properties",
+              "name": "AutoScalingGroupName",
+              "requiresRecreation": "Always"
+            }
+          }
+        ],
+        "logicalResourceId": "ScaleUpScheduledAction",
+        "moduleInfo": null,
+        "physicalResourceId": "prod-Scale-13PIRUZGZW86O",
+        "replacement": "Conditional",
+        "resourceType": "AWS::AutoScaling::ScheduledAction",
+        "scope": [
+          "Properties",
+          "Tags"
+        ]
+      },
+      "type'": "Resource"
+    }
+  ],
+  "creationTime": "2023-07-31T20:11:25Z",
+  "description": null,
+  "executionStatus": "AVAILABLE",
+  "httpStatus": 200,
+  "includeNestedStacks": false,
+  "nextToken": null,
+  "notificationARNs": null,
+  "parameters": [
+    {
+      "parameterKey": "IngressFrom",
+      "parameterValue": "7419",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "IngressTo",
+      "parameterValue": "7420",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "ScaleUpRecurrence",
+      "parameterValue": "0 1 * * 2",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "NLBSubDomain",
+      "parameterValue": "faktory-internal",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "ClusterRole",
+      "parameterValue": null,
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "Name",
+      "parameterValue": "faktory",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "NLBDomain",
+      "parameterValue": "freckle.com",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "ProvisionedThroughputInMibps",
+      "parameterValue": "3",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "Environment",
+      "parameterValue": "prod",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "NLBPort",
+      "parameterValue": "7419",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "InstanceType",
+      "parameterValue": "t3.medium",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "ECSAMI",
+      "parameterValue": "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id",
+      "resolvedValue": "ami-05aca8932be1b68c3",
+      "usePreviousValue": null
+    },
+    {
+      "parameterKey": "ScaleDownRecurrence",
+      "parameterValue": "10 1 * * 2",
+      "resolvedValue": null,
+      "usePreviousValue": null
+    }
+  ],
+  "parentChangeSetId": null,
+  "rollbackConfiguration": null,
+  "rootChangeSetId": null,
+  "stackId": "arn:aws:cloudformation:us-east-1:999999999999:stack/prod-faktory-ecs-cluster/f09dbb60-b244-11e9-a24c-120371d9064c",
+  "stackName": "prod-faktory-ecs-cluster",
+  "status": "CREATE_COMPLETE",
+  "statusReason": null,
+  "tags": [
+    {
+      "key": "Owner",
+      "value": "Platform"
+    },
+    {
+      "key": "DeployedBy",
+      "value": "github:freckle/infa"
+    },
+    {
+      "key": "service",
+      "value": "faktory"
+    },
+    {
+      "key": "env",
+      "value": "prod"
+    }
+  ]
+}

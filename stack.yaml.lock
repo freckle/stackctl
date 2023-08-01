@@ -89,6 +89,13 @@ packages:
   original:
     hackage: amazonka-sts-2.0
 - completed:
+    hackage: hspec-golden-0.2.1.0@sha256:b695ae72685bbb5acd04cdd79d07c43de5ab8867e28662dd1a0002296f2a4940,2635
+    pantry-tree:
+      sha256: d72fec5f2c0568ae958282c7a8b8f5bfba146e3e4ceee0510c0e22be5c8eb740
+      size: 495
+  original:
+    hackage: hspec-golden-0.2.1.0
+- completed:
     hackage: crypton-0.33@sha256:5e92f29b9b7104d91fcdda1dec9400c9ad1f1791c231cc41ceebd783fb517dee,18202
     pantry-tree:
       sha256: 38809499d7f9775ef45cd29ab5c3dc9b283a813f34c1cdc56681b24f8cf8bb4f
