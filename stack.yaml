@@ -15,5 +15,7 @@ extra-deps:
   - amazonka-sso-2.0
   - amazonka-sts-2.0
 
+  - hspec-golden-0.2.1.0
+
   # For amazonka-core-2.0
   - crypton-0.33

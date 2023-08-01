@@ -46,6 +46,7 @@ module Stackctl.AWS.CloudFormation
 
     -- * ChangeSets
   , ChangeSet (..)
+  , changeSetFromResponse
   , changeSetJSON
   , ChangeSetId (..)
   , ChangeSetName (..)
@@ -340,6 +341,23 @@ data ChangeSet = ChangeSet
   , csResponse :: DescribeChangeSetResponse
   }
 
+changeSetFromResponse :: DescribeChangeSetResponse -> Maybe ChangeSet
+changeSetFromResponse resp =
+  ChangeSet
+    <$> (resp ^. describeChangeSetResponse_creationTime)
+    <*> pure (fmap sortChanges $ resp ^. describeChangeSetResponse_changes)
+    <*> (ChangeSetName <$> resp ^. describeChangeSetResponse_changeSetName)
+    <*> (resp ^. describeChangeSetResponse_executionStatus)
+    <*> (ChangeSetId <$> resp ^. describeChangeSetResponse_changeSetId)
+    <*> pure (resp ^. describeChangeSetResponse_parameters)
+    <*> (StackId <$> resp ^. describeChangeSetResponse_stackId)
+    <*> pure (resp ^. describeChangeSetResponse_capabilities)
+    <*> pure (resp ^. describeChangeSetResponse_tags)
+    <*> (StackName <$> resp ^. describeChangeSetResponse_stackName)
+    <*> pure (resp ^. describeChangeSetResponse_status)
+    <*> pure (resp ^. describeChangeSetResponse_statusReason)
+    <*> pure resp
+
 changeSetJSON :: ChangeSet -> Text
 changeSetJSON = decodeUtf8 . BSL.toStrict . encodePretty . csResponse
 
@@ -406,21 +424,7 @@ awsCloudFormationDescribeChangeSet
   -> m ChangeSet
 awsCloudFormationDescribeChangeSet changeSetId = do
   let req = newDescribeChangeSet $ unChangeSetId changeSetId
-  awsSimple "DescribeChangeSet" req $ \resp ->
-    ChangeSet
-      <$> (resp ^. describeChangeSetResponse_creationTime)
-      <*> pure (fmap sortChanges $ resp ^. describeChangeSetResponse_changes)
-      <*> (ChangeSetName <$> resp ^. describeChangeSetResponse_changeSetName)
-      <*> (resp ^. describeChangeSetResponse_executionStatus)
-      <*> (ChangeSetId <$> resp ^. describeChangeSetResponse_changeSetId)
-      <*> pure (resp ^. describeChangeSetResponse_parameters)
-      <*> (StackId <$> resp ^. describeChangeSetResponse_stackId)
-      <*> pure (resp ^. describeChangeSetResponse_capabilities)
-      <*> pure (resp ^. describeChangeSetResponse_tags)
-      <*> (StackName <$> resp ^. describeChangeSetResponse_stackName)
-      <*> pure (resp ^. describeChangeSetResponse_status)
-      <*> pure (resp ^. describeChangeSetResponse_statusReason)
-      <*> pure resp
+  awsSimple "DescribeChangeSet" req changeSetFromResponse
 
 sortChanges :: [Change] -> [Change]
 sortChanges = sortByDependencies changeName changeCausedBy

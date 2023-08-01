@@ -19,6 +19,7 @@ import Stackctl.Colors
 data Format
   = FormatTTY
   | FormatPullRequest
+  deriving stock (Bounded, Enum, Show)
 
 data OmitFull
   = OmitFull

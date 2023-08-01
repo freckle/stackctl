@@ -1,0 +1,130 @@
+
+Changes for some-stack:
+  Add ASGDepends (AWS::CloudFormation::WaitConditionHandle)
+  Modify ASGLambdaExecutionRole (AWS::IAM::Role) prod-faktory-ecs-cluster-ASGLambdaExecutionRole-U9NPRW10WHGZ
+    Replacement: False
+    Scope: Tags
+    Details:
+  Modify ASGLifecycleLambdaFunction (AWS::Lambda::Function) prod-faktory-ecs-cluster-ASGLifecycleLambdaFunctio-C1RAZ4U57W7R
+    Replacement: False
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (Role), recreation Never
+      * ResourceAttribute in Properties (Role), recreation Never, caused by ASGLambdaExecutionRole.Arn
+  Modify ASGLambdaInvokePermission (AWS::Lambda::Permission) prod-faktory-ecs-cluster-ASGLambdaInvokePermission-1475JOG38K6P
+    Replacement: Conditional
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (FunctionName), recreation Always
+      * ResourceAttribute in Properties (FunctionName), recreation Always, caused by ASGLifecycleLambdaFunction.Arn
+  Modify ASGLambdaSNSSubscription (AWS::SNS::Subscription) arn:aws:sns:us-east-1:999999999999:prod-faktory-ecs-cluster-ASGSNSTopic-1GZCULO2RMPPZ:4fec6f06-f72b-488b-9d97-c7a4621be7ca
+    Replacement: Conditional
+    Scope: Properties
+    Details:
+      * ResourceAttribute in Properties (Endpoint), recreation Always, caused by ASGLifecycleLambdaFunction.Arn
+      * DirectModification in Properties (Endpoint), recreation Always
+  Modify ASGSNSTopic (AWS::SNS::Topic) arn:aws:sns:us-east-1:999999999999:prod-faktory-ecs-cluster-ASGSNSTopic-1GZCULO2RMPPZ
+    Replacement: False
+    Scope: Properties, Tags
+    Details:
+      * ResourceAttribute in Properties (Subscription), recreation Never, caused by ASGLifecycleLambdaFunction.Arn
+      * DirectModification in Properties (Subscription), recreation Never
+  Modify SNSLambdaRole (AWS::IAM::Role) prod-faktory-ecs-cluster-SNSLambdaRole-YSXPOSGWHAYA
+    Replacement: False
+    Scope: Tags
+    Details:
+  Modify ClusterSecurityGroup (AWS::EC2::SecurityGroup) sg-04a524560191c2e42
+    Replacement: True
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (GroupDescription), recreation Always
+      * DirectModification in Properties (SecurityGroupIngress), recreation Never
+      * ParameterReference in Properties (SecurityGroupIngress), recreation Never, caused by IngressTo
+      * DirectModification in Properties (VpcId), recreation Always
+      * ParameterReference in Properties (GroupDescription), recreation Always, caused by Name
+      * ParameterReference in Properties (SecurityGroupIngress), recreation Never, caused by IngressFrom
+  Modify LaunchConfiguration (AWS::AutoScaling::LaunchConfiguration) prod-faktory-ecs-cluster-LaunchConfiguration-Mko0Jp8XTuKr
+    Replacement: True
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (ImageId), recreation Always
+      * DirectModification in Properties (UserData), recreation Always
+      * ResourceReference in Properties (SecurityGroups), recreation Always, caused by ClusterSecurityGroup
+  Modify NLBTargetGroup (AWS::ElasticLoadBalancingV2::TargetGroup) arn:aws:elasticloadbalancing:us-east-1:999999999999:targetgroup/prod-NLBTa-RNPHZHDRPVIZ/73c88e6d9e0e5b01
+    Replacement: True
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (VpcId), recreation Always
+  Modify AutoScalingGroup (AWS::AutoScaling::AutoScalingGroup) prod-faktory-ecs-cluster-AutoScalingGroup-13NOD2PK314EV
+    Replacement: Conditional
+    Scope: Properties, Tags
+    Details:
+      * ResourceReference in Properties (LaunchConfigurationName), recreation Conditionally, caused by LaunchConfiguration
+      * ResourceReference in Properties (TargetGroupARNs), recreation Never, caused by NLBTargetGroup
+      * DirectModification in Properties (VPCZoneIdentifier), recreation Conditionally
+      * ParameterReference in Tags, recreation Never, caused by Environment
+      * DirectModification in Tags, recreation Never
+  Modify ASGTerminateHook (AWS::AutoScaling::LifecycleHook) prod-faktory-ecs-cluster-ASGTerminateHook-18CDA25XDPELR
+    Replacement: Conditional
+    Scope: Properties, Tags
+    Details:
+      * ResourceAttribute in Properties (RoleARN), recreation Never, caused by SNSLambdaRole.Arn
+      * DirectModification in Properties (RoleARN), recreation Never
+      * ResourceReference in Properties (AutoScalingGroupName), recreation Always, caused by AutoScalingGroup
+  Modify ECSCluster (AWS::ECS::Cluster) prod-faktory
+    Replacement: False
+    Scope: Tags
+    Details:
+  Modify EFSFileSystem (AWS::EFS::FileSystem) fs-9529dc77
+    Replacement: False
+    Scope: Tags
+    Details:
+  Modify EFSSecurityGroup (AWS::EC2::SecurityGroup) sg-07bd7bd588bafb48b
+    Replacement: True
+    Scope: Properties, Tags
+    Details:
+      * ResourceReference in Properties (SecurityGroupIngress), recreation Never, caused by ClusterSecurityGroup
+      * DirectModification in Properties (SecurityGroupIngress), recreation Never
+      * DirectModification in Properties (VpcId), recreation Always
+  Modify EFSMountTarget (AWS::EFS::MountTarget) fsmt-e4d41504
+    Replacement: True
+    Scope: Properties, Tags
+    Details:
+      * ResourceReference in Properties (SecurityGroups), recreation Never, caused by EFSSecurityGroup
+      * DirectModification in Properties (SubnetId), recreation Always
+  Modify InstanceProfile (AWS::IAM::InstanceProfile) prod-faktory-ecs-cluster-InstanceProfile-1W0KE43Y2TWDU
+    Replacement: False
+    Scope: Tags
+    Details:
+  Modify InstanceRole (AWS::IAM::Role) prod-faktory-ecs-cluster-InstanceRole-1EEWHD4VKB56Y
+    Replacement: False
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (Policies), recreation Never
+  Modify NLB (AWS::ElasticLoadBalancingV2::LoadBalancer) arn:aws:elasticloadbalancing:us-east-1:999999999999:loadbalancer/net/prod-fa-NLB-HHEBROLH5J6T/6b647d08dcc2d594
+    Replacement: False
+    Scope: Properties, Tags
+    Details:
+      * DirectModification in Properties (Subnets), recreation Never
+  Modify NLBDNSAliasRecord (AWS::Route53::RecordSet) faktory-internal.freckle.com
+    Replacement: False
+    Scope: Properties
+    Details:
+      * ResourceAttribute in Properties (AliasTarget), recreation Never, caused by NLB.CanonicalHostedZoneID
+      * DirectModification in Properties (AliasTarget), recreation Never
+      * ResourceAttribute in Properties (AliasTarget), recreation Never, caused by NLB.DNSName
+  Modify NLBListener (AWS::ElasticLoadBalancingV2::Listener) arn:aws:elasticloadbalancing:us-east-1:999999999999:listener/net/prod-fa-NLB-HHEBROLH5J6T/6b647d08dcc2d594/80372abc7d907982
+    Replacement: False
+    Scope: Properties, Tags
+    Details:
+      * ResourceReference in Properties (DefaultActions), recreation Never, caused by NLBTargetGroup
+  Modify ScaleDownScheduledAction (AWS::AutoScaling::ScheduledAction) prod-Scale-1KE1OLZRQSSXA
+    Replacement: Conditional
+    Scope: Properties, Tags
+    Details:
+      * ResourceReference in Properties (AutoScalingGroupName), recreation Always, caused by AutoScalingGroup
+  Modify ScaleUpScheduledAction (AWS::AutoScaling::ScheduledAction) prod-Scale-13PIRUZGZW86O
+    Replacement: Conditional
+    Scope: Properties, Tags
+    Details:
+      * ResourceReference in Properties (AutoScalingGroupName), recreation Always, caused by AutoScalingGroup
