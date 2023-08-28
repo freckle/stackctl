@@ -1,4 +1,9 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.2.2...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.3.0...main)
+
+## [v1.4.3.0](https://github.com/freckle/stackctl/compare/v1.4.2.2...v1.4.3.0)
+
+- Add `awsWithAuth`
+- Add `forEachSpec_`
 
 ## [v1.4.2.2](https://github.com/freckle/stackctl/compare/v1.4.2.1...v1.4.2.2)
 
