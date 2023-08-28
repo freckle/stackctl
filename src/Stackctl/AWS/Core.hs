@@ -2,6 +2,7 @@ module Stackctl.AWS.Core
   ( AwsEnv
   , HasAwsEnv (..)
   , awsEnvDiscover
+  , awsWithAuth
   , awsSimple
   , awsSend
   , awsPaginate
@@ -32,7 +33,7 @@ import Amazonka hiding (LogLevel (..))
 import qualified Amazonka as AWS
 import Amazonka.Auth.Keys (fromSession)
 import Amazonka.Data.Text (FromText (..), ToText (..))
-import Amazonka.Env (env_logger, env_region)
+import Amazonka.Env (env_auth, env_logger, env_region)
 import Amazonka.STS.AssumeRole
 import Conduit (ConduitM)
 import Control.Monad.Logger (defaultLoc, toLogStr)
@@ -73,6 +74,12 @@ class HasAwsEnv env where
 
 instance HasAwsEnv AwsEnv where
   awsEnvL = id
+
+awsWithAuth
+  :: (MonadIO m, MonadReader env m, HasAwsEnv env) => (AuthEnv -> m a) -> m a
+awsWithAuth f = do
+  auth <- view $ awsEnvL . unL . env_auth . to runIdentity
+  withAuth auth f
 
 awsSimple
   :: ( MonadResource m
