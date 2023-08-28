@@ -10,12 +10,13 @@ module Stackctl.AutoSSO
 import Stackctl.Prelude
 
 import Amazonka.SSO (_UnauthorizedException)
-import Amazonka.Types (Error, ErrorMessage (..), serviceMessage)
 import Data.Semigroup (Last (..))
 import qualified Env
 import Options.Applicative
+import Stackctl.AWS.Core (formatServiceError)
 import Stackctl.Prompt
 import System.Process.Typed
+import UnliftIO.Exception.Lens (catching)
 
 data AutoSSOOption
   = AutoSSOAlways
@@ -61,7 +62,7 @@ handleAutoSSO
   -> m a
   -> m a
 handleAutoSSO options f = do
-  catchJust (preview (_UnauthorizedException @Error)) f $ \ex -> do
+  catching _UnauthorizedException f $ \ex -> do
     case options ^. autoSSOOptionL of
       AutoSSOAlways -> do
         logWarn $ ssoErrorMessage ex
@@ -78,6 +79,6 @@ handleAutoSSO options f = do
  where
   ssoErrorMessage ex =
     "AWS SSO authorization error"
-      :# [ "message" .= fmap fromErrorMessage (ex ^. serviceMessage)
+      :# [ "message" .= formatServiceError ex
          , "hint" .= ("Run `aws sso login' and try again" :: Text)
          ]

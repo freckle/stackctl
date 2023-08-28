@@ -81,8 +81,6 @@ import Amazonka.Core
   ( AsError
   , ServiceError
   , hasStatus
-  , serviceCode
-  , serviceMessage
   , _MatchServiceError
   , _ServiceError
   )
@@ -503,10 +501,3 @@ runningStatuses =
 _ValidationError :: AsError a => Getting (First ServiceError) a ServiceError
 _ValidationError =
   _MatchServiceError defaultService "ValidationError" . hasStatus 400
-
-formatServiceError :: ServiceError -> Text
-formatServiceError e =
-  mconcat
-    [ toText $ e ^. serviceCode
-    , maybe "" ((": " <>) . toText) $ e ^. serviceMessage
-    ]

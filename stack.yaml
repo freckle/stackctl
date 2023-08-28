@@ -5,15 +5,15 @@ extra-deps:
   - cfn-flip-0.1.0.3
   - unliftio-0.2.25.0
 
-  - github: brendanhay/amazonka
-    commit: f73a957d05f64863e867cf39d0db260718f0fadd # main, as of SSO support
-    subdirs:
-      - lib/amazonka
-      - lib/amazonka-core
-      - lib/services/amazonka-certificatemanager
-      - lib/services/amazonka-cloudformation
-      - lib/services/amazonka-ec2
-      - lib/services/amazonka-ecr
-      - lib/services/amazonka-lambda
-      - lib/services/amazonka-sso
-      - lib/services/amazonka-sts
+  - amazonka-2.0
+  - amazonka-core-2.0
+  - amazonka-certificatemanager-2.0
+  - amazonka-cloudformation-2.0
+  - amazonka-ec2-2.0
+  - amazonka-ecr-2.0
+  - amazonka-lambda-2.0
+  - amazonka-sso-2.0
+  - amazonka-sts-2.0
+
+  # For amazonka-core-2.0
+  - crypton-0.33
