@@ -1,4 +1,10 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.2.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.2.2...main)
+
+## [v1.4.2.2](https://github.com/freckle/stackctl/compare/v1.4.2.1...v1.4.2.2)
+
+- Use `amazonka-2.0` :tada:
+- Finalize update to `UnliftIO.Exception.Lens`
+- Re-export upstreamed `Blammo.Logging.Colors`
 
 ## [v1.4.2.1](https://github.com/freckle/stackctl/compare/v1.4.2.0...v1.4.2.1)
 
