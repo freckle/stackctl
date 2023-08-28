@@ -64,13 +64,13 @@ library:
     - aeson
     - aeson-casing
     - aeson-pretty
-    - amazonka
-    - amazonka-cloudformation
-    - amazonka-core
-    - amazonka-ec2
-    - amazonka-lambda
-    - amazonka-sso
-    - amazonka-sts
+    - amazonka >= 2.0
+    - amazonka-cloudformation >= 2.0
+    - amazonka-core >= 2.0
+    - amazonka-ec2 >= 2.0
+    - amazonka-lambda >= 2.0
+    - amazonka-sso >= 2.0
+    - amazonka-sts >= 2.0
     - bytestring
     - cfn-flip >= 0.1.0.3 # bugfix for Condition
     - conduit
