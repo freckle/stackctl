@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.3.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.4.0...main)
+
+## [v1.4.4.0](https://github.com/freckle/stackctl/compare/v1.4.3.0...v1.4.4.0)
+
+- Add `awsSilently`
 
 ## [v1.4.3.0](https://github.com/freckle/stackctl/compare/v1.4.2.2...v1.4.3.0)
 
