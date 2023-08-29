@@ -174,7 +174,7 @@ awsWithin :: (MonadReader env m, HasAwsEnv env) => Region -> m a -> m a
 awsWithin r = local $ awsEnvL . unL . env_region .~ r
 
 awsTimeout :: (MonadReader env m, HasAwsEnv env) => Seconds -> m a -> m a
-awsTimeout t = local $ over (awsEnvL . unL) (globalTimeout t)
+awsTimeout t = local $ awsEnvL . unL %~ globalTimeout t
 
 awsSilently :: (MonadReader env m, HasAwsEnv env) => m a -> m a
 awsSilently = local $ awsEnvL . unL . env_logger .~ noop
