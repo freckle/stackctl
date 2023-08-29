@@ -40,6 +40,7 @@ import Conduit (ConduitM)
 import Control.Monad.Logger (defaultLoc, toLogStr)
 import Control.Monad.Trans.Resource (MonadResource)
 import Stackctl.AWS.Orphans ()
+import UnliftIO.Exception.Lens (handling)
 
 newtype AwsEnv = AwsEnv
   { unAwsEnv :: Env
@@ -191,7 +192,7 @@ newtype AccountId = AccountId
 -- makes things more readable and easier to debug.
 handlingServiceError :: (MonadUnliftIO m, MonadLogger m) => m a -> m a
 handlingServiceError =
-  handleJust @_ @SomeException (^? _ServiceError) $ \e -> do
+  handling _ServiceError $ \e -> do
     logError
       $ "Exiting due to AWS Service error"
       :# [ "code" .= toText (e ^. serviceError_code)
