@@ -10,5 +10,5 @@ import Stackctl.AWS.Core
 awsGetCallerIdentityAccount
   :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m AccountId
 awsGetCallerIdentityAccount = do
-  awsSimple "GetCallerIdentity" newGetCallerIdentity $ \resp -> do
+  awsSimple newGetCallerIdentity $ \resp -> do
     AccountId <$> resp ^. getCallerIdentityResponse_account

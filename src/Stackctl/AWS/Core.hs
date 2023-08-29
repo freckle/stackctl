@@ -39,6 +39,7 @@ import Amazonka.STS.AssumeRole
 import Conduit (ConduitM)
 import Control.Monad.Logger (defaultLoc, toLogStr)
 import Control.Monad.Trans.Resource (MonadResource)
+import Data.Typeable (typeRep)
 import Stackctl.AWS.Orphans ()
 import UnliftIO.Exception.Lens (handling)
 
@@ -84,22 +85,26 @@ awsWithAuth f = do
   withAuth auth f
 
 awsSimple
-  :: ( MonadResource m
+  :: forall a env m b
+   . ( HasCallStack
+     , MonadResource m
      , MonadReader env m
      , HasAwsEnv env
      , AWSRequest a
      , Typeable a
      , Typeable (AWSResponse a)
      )
-  => Text
-  -> a
+  => a
   -> (AWSResponse a -> Maybe b)
   -> m b
-awsSimple name req post = do
+awsSimple req post = do
   resp <- awsSend req
+
+  let
+    name = show $ typeRep $ Proxy @a
+    err = name <> " successful, but processing the response failed"
+
   maybe (throwString err) pure $ post resp
- where
-  err = unpack name <> " successful, but processing the response failed"
 
 awsSend
   :: ( MonadResource m
@@ -158,7 +163,7 @@ awsAssumeRole
 awsAssumeRole role sessionName f = do
   let req = newAssumeRole role sessionName
 
-  assumeEnv <- awsSimple "sts:AssumeRole" req $ \resp -> do
+  assumeEnv <- awsSimple req $ \resp -> do
     let creds = resp ^. assumeRoleResponse_credentials
     token <- creds ^. authEnv_sessionToken
 

@@ -12,7 +12,7 @@ awsEc2DescribeFirstAvailabilityZoneRegionName
   :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m Region
 awsEc2DescribeFirstAvailabilityZoneRegionName = do
   let req = newDescribeAvailabilityZones
-  awsSimple "DescribeAvailabilityZones" req $ \resp -> do
+  awsSimple req $ \resp -> do
     azs <- resp ^. describeAvailabilityZonesResponse_availabilityZones
     az <- listToMaybe azs
     rn <- regionName az
