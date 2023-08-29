@@ -176,7 +176,7 @@ awsCloudFormationDescribeStack
 awsCloudFormationDescribeStack stackName = do
   let req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
-  awsSimple "DescribeStack" req $ \resp -> do
+  awsSimple req $ \resp -> do
     stacks <- resp ^. describeStacksResponse_stacks
     listToMaybe stacks
 
@@ -252,7 +252,7 @@ awsCloudFormationGetMostRecentStackEventId stackName = do
       [] -> Nothing
       (e : _) -> Just $ e ^. stackEvent_eventId
 
-  awsSimple "DescribeStackEvents" req
+  awsSimple req
     $ pure
     . getFirstEventId
     . fromMaybe []
@@ -268,7 +268,7 @@ awsCloudFormationDeleteStack stackName = do
     describeReq =
       newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
-  awsSimple "DeleteStack" deleteReq $ const $ pure ()
+  awsSimple deleteReq $ const $ pure ()
 
   logDebug "Awaiting DeleteStack"
   stackDeleteResult <$> awsAwait newStackDeleteComplete describeReq
@@ -298,7 +298,7 @@ awsCloudFormationGetTemplate stackName = do
     decodeTemplateBody body =
       fromMaybe (toJSON body) $ decodeStrict $ encodeUtf8 body
 
-  awsSimple "GetTemplate" req $ \resp -> do
+  awsSimple req $ \resp -> do
     body <- resp ^. getTemplateResponse_templateBody
     pure $ decodeTemplateBody body
 
@@ -409,7 +409,7 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
       logInfo
         $ "Creating changeset..."
         :# ["name" .= name, "type" .= changeSetType]
-      csId <- awsSimple "CreateChangeSet" req (^. createChangeSetResponse_id)
+      csId <- awsSimple req (^. createChangeSetResponse_id)
 
       logDebug "Awaiting CREATE_COMPLETE"
       void $ awsAwait newChangeSetCreateComplete $ newDescribeChangeSet csId
@@ -424,7 +424,7 @@ awsCloudFormationDescribeChangeSet
   -> m ChangeSet
 awsCloudFormationDescribeChangeSet changeSetId = do
   let req = newDescribeChangeSet $ unChangeSetId changeSetId
-  awsSimple "DescribeChangeSet" req changeSetFromResponse
+  awsSimple req changeSetFromResponse
 
 sortChanges :: [Change] -> [Change]
 sortChanges = sortByDependencies changeName changeCausedBy
