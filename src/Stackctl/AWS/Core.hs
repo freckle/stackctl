@@ -12,6 +12,7 @@ module Stackctl.AWS.Core
     -- * Modifiers on 'AwsEnv'
   , awsWithin
   , awsTimeout
+  , awsSilently
 
     -- * 'Amazonka' extensions
   , AccountId (..)
@@ -173,6 +174,11 @@ awsWithin r = local $ awsEnvL . unL . env_region .~ r
 
 awsTimeout :: (MonadReader env m, HasAwsEnv env) => Seconds -> m a -> m a
 awsTimeout t = local $ over (awsEnvL . unL) (globalTimeout t)
+
+awsSilently :: (MonadReader env m, HasAwsEnv env) => m a -> m a
+awsSilently = local $ awsEnvL . unL . env_logger .~ noop
+ where
+  noop _level _msg = pure ()
 
 newtype AccountId = AccountId
   { unAccountId :: Text

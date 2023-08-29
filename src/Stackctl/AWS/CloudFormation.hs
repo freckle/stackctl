@@ -185,8 +185,10 @@ awsCloudFormationDescribeStackMaybe
 awsCloudFormationDescribeStackMaybe stackName =
   -- AWS gives us a 400 if the stackName doesn't exist, rather than simply
   -- returning an empty list, so we need to do this through exceptions
-  handling_ _ValidationError (pure Nothing) $ do
-    Just <$> awsCloudFormationDescribeStack stackName
+  handling_ _ValidationError (pure Nothing)
+    $ awsSilently -- don't log said 400
+    $ Just
+    <$> awsCloudFormationDescribeStack stackName
 
 awsCloudFormationDescribeStackOutputs
   :: (MonadResource m, MonadReader env m, HasAwsEnv env)
