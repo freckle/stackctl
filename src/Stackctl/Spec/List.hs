@@ -61,8 +61,6 @@ runList ListOptions {..} = do
       fmap (^. stack_stackStatus)
         <$> awsCloudFormationDescribeStackMaybe name
 
-    -- logInfo $ "" :# ["stackStatus" .= mStackStatus]
-
     let
       indicator = maybe NotDeployed statusIndicator mStackStatus
 
