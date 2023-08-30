@@ -77,7 +77,7 @@ expandPatterns t = map compile $ s : expanded
 
   suffixed
     | "*" `T.isSuffixOf` t || hasExtension s = []
-    | otherwise = (s </> "*") : map (s <.>) extensions
+    | otherwise = (s </> "**" </> "*") : map (s <.>) extensions
 
   extensions = ["json", "yaml"]
 
