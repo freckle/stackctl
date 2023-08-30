@@ -1,6 +1,7 @@
 module Stackctl.AWS.CloudFormation
   ( Stack (..)
   , stack_stackName
+  , stack_stackStatus
   , stackDescription
   , stackStatusRequiresDeletion
   , StackId (..)
