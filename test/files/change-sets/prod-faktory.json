@@ -1,7 +1,5 @@
 {
-  "capabilities": [
-    "CAPABILITY_IAM"
-  ],
+  "capabilities": ["CAPABILITY_IAM"],
   "changeSetId": "arn:aws:cloudformation:us-east-1:999999999999:changeSet/stackctl-202307312011-484b4202-2b16-44d5-ad51-673ec8ec057e/87b2b49a-5bac-4202-ba2f-25e2a4f18315",
   "changeSetName": "stackctl-202307312011-484b4202-2b16-44d5-ad51-673ec8ec057e",
   "changes": [
@@ -40,9 +38,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-ASGLambdaExecutionRole-U9NPRW10WHGZ",
         "replacement": "False",
         "resourceType": "AWS::IAM::Role",
-        "scope": [
-          "Tags"
-        ]
+        "scope": ["Tags"]
       },
       "type'": "Resource"
     },
@@ -87,10 +83,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-ASGLambdaInvokePermission-1475JOG38K6P",
         "replacement": "Conditional",
         "resourceType": "AWS::Lambda::Permission",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -125,9 +118,7 @@
         "physicalResourceId": "arn:aws:sns:us-east-1:999999999999:prod-faktory-ecs-cluster-ASGSNSTopic-1GZCULO2RMPPZ:4fec6f06-f72b-488b-9d97-c7a4621be7ca",
         "replacement": "Conditional",
         "resourceType": "AWS::SNS::Subscription",
-        "scope": [
-          "Properties"
-        ]
+        "scope": ["Properties"]
       },
       "type'": "Resource"
     },
@@ -172,10 +163,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-ASGLifecycleLambdaFunctio-C1RAZ4U57W7R",
         "replacement": "False",
         "resourceType": "AWS::Lambda::Function",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -220,10 +208,7 @@
         "physicalResourceId": "arn:aws:sns:us-east-1:999999999999:prod-faktory-ecs-cluster-ASGSNSTopic-1GZCULO2RMPPZ",
         "replacement": "False",
         "resourceType": "AWS::SNS::Topic",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -278,10 +263,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-ASGTerminateHook-18CDA25XDPELR",
         "replacement": "Conditional",
         "resourceType": "AWS::AutoScaling::LifecycleHook",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -356,10 +338,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-AutoScalingGroup-13NOD2PK314EV",
         "replacement": "Conditional",
         "resourceType": "AWS::AutoScaling::AutoScalingGroup",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -444,10 +423,7 @@
         "physicalResourceId": "sg-04a524560191c2e42",
         "replacement": "True",
         "resourceType": "AWS::EC2::SecurityGroup",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -472,9 +448,7 @@
         "physicalResourceId": "prod-faktory",
         "replacement": "False",
         "resourceType": "AWS::ECS::Cluster",
-        "scope": [
-          "Tags"
-        ]
+        "scope": ["Tags"]
       },
       "type'": "Resource"
     },
@@ -499,9 +473,7 @@
         "physicalResourceId": "fs-9529dc77",
         "replacement": "False",
         "resourceType": "AWS::EFS::FileSystem",
-        "scope": [
-          "Tags"
-        ]
+        "scope": ["Tags"]
       },
       "type'": "Resource"
     },
@@ -546,10 +518,7 @@
         "physicalResourceId": "fsmt-e4d41504",
         "replacement": "True",
         "resourceType": "AWS::EFS::MountTarget",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -604,10 +573,7 @@
         "physicalResourceId": "sg-07bd7bd588bafb48b",
         "replacement": "True",
         "resourceType": "AWS::EC2::SecurityGroup",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -632,9 +598,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-InstanceProfile-1W0KE43Y2TWDU",
         "replacement": "False",
         "resourceType": "AWS::IAM::InstanceProfile",
-        "scope": [
-          "Tags"
-        ]
+        "scope": ["Tags"]
       },
       "type'": "Resource"
     },
@@ -669,10 +633,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-InstanceRole-1EEWHD4VKB56Y",
         "replacement": "False",
         "resourceType": "AWS::IAM::Role",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -727,10 +688,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-LaunchConfiguration-Mko0Jp8XTuKr",
         "replacement": "True",
         "resourceType": "AWS::AutoScaling::LaunchConfiguration",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -775,9 +733,7 @@
         "physicalResourceId": "faktory-internal.freckle.com",
         "replacement": "False",
         "resourceType": "AWS::Route53::RecordSet",
-        "scope": [
-          "Properties"
-        ]
+        "scope": ["Properties"]
       },
       "type'": "Resource"
     },
@@ -812,10 +768,7 @@
         "physicalResourceId": "arn:aws:elasticloadbalancing:us-east-1:999999999999:listener/net/prod-fa-NLB-HHEBROLH5J6T/6b647d08dcc2d594/80372abc7d907982",
         "replacement": "False",
         "resourceType": "AWS::ElasticLoadBalancingV2::Listener",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -850,10 +803,7 @@
         "physicalResourceId": "arn:aws:elasticloadbalancing:us-east-1:999999999999:targetgroup/prod-NLBTa-RNPHZHDRPVIZ/73c88e6d9e0e5b01",
         "replacement": "True",
         "resourceType": "AWS::ElasticLoadBalancingV2::TargetGroup",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -888,10 +838,7 @@
         "physicalResourceId": "arn:aws:elasticloadbalancing:us-east-1:999999999999:loadbalancer/net/prod-fa-NLB-HHEBROLH5J6T/6b647d08dcc2d594",
         "replacement": "False",
         "resourceType": "AWS::ElasticLoadBalancingV2::LoadBalancer",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -916,9 +863,7 @@
         "physicalResourceId": "prod-faktory-ecs-cluster-SNSLambdaRole-YSXPOSGWHAYA",
         "replacement": "False",
         "resourceType": "AWS::IAM::Role",
-        "scope": [
-          "Tags"
-        ]
+        "scope": ["Tags"]
       },
       "type'": "Resource"
     },
@@ -953,10 +898,7 @@
         "physicalResourceId": "prod-Scale-1KE1OLZRQSSXA",
         "replacement": "Conditional",
         "resourceType": "AWS::AutoScaling::ScheduledAction",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     },
@@ -991,10 +933,7 @@
         "physicalResourceId": "prod-Scale-13PIRUZGZW86O",
         "replacement": "Conditional",
         "resourceType": "AWS::AutoScaling::ScheduledAction",
-        "scope": [
-          "Properties",
-          "Tags"
-        ]
+        "scope": ["Properties", "Tags"]
       },
       "type'": "Resource"
     }
