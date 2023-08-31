@@ -1,5 +1,7 @@
 restylers_version: dev
 restylers:
+  - cabal-fmt:
+      enabled: false
   - fourmolu
   - stylish-haskell:
       enabled: false
@@ -11,3 +13,6 @@ restylers:
         - "!**/*.t" # cram tests have whitespace in assertions
         - "!README.md" # help code blocks have trailing whitespace
   - "*"
+
+also_exclude:
+  - "test/files/**/*"
