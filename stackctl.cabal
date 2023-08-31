@@ -1,118 +1,122 @@
-cabal-version: 1.18
+cabal-version:   1.18
 
 -- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
-name:           stackctl
-version:        1.4.4.0
-description:    Please see <https://github.com/freckle/stackctl#readme>
-homepage:       https://github.com/freckle/stackctl#readme
-bug-reports:    https://github.com/freckle/stackctl/issues
-author:         Freckle Engineering
-maintainer:     freckle-engineering@renaissance.com
-copyright:      2022 Renaissance Learning Inc
-license:        MIT
-license-file:   LICENSE
-build-type:     Simple
+name:            stackctl
+version:         1.4.4.0
+description:     Please see <https://github.com/freckle/stackctl#readme>
+homepage:        https://github.com/freckle/stackctl#readme
+bug-reports:     https://github.com/freckle/stackctl/issues
+author:          Freckle Engineering
+maintainer:      freckle-engineering@renaissance.com
+copyright:       2022 Renaissance Learning Inc
+license:         MIT
+license-file:    LICENSE
+build-type:      Simple
 extra-doc-files:
-    README.md
-    CHANGELOG.md
+  CHANGELOG.md
+  README.md
 
 source-repository head
-  type: git
+  type:     git
   location: https://github.com/freckle/stackctl
 
 library
   exposed-modules:
-      Stackctl.Action
-      Stackctl.AutoSSO
-      Stackctl.AWS
-      Stackctl.AWS.CloudFormation
-      Stackctl.AWS.Core
-      Stackctl.AWS.EC2
-      Stackctl.AWS.Lambda
-      Stackctl.AWS.Orphans
-      Stackctl.AWS.Scope
-      Stackctl.AWS.STS
-      Stackctl.CLI
-      Stackctl.ColorOption
-      Stackctl.Colors
-      Stackctl.Commands
-      Stackctl.Config
-      Stackctl.Config.RequiredVersion
-      Stackctl.DirectoryOption
-      Stackctl.FilterOption
-      Stackctl.Options
-      Stackctl.ParameterOption
-      Stackctl.Prelude
-      Stackctl.Prompt
-      Stackctl.RemovedStack
-      Stackctl.Sort
-      Stackctl.Spec.Capture
-      Stackctl.Spec.Cat
-      Stackctl.Spec.Changes
-      Stackctl.Spec.Changes.Format
-      Stackctl.Spec.Deploy
-      Stackctl.Spec.Discover
-      Stackctl.Spec.Generate
-      Stackctl.Spec.List
-      Stackctl.StackDescription
-      Stackctl.StackSpec
-      Stackctl.StackSpecPath
-      Stackctl.StackSpecYaml
-      Stackctl.Subcommand
-      Stackctl.TagOption
-      Stackctl.VerboseOption
-      Stackctl.Version
-  other-modules:
-      Paths_stackctl
-  hs-source-dirs:
-      src
+    Stackctl.Action
+    Stackctl.AutoSSO
+    Stackctl.AWS
+    Stackctl.AWS.CloudFormation
+    Stackctl.AWS.Core
+    Stackctl.AWS.EC2
+    Stackctl.AWS.Lambda
+    Stackctl.AWS.Orphans
+    Stackctl.AWS.Scope
+    Stackctl.AWS.STS
+    Stackctl.CLI
+    Stackctl.ColorOption
+    Stackctl.Colors
+    Stackctl.Commands
+    Stackctl.Config
+    Stackctl.Config.RequiredVersion
+    Stackctl.DirectoryOption
+    Stackctl.FilterOption
+    Stackctl.Options
+    Stackctl.ParameterOption
+    Stackctl.Prelude
+    Stackctl.Prompt
+    Stackctl.RemovedStack
+    Stackctl.Sort
+    Stackctl.Spec.Capture
+    Stackctl.Spec.Cat
+    Stackctl.Spec.Changes
+    Stackctl.Spec.Changes.Format
+    Stackctl.Spec.Deploy
+    Stackctl.Spec.Discover
+    Stackctl.Spec.Generate
+    Stackctl.Spec.List
+    Stackctl.StackDescription
+    Stackctl.StackSpec
+    Stackctl.StackSpecPath
+    Stackctl.StackSpecYaml
+    Stackctl.Subcommand
+    Stackctl.TagOption
+    Stackctl.VerboseOption
+    Stackctl.Version
+
+  other-modules:      Paths_stackctl
+  hs-source-dirs:     src
   default-extensions:
-      BangPatterns
-      DataKinds
-      DeriveAnyClass
-      DeriveFoldable
-      DeriveFunctor
-      DeriveGeneric
-      DeriveLift
-      DeriveTraversable
-      DerivingStrategies
-      DerivingVia
-      FlexibleContexts
-      FlexibleInstances
-      GADTs
-      GeneralizedNewtypeDeriving
-      LambdaCase
-      MultiParamTypeClasses
-      NoImplicitPrelude
-      NoMonomorphismRestriction
-      OverloadedStrings
-      RankNTypes
-      RecordWildCards
-      ScopedTypeVariables
-      StandaloneDeriving
-      TypeApplications
-      TypeFamilies
-  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
+    NoImplicitPrelude
+    NoMonomorphismRestriction
+    BangPatterns
+    DataKinds
+    DeriveAnyClass
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    FlexibleContexts
+    FlexibleInstances
+    GADTs
+    GeneralizedNewtypeDeriving
+    LambdaCase
+    MultiParamTypeClasses
+    OverloadedStrings
+    RankNTypes
+    RecordWildCards
+    ScopedTypeVariables
+    StandaloneDeriving
+    TypeApplications
+    TypeFamilies
+
+  ghc-options:
+    -fignore-optim-changes -fwrite-ide-info -Weverything
+    -Wno-all-missed-specialisations -Wno-missing-import-lists
+    -Wno-missing-kind-signatures -Wno-missing-local-signatures
+    -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+    -Wno-unsafe -optP-Wno-nonportable-include-path
+
   build-depends:
-      Blammo >=1.1.2.1
-    , Glob
-    , QuickCheck
-    , aeson
+      aeson
     , aeson-casing
     , aeson-pretty
-    , amazonka >=2.0
-    , amazonka-cloudformation >=2.0
-    , amazonka-core >=2.0
-    , amazonka-ec2 >=2.0
-    , amazonka-lambda >=2.0
-    , amazonka-sso >=2.0
-    , amazonka-sts >=2.0
-    , base ==4.*
+    , amazonka                 >=2.0
+    , amazonka-cloudformation  >=2.0
+    , amazonka-core            >=2.0
+    , amazonka-ec2             >=2.0
+    , amazonka-lambda          >=2.0
+    , amazonka-sso             >=2.0
+    , amazonka-sts             >=2.0
+    , base                     >=4        && <5
+    , Blammo                   >=1.1.2.1
     , bytestring
-    , cfn-flip >=0.1.0.3
+    , cfn-flip                 >=0.1.0.3
     , conduit
     , containers
     , envparse
@@ -120,11 +124,13 @@ library
     , exceptions
     , extra
     , filepath
+    , Glob
     , lens
     , lens-aeson
     , monad-logger
     , mtl
     , optparse-applicative
+    , QuickCheck
     , resourcet
     , rio
     , semigroups
@@ -132,103 +138,119 @@ library
     , time
     , transformers
     , typed-process
-    , unliftio >=0.2.25.0
+    , unliftio                 >=0.2.25.0
     , unordered-containers
     , uuid
     , yaml
-  default-language: Haskell2010
+
+  default-language:   Haskell2010
 
 executable stackctl
-  main-is: Main.hs
-  other-modules:
-      Paths_stackctl
-  hs-source-dirs:
-      app
+  main-is:            Main.hs
+  other-modules:      Paths_stackctl
+  hs-source-dirs:     app
   default-extensions:
-      BangPatterns
-      DataKinds
-      DeriveAnyClass
-      DeriveFoldable
-      DeriveFunctor
-      DeriveGeneric
-      DeriveLift
-      DeriveTraversable
-      DerivingStrategies
-      DerivingVia
-      FlexibleContexts
-      FlexibleInstances
-      GADTs
-      GeneralizedNewtypeDeriving
-      LambdaCase
-      MultiParamTypeClasses
-      NoImplicitPrelude
-      NoMonomorphismRestriction
-      OverloadedStrings
-      RankNTypes
-      RecordWildCards
-      ScopedTypeVariables
-      StandaloneDeriving
-      TypeApplications
-      TypeFamilies
-  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N
+    NoImplicitPrelude
+    NoMonomorphismRestriction
+    BangPatterns
+    DataKinds
+    DeriveAnyClass
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    FlexibleContexts
+    FlexibleInstances
+    GADTs
+    GeneralizedNewtypeDeriving
+    LambdaCase
+    MultiParamTypeClasses
+    OverloadedStrings
+    RankNTypes
+    RecordWildCards
+    ScopedTypeVariables
+    StandaloneDeriving
+    TypeApplications
+    TypeFamilies
+
+  ghc-options:
+    -fignore-optim-changes -fwrite-ide-info -Weverything
+    -Wno-all-missed-specialisations -Wno-missing-import-lists
+    -Wno-missing-kind-signatures -Wno-missing-local-signatures
+    -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+    -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts
+    -with-rtsopts=-N
+
   build-depends:
-      base ==4.*
+      base      >=4 && <5
     , stackctl
-  default-language: Haskell2010
+
+  default-language:   Haskell2010
 
 test-suite spec
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  type:               exitcode-stdio-1.0
+  main-is:            Spec.hs
   other-modules:
-      Stackctl.AWS.CloudFormationSpec
-      Stackctl.AWS.ScopeSpec
-      Stackctl.Config.RequiredVersionSpec
-      Stackctl.ConfigSpec
-      Stackctl.FilterOptionSpec
-      Stackctl.Spec.Changes.FormatSpec
-      Stackctl.StackDescriptionSpec
-      Stackctl.StackSpecSpec
-      Stackctl.StackSpecYamlSpec
-      Paths_stackctl
-  hs-source-dirs:
-      test
+    Paths_stackctl
+    Stackctl.AWS.CloudFormationSpec
+    Stackctl.AWS.ScopeSpec
+    Stackctl.Config.RequiredVersionSpec
+    Stackctl.ConfigSpec
+    Stackctl.FilterOptionSpec
+    Stackctl.Spec.Changes.FormatSpec
+    Stackctl.StackDescriptionSpec
+    Stackctl.StackSpecSpec
+    Stackctl.StackSpecYamlSpec
+
+  hs-source-dirs:     test
   default-extensions:
-      BangPatterns
-      DataKinds
-      DeriveAnyClass
-      DeriveFoldable
-      DeriveFunctor
-      DeriveGeneric
-      DeriveLift
-      DeriveTraversable
-      DerivingStrategies
-      DerivingVia
-      FlexibleContexts
-      FlexibleInstances
-      GADTs
-      GeneralizedNewtypeDeriving
-      LambdaCase
-      MultiParamTypeClasses
-      NoImplicitPrelude
-      NoMonomorphismRestriction
-      OverloadedStrings
-      RankNTypes
-      RecordWildCards
-      ScopedTypeVariables
-      StandaloneDeriving
-      TypeApplications
-      TypeFamilies
-  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
+    NoImplicitPrelude
+    NoMonomorphismRestriction
+    BangPatterns
+    DataKinds
+    DeriveAnyClass
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    FlexibleContexts
+    FlexibleInstances
+    GADTs
+    GeneralizedNewtypeDeriving
+    LambdaCase
+    MultiParamTypeClasses
+    OverloadedStrings
+    RankNTypes
+    RecordWildCards
+    ScopedTypeVariables
+    StandaloneDeriving
+    TypeApplications
+    TypeFamilies
+
+  ghc-options:
+    -fignore-optim-changes -fwrite-ide-info -Weverything
+    -Wno-all-missed-specialisations -Wno-missing-import-lists
+    -Wno-missing-kind-signatures -Wno-missing-local-signatures
+    -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+    -Wno-unsafe -optP-Wno-nonportable-include-path
+
   build-depends:
-      Glob
-    , QuickCheck
-    , aeson
-    , base ==4.*
+      aeson
+    , base          >=4       && <5
     , bytestring
     , filepath
+    , Glob
     , hspec
-    , hspec-golden >=0.2.1.0
+    , hspec-golden  >=0.2.1.0
     , mtl
+    , QuickCheck
     , stackctl
     , yaml
-  default-language: Haskell2010
+
+  default-language:   Haskell2010
