@@ -21,12 +21,15 @@ module Stackctl.Action
 
 import Stackctl.Prelude hiding (on)
 
+import Blammo.Logging.Logger (flushLogger)
 import Data.Aeson
 import Data.List (find)
+import qualified Data.List.NonEmpty as NE
 import Stackctl.AWS
 import Stackctl.AWS.Lambda
 import Stackctl.OneOrListOf
 import qualified Stackctl.OneOrListOf as OneOrListOf
+import System.Process.Typed
 
 data Action = Action
   { on :: ActionOn
@@ -56,31 +59,45 @@ instance ToJSON ActionOn where
 data ActionRun
   = InvokeLambdaByStackOutput Text
   | InvokeLambdaByName Text
+  | Exec (NonEmpty String)
+  | Shell String
   deriving stock (Eq, Show)
 
 instance FromJSON ActionRun where
   parseJSON = withObject "ActionRun" $ \o ->
     (InvokeLambdaByStackOutput <$> o .: "InvokeLambdaByStackOutput")
       <|> (InvokeLambdaByName <$> o .: "InvokeLambdaByName")
+      <|> (Exec <$> o .: "Exec")
+      <|> (Shell <$> o .: "Shell")
 
 instance ToJSON ActionRun where
   toJSON =
     object . \case
       InvokeLambdaByStackOutput name -> ["InvokeLambdaByStackOutput" .= name]
       InvokeLambdaByName name -> ["InvokeLambdaByName" .= name]
+      Exec args -> ["Exec" .= args]
+      Shell arg -> ["Shell" .= arg]
   toEncoding =
     pairs . \case
       InvokeLambdaByStackOutput name -> "InvokeLambdaByStackOutput" .= name
       InvokeLambdaByName name -> "InvokeLambdaByName" .= name
+      Exec args -> "Exec" .= args
+      Shell arg -> "Shell" .= arg
 
 data ActionFailure
   = NoSuchOutput
   | InvokeLambdaFailure
+  | ExecFailure ExitCode
   deriving stock (Show)
   deriving anyclass (Exception)
 
 runActions
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: ( MonadResource m
+     , MonadLogger m
+     , MonadReader env m
+     , HasLogger env
+     , HasAwsEnv env
+     )
   => StackName
   -> ActionOn
   -> [Action]
@@ -92,7 +109,12 @@ shouldRunOn :: Action -> ActionOn -> Bool
 shouldRunOn Action {on} on' = on == on'
 
 runAction
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: ( MonadResource m
+     , MonadLogger m
+     , MonadReader env m
+     , HasLogger env
+     , HasAwsEnv env
+     )
   => StackName
   -> Action
   -> m ()
@@ -113,6 +135,8 @@ runAction stackName Action {on, run} = do
           throwIO NoSuchOutput
         Just name -> invoke name
     InvokeLambdaByName name -> invoke name
+    Exec args -> execProcessAction (NE.head args) (NE.tail args)
+    Shell arg -> execProcessAction "sh" ["-c", arg]
  where
   invoke name = do
     result <- awsLambdaInvoke name payload
@@ -124,3 +148,15 @@ runAction stackName Action {on, run} = do
 findOutputValue :: Text -> [Output] -> Maybe Text
 findOutputValue name =
   view output_outputValue <=< find ((== Just name) . view output_outputKey)
+
+execProcessAction
+  :: (MonadIO m, MonadLogger m, MonadReader env m, HasLogger env)
+  => String
+  -> [String]
+  -> m ()
+execProcessAction cmd args = do
+  logDebug $ "runProcess" :# ["command" .= (cmd : args)]
+  flushLogger
+
+  ec <- runProcess $ proc cmd args
+  unless (ec == ExitSuccess) $ throwIO $ ExecFailure ec
