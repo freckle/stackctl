@@ -43,6 +43,7 @@ library
       Stackctl.Config.RequiredVersion
       Stackctl.DirectoryOption
       Stackctl.FilterOption
+      Stackctl.OneOrListOf
       Stackctl.Options
       Stackctl.ParameterOption
       Stackctl.Prelude
@@ -185,6 +186,7 @@ test-suite spec
       Stackctl.Config.RequiredVersionSpec
       Stackctl.ConfigSpec
       Stackctl.FilterOptionSpec
+      Stackctl.OneOrListOfSpec
       Stackctl.Spec.Changes.FormatSpec
       Stackctl.StackDescriptionSpec
       Stackctl.StackSpecSpec
