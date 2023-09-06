@@ -124,12 +124,21 @@ And these constituent parts are used as follows:
     **PostDeploy**: run the action after a successful deployment.
 
   * `{.Actions[].run}`:
-    The action to perform on the given event:
+    An action or list of actions to perform on the given event:
 
     **InvokeLambdaByStackOutput**: <output name>: invoke the function whose name
     is found in the given Output of the deployed Stack.
 
     **InvokeLambdaByName**: <function name>: invoke the given function.
+
+    **Exec**: [<command>, <argument...>]: execute the given `command` and
+    `argument`s.
+
+    **Shell**: <argument>: execute the given argument via `sh -c`.
+
+    Executed processes will inherit any environment variables and print their
+    own `stdout` and `stderr`. If they do not exit 0, an exception is thrown and
+    `stackctl` itself exits.
 
   * `{.Parameters}`:
     Optional. Parameters to use when deploying the Stack.
