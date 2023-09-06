@@ -25,16 +25,18 @@ import Data.Aeson
 import Data.List (find)
 import Stackctl.AWS
 import Stackctl.AWS.Lambda
+import Stackctl.OneOrListOf
+import qualified Stackctl.OneOrListOf as OneOrListOf
 
 data Action = Action
   { on :: ActionOn
-  , run :: ActionRun
+  , run :: OneOrListOf ActionRun
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (FromJSON, ToJSON)
 
-newAction :: ActionOn -> ActionRun -> Action
-newAction = Action
+newAction :: ActionOn -> [ActionRun] -> Action
+newAction on runs = Action {on, run = OneOrListOf.fromList runs}
 
 data ActionOn = PostDeploy
   deriving stock (Eq, Show, Generic)
@@ -97,7 +99,7 @@ runAction
 runAction stackName Action {on, run} = do
   logInfo $ "Running action" :# ["on" .= on, "run" .= run]
 
-  case run of
+  for_ run $ \case
     InvokeLambdaByStackOutput outputName -> do
       outputs <- awsCloudFormationDescribeStackOutputs stackName
       case findOutputValue outputName outputs of

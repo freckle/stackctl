@@ -24,7 +24,7 @@ spec = do
               , ssyDepends = Just [StackName "a-stack", StackName "another-stack"]
               , ssyActions =
                   Just
-                    [newAction PostDeploy $ InvokeLambdaByName "a-lambda"]
+                    [newAction PostDeploy [InvokeLambdaByName "a-lambda"]]
               , ssyParameters =
                   Just
                     $ parametersYaml
