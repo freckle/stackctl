@@ -381,6 +381,7 @@ awsCloudFormationCreateChangeSet
 awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate parameters capabilities tags =
   fmap (first formatServiceError)
     $ trying (_ServiceError . hasStatus 400)
+    $ awsSilently
     $ do
       name <- newChangeSetName
 
