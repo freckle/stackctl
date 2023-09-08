@@ -1,4 +1,22 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.4.4.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.5.0.0...main)
+
+## [v1.4.4.1](https://github.com/freckle/stackctl/compare/v1.4.4.0...v1.5.0.0)
+
+Breaking changes:
+
+- Don't require a name argument to the `awsSimple` function
+
+New features:
+
+- Add `Exec` and `Shell` features in `actions[].run`
+- Support lists in `actions[].run` (single items still work)
+- Add more granular status indicators in `stack-ls(1)` output, print a legend of
+  these indicators as a footer (disable with `--no-legend`)
+
+Fixes:
+
+- Fix for redundant change-set creation errors in logging output
+- Fix globbing bug in auto-expansion of `--filter` arguments
 
 ## [v1.4.4.0](https://github.com/freckle/stackctl/compare/v1.4.3.0...v1.4.4.0)
 
