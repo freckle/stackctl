@@ -20,6 +20,7 @@ ghc-options:
   - -fwrite-ide-info
   - -Weverything
   - -Wno-all-missed-specialisations
+  - -Wno-missed-specialisations
   - -Wno-missing-import-lists
   - -Wno-missing-kind-signatures
   - -Wno-missing-local-signatures
