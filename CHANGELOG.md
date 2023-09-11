@@ -1,6 +1,6 @@
 ## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.5.0.0...main)
 
-## [v1.4.4.1](https://github.com/freckle/stackctl/compare/v1.4.4.0...v1.5.0.0)
+## [v1.5.0.0](https://github.com/freckle/stackctl/compare/v1.4.4.0...v1.5.0.0)
 
 Breaking changes:
 
