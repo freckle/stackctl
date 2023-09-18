@@ -185,10 +185,8 @@ readStackSpec dir specPath = do
 -- | Create a Change Set between a Stack Specification and deployed state
 createChangeSet
   :: ( MonadUnliftIO m
-     , MonadResource m
      , MonadLogger m
-     , MonadReader env m
-     , HasAwsEnv env
+     , MonadAWS m
      )
   => StackSpec
   -> [Parameter]

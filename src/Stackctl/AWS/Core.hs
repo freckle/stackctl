@@ -1,95 +1,76 @@
 module Stackctl.AWS.Core
-  ( AwsEnv
-  , HasAwsEnv (..)
-  , awsEnvDiscover
-  , awsWithAuth
-  , awsSimple
-  , awsSend
-  , awsPaginate
-  , awsAwait
-  , awsAssumeRole
+  ( MonadAWS
+  , send
+  , paginate
+  , await
+  , withAuth
+  , localEnv
 
-    -- * Modifiers on 'AwsEnv'
-  , awsWithin
-  , awsTimeout
-  , awsSilently
-
-    -- * 'Amazonka' extensions
-  , AccountId (..)
+    -- * "Control.Monad.AWS" extensions
+  , simple
+  , discover
+  , assumeRole
 
     -- * Error-handling
   , handlingServiceError
   , formatServiceError
 
-    -- * 'Amazonka'/'ResourceT' re-exports
+    -- * "Amazonka" extensions
+  , AccountId (..)
+
+    -- * "Amazonka" re-exports
   , Region (..)
   , FromText (..)
   , ToText (..)
-  , MonadResource
   ) where
 
-import Stackctl.Prelude hiding (timeout)
+import Stackctl.Prelude
 
-import Amazonka hiding (LogLevel (..))
-import qualified Amazonka as AWS
+import Amazonka
+  ( AWSRequest
+  , AWSResponse
+  , Region
+  , ServiceError
+  , serviceError_code
+  , serviceError_message
+  , serviceError_requestId
+  , _Sensitive
+  , _ServiceError
+  )
+import qualified Amazonka
 import Amazonka.Auth.Keys (fromSession)
 import Amazonka.Data.Text (FromText (..), ToText (..))
-import Amazonka.Env (env_auth, env_logger, env_region)
+import qualified Amazonka.Env as Amazonka
 import Amazonka.STS.AssumeRole
-import Conduit (ConduitM)
+import Control.Monad.AWS
 import Control.Monad.Logger (defaultLoc, toLogStr)
-import Control.Monad.Trans.Resource (MonadResource)
 import Data.Typeable (typeRep)
 import Stackctl.AWS.Orphans ()
 import UnliftIO.Exception.Lens (handling)
 
-newtype AwsEnv = AwsEnv
-  { unAwsEnv :: Env
-  }
-
-unL :: Lens' AwsEnv Env
-unL = lens unAwsEnv $ \x y -> x {unAwsEnv = y}
-
-awsEnvDiscover :: MonadLoggerIO m => m AwsEnv
-awsEnvDiscover = do
-  env <- liftIO $ newEnv discover
-  AwsEnv <$> configureLogging env
-
-configureLogging :: MonadLoggerIO m => Env -> m Env
-configureLogging env = do
+discover :: MonadLoggerIO m => m Amazonka.Env
+discover = do
+  env <- liftIO $ Amazonka.newEnv Amazonka.discover
   loggerIO <- askLoggerIO
 
   let logger level = do
         loggerIO
-          defaultLoc -- TODO: there may be a way to get a CallStack/Loc
+          defaultLoc
           "Amazonka"
           ( case level of
-              AWS.Info -> LevelInfo
-              AWS.Error -> LevelError
-              AWS.Debug -> LevelDebug
-              AWS.Trace -> LevelOther "trace"
+              Amazonka.Info -> LevelInfo
+              Amazonka.Error -> LevelError
+              Amazonka.Debug -> LevelDebug
+              Amazonka.Trace -> LevelOther "trace"
           )
           . toLogStr
-  pure $ env & env_logger .~ logger
+  pure $ env & Amazonka.env_logger .~ logger
 
-class HasAwsEnv env where
-  awsEnvL :: Lens' env AwsEnv
-
-instance HasAwsEnv AwsEnv where
-  awsEnvL = id
-
-awsWithAuth
-  :: (MonadIO m, MonadReader env m, HasAwsEnv env) => (AuthEnv -> m a) -> m a
-awsWithAuth f = do
-  auth <- view $ awsEnvL . unL . env_auth . to runIdentity
-  withAuth auth f
-
-awsSimple
-  :: forall a env m b
+simple
+  :: forall a m b
    . ( HasCallStack
-     , MonadResource m
-     , MonadReader env m
-     , HasAwsEnv env
+     , MonadIO m
+     , MonadAWS m
      , AWSRequest a
      , Typeable a
      , Typeable (AWSResponse a)
@@ -97,8 +78,8 @@ awsSimple
   => a
   -> (AWSResponse a -> Maybe b)
   -> m b
-awsSimple req post = do
-  resp <- awsSend req
+simple req post = do
+  resp <- send req
 
   let
     name = show $ typeRep $ Proxy @a
@@ -106,53 +87,8 @@ awsSimple req post = do
 
   maybe (throwString err) pure $ post resp
 
-awsSend
-  :: ( MonadResource m
-     , MonadReader env m
-     , HasAwsEnv env
-     , AWSRequest a
-     , Typeable a
-     , Typeable (AWSResponse a)
-     )
-  => a
-  -> m (AWSResponse a)
-awsSend req = do
-  AwsEnv env <- view awsEnvL
-  send env req
-
-awsPaginate
-  :: ( MonadResource m
-     , MonadReader env m
-     , HasAwsEnv env
-     , AWSPager a
-     , Typeable a
-     , Typeable (AWSResponse a)
-     )
-  => a
-  -> ConduitM () (AWSResponse a) m ()
-awsPaginate req = do
-  AwsEnv env <- view awsEnvL
-  paginateEither env req >>= hoistEither
-
-hoistEither :: MonadIO m => Either Error a -> m a
-hoistEither = either (liftIO . throwIO) pure
-
-awsAwait
-  :: ( MonadResource m
-     , MonadReader env m
-     , HasAwsEnv env
-     , AWSRequest a
-     , Typeable a
-     )
-  => Wait a
-  -> a
-  -> m Accept
-awsAwait w req = do
-  AwsEnv env <- view awsEnvL
-  await env w req
-
-awsAssumeRole
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+assumeRole
+  :: (MonadIO m, MonadAWS m)
   => Text
   -- ^ Role ARN
   -> Text
@@ -160,31 +96,21 @@ awsAssumeRole
   -> m a
   -- ^ Action to run as the assumed role
   -> m a
-awsAssumeRole role sessionName f = do
+assumeRole role sessionName f = do
   let req = newAssumeRole role sessionName
 
-  assumeEnv <- awsSimple req $ \resp -> do
+  assumeEnv <- simple req $ \resp -> do
     let creds = resp ^. assumeRoleResponse_credentials
-    token <- creds ^. authEnv_sessionToken
+    token <- creds ^. Amazonka.authEnv_sessionToken
 
     let
-      accessKeyId = creds ^. authEnv_accessKeyId
-      secretAccessKey = creds ^. authEnv_secretAccessKey . _Sensitive
+      accessKeyId = creds ^. Amazonka.authEnv_accessKeyId
+      secretAccessKey = creds ^. Amazonka.authEnv_secretAccessKey . _Sensitive
+      sessionToken = token ^. _Sensitive
 
-    pure $ fromSession accessKeyId secretAccessKey $ token ^. _Sensitive
+    pure $ fromSession accessKeyId secretAccessKey sessionToken
 
-  local (awsEnvL . unL %~ assumeEnv) f
-
-awsWithin :: (MonadReader env m, HasAwsEnv env) => Region -> m a -> m a
-awsWithin r = local $ awsEnvL . unL . env_region .~ r
-
-awsTimeout :: (MonadReader env m, HasAwsEnv env) => Seconds -> m a -> m a
-awsTimeout t = local $ awsEnvL . unL %~ globalTimeout t
-
-awsSilently :: (MonadReader env m, HasAwsEnv env) => m a -> m a
-awsSilently = local $ awsEnvL . unL . env_logger .~ noop
- where
-  noop _level _msg = pure ()
+  localEnv assumeEnv f
 
 newtype AccountId = AccountId
   { unAccountId :: Text

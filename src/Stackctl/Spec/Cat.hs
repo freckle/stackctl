@@ -54,8 +54,8 @@ parseCatOptions =
       )
 
 runCat
-  :: ( MonadMask m
-     , MonadResource m
+  :: ( MonadIO m
+     , MonadMask m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env

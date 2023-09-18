@@ -64,8 +64,7 @@ class HasAwsScope env where
 instance HasAwsScope AwsScope where
   awsScopeL = id
 
-fetchAwsScope
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m AwsScope
+fetchAwsScope :: (MonadIO m, MonadAWS m) => m AwsScope
 fetchAwsScope =
   AwsScope
     <$> awsGetCallerIdentityAccount

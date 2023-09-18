@@ -10,10 +10,11 @@ module Stackctl.AWS.Lambda
 
 import Stackctl.Prelude hiding (trace)
 
+import Amazonka (globalTimeout)
 import Amazonka.Lambda.Invoke
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
-import Stackctl.AWS.Core
+import Stackctl.AWS.Core as AWS
 
 data LambdaInvokeResult
   = LambdaInvokeSuccess ByteString
@@ -63,10 +64,9 @@ data LambdaError = LambdaError
   deriving anyclass (FromJSON, ToJSON)
 
 awsLambdaInvoke
-  :: ( MonadResource m
+  :: ( MonadIO m
      , MonadLogger m
-     , MonadReader env m
-     , HasAwsEnv env
+     , MonadAWS m
      , ToJSON a
      )
   => Text
@@ -78,8 +78,8 @@ awsLambdaInvoke name payload = do
 
   -- Match Lambda's own limit (15 minutes) and add some buffer
   resp <-
-    awsTimeout 905
-      $ awsSend
+    AWS.localEnv (globalTimeout 905)
+      $ AWS.send
       $ newInvoke name
       $ BSL.toStrict
       $ encode

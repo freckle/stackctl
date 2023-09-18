@@ -86,6 +86,7 @@ import Amazonka.Core
   , _MatchServiceError
   , _ServiceError
   )
+import qualified Amazonka.Env as Amazonka
 import Amazonka.Waiter (Accept (..))
 import Conduit
 import Control.Lens ((?~))
@@ -97,7 +98,7 @@ import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
-import Stackctl.AWS.Core
+import Stackctl.AWS.Core as AWS
 import Stackctl.Sort
 import Stackctl.StackDescription
 import System.FilePath.Glob
@@ -172,16 +173,16 @@ newChangeSetName = liftIO $ do
   pure $ ChangeSetName $ T.intercalate "-" $ map pack parts
 
 awsCloudFormationDescribeStack
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => StackName -> m Stack
+  :: (MonadIO m, MonadAWS m) => StackName -> m Stack
 awsCloudFormationDescribeStack stackName = do
   let req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
-  awsSimple req $ \resp -> do
+  AWS.simple req $ \resp -> do
     stacks <- resp ^. describeStacksResponse_stacks
     listToMaybe stacks
 
 awsCloudFormationDescribeStackMaybe
-  :: (MonadUnliftIO m, MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadUnliftIO m, MonadAWS m)
   => StackName
   -> m (Maybe Stack)
 awsCloudFormationDescribeStackMaybe stackName =
@@ -193,7 +194,7 @@ awsCloudFormationDescribeStackMaybe stackName =
     <$> awsCloudFormationDescribeStack stackName
 
 awsCloudFormationDescribeStackOutputs
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadAWS m)
   => StackName
   -> m [Output]
 awsCloudFormationDescribeStackOutputs stackName = do
@@ -201,7 +202,7 @@ awsCloudFormationDescribeStackOutputs stackName = do
   pure $ fromMaybe [] $ outputs stack
 
 awsCloudFormationDescribeStackEvents
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadAWS m)
   => StackName
   -> Maybe Text
   -- ^ Last-seen Id
@@ -213,21 +214,21 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
           ?~ unStackName stackName
 
   runConduit
-    $ awsPaginate req
+    $ AWS.paginate req
     .| mapC (fromMaybe [] . (^. describeStackEventsResponse_stackEvents))
     .| concatC
     .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
     .| sinkList
 
 awsCloudFormationGetStackNamesMatching
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadAWS m)
   => Pattern
   -> m [StackName]
 awsCloudFormationGetStackNamesMatching p = do
   let req = newListStacks & listStacks_stackStatusFilter ?~ runningStatuses
 
   runConduit
-    $ awsPaginate req
+    $ AWS.paginate req
     .| concatMapC (^. listStacksResponse_stackSummaries)
     .| concatC
     .| mapC (^. stackSummary_stackName)
@@ -236,7 +237,7 @@ awsCloudFormationGetStackNamesMatching p = do
     .| sinkList
 
 awsCloudFormationGetMostRecentStackEventId
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadAWS m)
   => StackName
   -> m (Maybe Text)
 awsCloudFormationGetMostRecentStackEventId stackName = do
@@ -252,14 +253,14 @@ awsCloudFormationGetMostRecentStackEventId stackName = do
       [] -> Nothing
       (e : _) -> Just $ e ^. stackEvent_eventId
 
-  awsSimple req
+  AWS.simple req
     $ pure
     . getFirstEventId
     . fromMaybe []
     . (^. describeStackEventsResponse_stackEvents)
 
 awsCloudFormationDeleteStack
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadLogger m, MonadAWS m)
   => StackName
   -> m StackDeleteResult
 awsCloudFormationDeleteStack stackName = do
@@ -268,25 +269,25 @@ awsCloudFormationDeleteStack stackName = do
     describeReq =
       newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
-  awsSimple deleteReq $ const $ pure ()
+  AWS.simple deleteReq $ const $ pure ()
 
   logDebug "Awaiting DeleteStack"
-  stackDeleteResult <$> awsAwait newStackDeleteComplete describeReq
+  stackDeleteResult <$> AWS.await newStackDeleteComplete describeReq
 
 awsCloudFormationWait
-  :: (MonadUnliftIO m, MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadUnliftIO m, MonadAWS m)
   => StackName
   -> m StackDeployResult
 awsCloudFormationWait stackName = do
   either stackCreateResult stackUpdateResult
     <$> race
-      (awsAwait newStackCreateComplete req)
-      (awsAwait newStackUpdateComplete req)
+      (AWS.await newStackCreateComplete req)
+      (AWS.await newStackUpdateComplete req)
  where
   req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
 
 awsCloudFormationGetTemplate
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => StackName -> m Value
+  :: (MonadIO m, MonadAWS m) => StackName -> m Value
 awsCloudFormationGetTemplate stackName = do
   let
     req =
@@ -298,7 +299,7 @@ awsCloudFormationGetTemplate stackName = do
     decodeTemplateBody body =
       fromMaybe (toJSON body) $ decodeStrict $ encodeUtf8 body
 
-  awsSimple req $ \resp -> do
+  AWS.simple req $ \resp -> do
     body <- resp ^. getTemplateResponse_templateBody
     pure $ decodeTemplateBody body
 
@@ -366,10 +367,8 @@ changeSetFailed = (== ChangeSetStatus_FAILED) . csStatus
 
 awsCloudFormationCreateChangeSet
   :: ( MonadUnliftIO m
-     , MonadResource m
      , MonadLogger m
-     , MonadReader env m
-     , HasAwsEnv env
+     , MonadAWS m
      )
   => StackName
   -> Maybe StackDescription
@@ -410,22 +409,22 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
       logInfo
         $ "Creating changeset..."
         :# ["name" .= name, "type" .= changeSetType]
-      csId <- awsSimple req (^. createChangeSetResponse_id)
+      csId <- AWS.simple req (^. createChangeSetResponse_id)
 
       logDebug "Awaiting CREATE_COMPLETE"
-      void $ awsAwait newChangeSetCreateComplete $ newDescribeChangeSet csId
+      void $ AWS.await newChangeSetCreateComplete $ newDescribeChangeSet csId
 
       logInfo "Retrieving changeset..."
       cs <- awsCloudFormationDescribeChangeSet $ ChangeSetId csId
       pure $ cs <$ guard (not $ changeSetFailed cs)
 
 awsCloudFormationDescribeChangeSet
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadAWS m)
   => ChangeSetId
   -> m ChangeSet
 awsCloudFormationDescribeChangeSet changeSetId = do
   let req = newDescribeChangeSet $ unChangeSetId changeSetId
-  awsSimple req changeSetFromResponse
+  AWS.simple req changeSetFromResponse
 
 sortChanges :: [Change] -> [Change]
 sortChanges = sortByDependencies changeName changeCausedBy
@@ -445,18 +444,16 @@ detailCausingLogicalResourceId ResourceChangeDetail' {..} =
   T.takeWhile (/= '.') <$> causingEntity
 
 awsCloudFormationExecuteChangeSet
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => ChangeSetId -> m ()
+  :: (MonadIO m, MonadAWS m) => ChangeSetId -> m ()
 awsCloudFormationExecuteChangeSet changeSetId = do
-  void $ awsSend $ newExecuteChangeSet $ unChangeSetId changeSetId
+  void $ AWS.send $ newExecuteChangeSet $ unChangeSetId changeSetId
 
 awsCloudFormationDeleteAllChangeSets
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
-  => StackName
-  -> m ()
+  :: (MonadIO m, MonadLogger m, MonadAWS m) => StackName -> m ()
 awsCloudFormationDeleteAllChangeSets stackName = do
   logInfo "Deleting all changesets"
   runConduit
-    $ awsPaginate (newListChangeSets $ unStackName stackName)
+    $ AWS.paginate (newListChangeSets $ unStackName stackName)
     .| concatMapC
       ( \resp -> fromMaybe [] $ do
           ss <- resp ^. listChangeSetsResponse_summaries
@@ -465,7 +462,7 @@ awsCloudFormationDeleteAllChangeSets stackName = do
     .| mapM_C
       ( \csId -> do
           logInfo $ "Enqueing delete" :# ["changeSetId" .= csId]
-          void $ awsSend $ newDeleteChangeSet csId
+          void $ AWS.send $ newDeleteChangeSet csId
       )
 
 -- | Did we abandoned this Stack's first ever ChangeSet?
@@ -509,3 +506,8 @@ runningStatuses =
 _ValidationError :: AsError a => Getting (First ServiceError) a ServiceError
 _ValidationError =
   _MatchServiceError defaultService "ValidationError" . hasStatus 400
+
+awsSilently :: MonadAWS m => m a -> m a
+awsSilently = AWS.localEnv $ Amazonka.env_logger .~ noop
+ where
+  noop _level _msg = pure ()

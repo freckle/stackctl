@@ -92,11 +92,11 @@ data ActionFailure
   deriving anyclass (Exception)
 
 runActions
-  :: ( MonadResource m
+  :: ( MonadIO m
      , MonadLogger m
+     , MonadAWS m
      , MonadReader env m
      , HasLogger env
-     , HasAwsEnv env
      )
   => StackName
   -> ActionOn
@@ -109,11 +109,11 @@ shouldRunOn :: Action -> ActionOn -> Bool
 shouldRunOn Action {on} on' = on == on'
 
 runAction
-  :: ( MonadResource m
+  :: ( MonadIO m
      , MonadLogger m
+     , MonadAWS m
      , MonadReader env m
      , HasLogger env
-     , HasAwsEnv env
      )
   => StackName
   -> Action

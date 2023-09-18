@@ -37,11 +37,10 @@ parseListOptions =
 runList
   :: ( MonadUnliftIO m
      , MonadMask m
-     , MonadResource m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasAwsScope env
-     , HasAwsEnv env
      , HasLogger env
      , HasConfig env
      , HasDirectoryOption env
