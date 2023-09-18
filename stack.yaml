@@ -14,6 +14,7 @@ extra-deps:
   - amazonka-lambda-2.0
   - amazonka-sso-2.0
   - amazonka-sts-2.0
+  - amazonka-mtl-0.1.1.0
 
   - hspec-golden-0.2.1.0
 

@@ -5,10 +5,9 @@ module Stackctl.AWS.STS
 import Stackctl.Prelude
 
 import Amazonka.STS.GetCallerIdentity
-import Stackctl.AWS.Core
+import Stackctl.AWS.Core as AWS
 
-awsGetCallerIdentityAccount
-  :: (MonadResource m, MonadReader env m, HasAwsEnv env) => m AccountId
+awsGetCallerIdentityAccount :: (MonadIO m, MonadAWS m) => m AccountId
 awsGetCallerIdentityAccount = do
-  awsSimple newGetCallerIdentity $ \resp -> do
+  AWS.simple newGetCallerIdentity $ \resp -> do
     AccountId <$> resp ^. getCallerIdentityResponse_account

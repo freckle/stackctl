@@ -7,16 +7,15 @@ import Stackctl.Prelude
 import Control.Error.Util (hoistMaybe)
 import Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
 import Stackctl.AWS.CloudFormation
-import Stackctl.AWS.Core
+import Stackctl.AWS.Core as AWS
 import Stackctl.AWS.Scope
 import Stackctl.FilterOption
 import UnliftIO.Directory (doesFileExist)
 
 inferRemovedStacks
   :: ( MonadUnliftIO m
-     , MonadResource m
+     , MonadAWS m
      , MonadReader env m
-     , HasAwsEnv env
      , HasAwsScope env
      , HasFilterOption env
      )
@@ -27,7 +26,7 @@ inferRemovedStacks = do
   catMaybes <$> traverse (findRemovedStack scope) paths
 
 findRemovedStack
-  :: (MonadUnliftIO m, MonadResource m, MonadReader env m, HasAwsEnv env)
+  :: (MonadUnliftIO m, MonadAWS m)
   => AwsScope
   -> FilePath
   -> m (Maybe Stack)

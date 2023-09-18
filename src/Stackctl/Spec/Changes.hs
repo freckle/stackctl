@@ -52,12 +52,11 @@ parseChangesOptions =
 runChanges
   :: ( MonadMask m
      , MonadUnliftIO m
-     , MonadResource m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env
      , HasAwsScope env
-     , HasAwsEnv env
      , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env

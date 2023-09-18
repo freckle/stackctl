@@ -21,8 +21,8 @@ import System.FilePath (isPathSeparator)
 import System.FilePath.Glob
 
 forEachSpec_
-  :: ( MonadMask m
-     , MonadResource m
+  :: ( MonadIO m
+     , MonadMask m
      , MonadLogger m
      , MonadReader env m
      , HasAwsScope env
@@ -35,8 +35,8 @@ forEachSpec_
 forEachSpec_ f = traverse_ f =<< discoverSpecs
 
 discoverSpecs
-  :: ( MonadMask m
-     , MonadResource m
+  :: ( MonadIO m
+     , MonadMask m
      , MonadLogger m
      , MonadReader env m
      , HasAwsScope env

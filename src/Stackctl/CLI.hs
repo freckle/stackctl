@@ -8,9 +8,11 @@ module Stackctl.CLI
 import Stackctl.Prelude
 
 import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
+import Control.Monad.AWS as AWS
+import Control.Monad.AWS.ViaReader as AWS
 import Control.Monad.Catch (MonadCatch)
-import Control.Monad.Trans.Resource (ResourceT, runResourceT)
-import Stackctl.AWS
+import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
+import qualified Stackctl.AWS.Core as AWS
 import Stackctl.AWS.Scope
 import Stackctl.AutoSSO
 import Stackctl.ColorOption
@@ -24,7 +26,7 @@ data App options = App
   , appConfig :: Config
   , appOptions :: options
   , appAwsScope :: AwsScope
-  , appAwsEnv :: AwsEnv
+  , appAwsEnv :: AWS.Env
   }
 
 optionsL :: Lens' (App options) options
@@ -39,8 +41,8 @@ instance HasConfig (App options) where
 instance HasAwsScope (App options) where
   awsScopeL = lens appAwsScope $ \x y -> x {appAwsScope = y}
 
-instance HasAwsEnv (App options) where
-  awsEnvL = lens appAwsEnv $ \x y -> x {appAwsEnv = y}
+instance AWS.HasEnv (App options) where
+  envL = lens appAwsEnv $ \x y -> x {appAwsEnv = y}
 
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
@@ -73,6 +75,7 @@ newtype AppT app m a = AppT
     , MonadCatch
     , MonadMask
     )
+  deriving (MonadAWS) via (ReaderAWS (AppT app m))
 
 runAppT
   :: ( MonadMask m
@@ -99,12 +102,12 @@ runAppT options f = do
         envLogSettings
 
   app <- runResourceT $ runLoggerLoggingT logger $ do
-    aws <- runReaderT (handleAutoSSO options awsEnvDiscover) logger
+    aws <- runReaderT (handleAutoSSO options AWS.discover) logger
 
     App logger
       <$> loadConfigOrExit
       <*> pure options
-      <*> runReaderT fetchAwsScope aws
+      <*> AWS.runEnvT fetchAwsScope aws
       <*> pure aws
 
   let

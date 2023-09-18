@@ -13,7 +13,7 @@ import Amazonka.SSO (_UnauthorizedException)
 import Data.Semigroup (Last (..))
 import qualified Env
 import Options.Applicative
-import Stackctl.AWS.Core (formatServiceError)
+import Stackctl.AWS.Core as AWS (formatServiceError)
 import Stackctl.Prompt
 import System.Process.Typed
 import UnliftIO.Exception.Lens (catching)

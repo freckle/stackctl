@@ -71,12 +71,11 @@ parseDeployOptions =
 runDeploy
   :: ( MonadMask m
      , MonadUnliftIO m
-     , MonadResource m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env
      , HasAwsScope env
-     , HasAwsEnv env
      , HasConfig env
      , HasDirectoryOption env
      , HasFilterOption env
@@ -114,12 +113,12 @@ runDeploy DeployOptions {..} = do
           when sdoClean $ awsCloudFormationDeleteAllChangeSets stackName
 
 deleteRemovedStack
-  :: ( MonadMask m
-     , MonadResource m
+  :: ( MonadIO m
+     , MonadMask m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env
-     , HasAwsEnv env
      )
   => DeployConfirmation
   -> Stack
@@ -146,11 +145,10 @@ data DeployConfirmation
 
 checkIfStackRequiresDeletion
   :: ( MonadUnliftIO m
-     , MonadResource m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env
-     , HasAwsEnv env
      )
   => DeployConfirmation
   -> StackName
@@ -174,7 +172,7 @@ checkIfStackRequiresDeletion confirmation stackName = do
     deleteStack stackName
 
 deleteStack
-  :: (MonadResource m, MonadLogger m, MonadReader env m, HasAwsEnv env)
+  :: (MonadIO m, MonadAWS m, MonadLogger m)
   => StackName
   -> m ()
 deleteStack stackName = do
@@ -186,11 +184,10 @@ deleteStack stackName = do
 
 deployChangeSet
   :: ( MonadUnliftIO m
-     , MonadResource m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env
-     , HasAwsEnv env
      )
   => DeployConfirmation
   -> ChangeSet
@@ -232,11 +229,11 @@ deployChangeSet confirmation changeSet = do
   changeSetId = csChangeSetId changeSet
 
 tailStackEventsSince
-  :: ( MonadResource m
+  :: ( MonadIO m
+     , MonadAWS m
      , MonadLogger m
      , MonadReader env m
      , HasLogger env
-     , HasAwsEnv env
      )
   => StackName
   -> Maybe Text
