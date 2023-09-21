@@ -6,8 +6,9 @@ module Stackctl.Spec.Discover
 
 import Stackctl.Prelude
 
-import Data.List.Extra (dropPrefix)
+import Data.List.Extra (dropPrefix, minimumBy)
 import qualified Data.List.NonEmpty as NE
+import Data.Text.Metrics (levenshtein)
 import Stackctl.AWS
 import Stackctl.AWS.Scope
 import Stackctl.Config (HasConfig)
@@ -64,10 +65,13 @@ discoverSpecs = do
   withThreadContext context $ do
     checkForDuplicateStackNames specPaths
 
-    specs <-
-      sortStackSpecs
-        . filterStackSpecs filterOption
-        <$> traverse (readStackSpec dir) specPaths
+    allSpecs <- traverse (readStackSpec dir) specPaths
+
+    let
+      known = map stackSpecStackName allSpecs
+      specs = sortStackSpecs $ filterStackSpecs filterOption allSpecs
+
+    traverse_ (checkForUnknownDepends known) specs
 
     when (null specs) $ logWarn "No specs found"
     specs <$ logDebug ("Discovered specs" :# ["matched" .= length specs])
@@ -93,6 +97,39 @@ checkForDuplicateStackNames =
            ]
 
     exitFailure
+
+-- | Warn if a 'StackSpec' depends on a name not in the given 'StackName's
+--
+-- The 'StackName's are built from all specs, but we only run this with specs
+-- that are filtered in.
+--
+-- NB. This function is written so it can easily be made into a fatal error
+-- (like 'checkForDuplicateStackNames'), but we only warn for now.
+checkForUnknownDepends :: MonadLogger m => [StackName] -> StackSpec -> m ()
+checkForUnknownDepends known spec =
+  traverse_ reportUnknownDepends
+    $ NE.nonEmpty
+    $ filter (`notElem` known)
+    $ stackSpecDepends spec
+ where
+  reportUnknownDepends depends = do
+    for_ depends $ \depend -> do
+      let (nearest, _distance) =
+            minimumBy (comparing snd)
+              . map (id &&& getDistance depend)
+              $ known
+
+      logWarn
+        $ "Stack lists dependency that does not exist"
+        :# [ "dependency"
+              .= ( unStackName (stackSpecStackName spec)
+                    <> " -> "
+                    <> unStackName depend
+                 )
+           , "hint" .= ("Did you mean " <> unStackName nearest <> "?")
+           ]
+
+  getDistance = levenshtein `on` unStackName
 
 buildSpecPath
   :: (MonadReader env m, HasAwsScope env)

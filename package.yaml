@@ -90,6 +90,7 @@ library:
     - rio
     - semigroups
     - text
+    - text-metrics
     - time
     - transformers
     - typed-process

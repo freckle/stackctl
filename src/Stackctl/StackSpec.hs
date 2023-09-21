@@ -5,6 +5,7 @@ module Stackctl.StackSpec
   , stackSpecSpecBody
   , stackSpecStackName
   , stackSpecStackDescription
+  , stackSpecDepends
   , stackSpecActions
   , stackSpecParameters
   , stackSpecCapabilities
