@@ -63,7 +63,8 @@ configErrorMessage = \case
       :# ["error" .= Yaml.prettyPrintParseException ex]
   ConfigInvalid errs -> "Invalid configuration" :# ["errors" .= errs]
   ConfigVersionNotSatisfied rv v ->
-    "Incompatible Stackctl version" :# ["current" .= v, "required" .= show rv]
+    "Incompatible Stackctl version"
+      :# ["current" .= v, "required" .= show (requiredVersionToText rv)]
 
 loadConfigOrExit :: (MonadIO m, MonadLogger m) => m Config
 loadConfigOrExit = either die pure =<< loadConfig
