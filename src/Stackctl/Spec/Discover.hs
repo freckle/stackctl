@@ -6,8 +6,9 @@ module Stackctl.Spec.Discover
 
 import Stackctl.Prelude
 
-import Data.List.Extra (dropPrefix, minimumBy)
+import Data.List.Extra (dropPrefix)
 import qualified Data.List.NonEmpty as NE
+import qualified Data.List.NonEmpty.Extra as NE
 import Data.Text.Metrics (levenshtein)
 import Stackctl.AWS
 import Stackctl.AWS.Scope
@@ -65,16 +66,28 @@ discoverSpecs = do
   withThreadContext context $ do
     checkForDuplicateStackNames specPaths
 
-    allSpecs <- traverse (readStackSpec dir) specPaths
+    mAllSpecs <- NE.nonEmpty <$> traverse (readStackSpec dir) specPaths
 
-    let
-      known = map stackSpecStackName allSpecs
-      specs = sortStackSpecs $ filterStackSpecs filterOption allSpecs
+    case mAllSpecs of
+      Nothing -> do
+        []
+          <$ logWarn
+            ( "Missing or empty specification directory"
+                :# [ "directory" .= dir
+                   , "hint" .= ("Is this the correct directory?" :: Text)
+                   ]
+            )
+      Just allSpecs -> do
+        let
+          known = stackSpecStackName <$> allSpecs
+          specs =
+            sortStackSpecs
+              $ filterStackSpecs filterOption
+              $ NE.toList allSpecs
 
-    traverse_ (checkForUnknownDepends known) specs
-
-    when (null specs) $ logWarn "No specs found"
-    specs <$ logDebug ("Discovered specs" :# ["matched" .= length specs])
+        traverse_ (checkForUnknownDepends known) specs
+        when (null specs) $ logWarn "No specs matched filters"
+        specs <$ logDebug ("Discovered specs" :# ["matched" .= length specs])
 
 checkForDuplicateStackNames
   :: (MonadIO m, MonadLogger m) => [StackSpecPath] -> m ()
@@ -105,7 +118,8 @@ checkForDuplicateStackNames =
 --
 -- NB. This function is written so it can easily be made into a fatal error
 -- (like 'checkForDuplicateStackNames'), but we only warn for now.
-checkForUnknownDepends :: MonadLogger m => [StackName] -> StackSpec -> m ()
+checkForUnknownDepends
+  :: MonadLogger m => NonEmpty StackName -> StackSpec -> m ()
 checkForUnknownDepends known spec =
   traverse_ reportUnknownDepends
     $ NE.nonEmpty
@@ -115,9 +129,9 @@ checkForUnknownDepends known spec =
   reportUnknownDepends depends = do
     for_ depends $ \depend -> do
       let (nearest, _distance) =
-            minimumBy (comparing snd)
-              . map (id &&& getDistance depend)
-              $ known
+            NE.minimumBy1 (comparing snd)
+              $ (id &&& getDistance depend)
+              <$> known
 
       logWarn
         $ "Stack lists dependency that does not exist"
