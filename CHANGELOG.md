@@ -1,4 +1,10 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.5.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.5.0.1...main)
+
+## [v1.5.0.1](https://github.com/freckle/stackctl/compare/v1.5.0.0...v1.5.0.1)
+
+- Handle missing-or-empty specs directory more explicitly
+- Add warning for `Depends` pointing to non-existent spec
+- Fix formatting of required version in warning message
 
 ## [v1.5.0.0](https://github.com/freckle/stackctl/compare/v1.4.4.0...v1.5.0.0)
 
