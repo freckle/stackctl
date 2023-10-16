@@ -1,4 +1,10 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.5.0.1...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.6.0.0...main)
+
+## [v1.6.0.0](https://github.com/freckle/stackctl/compare/v1.5.0.1...v1.6.0.0)
+
+- Re-implement `Stackctl.AWS` with `amazonka-mtl`.
+
+_No CLI or behavior changes._
 
 ## [v1.5.0.1](https://github.com/freckle/stackctl/compare/v1.5.0.0...v1.5.0.1)
 
