@@ -116,13 +116,18 @@ tests:
     main: Spec.hs
     source-dirs: test
     dependencies:
+      - Blammo
       - Glob
       - QuickCheck
       - aeson
+      - amazonka-ec2
+      - amazonka-mtl
       - bytestring
       - filepath
       - hspec
+      - hspec-expectations-lifted
       - hspec-golden >= 0.2.1.0
+      - lens
       - mtl
       - stackctl
       - yaml

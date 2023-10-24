@@ -184,6 +184,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Stackctl.AWS.CloudFormationSpec
+      Stackctl.AWS.EC2Spec
       Stackctl.AWS.ScopeSpec
       Stackctl.Config.RequiredVersionSpec
       Stackctl.ConfigSpec
@@ -193,6 +194,7 @@ test-suite spec
       Stackctl.StackDescriptionSpec
       Stackctl.StackSpecSpec
       Stackctl.StackSpecYamlSpec
+      Stackctl.Test.App
       Paths_stackctl
   hs-source-dirs:
       test
@@ -224,14 +226,19 @@ test-suite spec
       TypeFamilies
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missed-specialisations -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
-      Glob
+      Blammo
+    , Glob
     , QuickCheck
     , aeson
+    , amazonka-ec2
+    , amazonka-mtl
     , base ==4.*
     , bytestring
     , filepath
     , hspec
+    , hspec-expectations-lifted
     , hspec-golden >=0.2.1.0
+    , lens
     , mtl
     , stackctl
     , yaml
