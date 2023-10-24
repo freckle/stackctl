@@ -60,7 +60,7 @@ data LambdaError = LambdaError
   , errorMessage :: Text
   , trace :: [Text]
   }
-  deriving stock (Show, Generic)
+  deriving stock (Eq, Show, Generic)
   deriving anyclass (FromJSON, ToJSON)
 
 awsLambdaInvoke

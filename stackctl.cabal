@@ -185,6 +185,7 @@ test-suite spec
   other-modules:
       Stackctl.AWS.CloudFormationSpec
       Stackctl.AWS.EC2Spec
+      Stackctl.AWS.LambdaSpec
       Stackctl.AWS.ScopeSpec
       Stackctl.Config.RequiredVersionSpec
       Stackctl.ConfigSpec
@@ -231,6 +232,7 @@ test-suite spec
     , QuickCheck
     , aeson
     , amazonka-ec2
+    , amazonka-lambda
     , amazonka-mtl
     , base ==4.*
     , bytestring

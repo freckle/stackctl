@@ -121,6 +121,7 @@ tests:
       - QuickCheck
       - aeson
       - amazonka-ec2
+      - amazonka-lambda
       - amazonka-mtl
       - bytestring
       - filepath
