@@ -44,6 +44,9 @@ newtype TestAppT m a = TestAppT
     )
   deriving (MonadAWS) via (MockAWS (TestAppT m))
 
+instance MonadIO m => MonadFail (TestAppT m) where
+  fail msg = expectationFailure msg >> error "unreachable"
+
 runTestAppT :: MonadUnliftIO m => TestAppT m a -> m a
 runTestAppT f = do
   app <-
