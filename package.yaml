@@ -120,6 +120,7 @@ tests:
       - Glob
       - QuickCheck
       - aeson
+      - amazonka-cloudformation
       - amazonka-ec2
       - amazonka-lambda
       - amazonka-mtl
