@@ -16,12 +16,14 @@ import Blammo.Logging.Logger (newTestLogger)
 import Control.Lens ((?~))
 import Control.Monad.AWS
 import Control.Monad.AWS.ViaMock
+import Stackctl.Telemetry
 import Test.Hspec (Spec, describe, example, it)
 import Test.Hspec.Expectations.Lifted
 
 data TestApp = TestApp
   { taLogger :: Logger
   , taMatchers :: Matchers
+  , taRecordedDeployments :: IORef [Deployment]
   }
 
 instance HasLogger TestApp where
@@ -47,11 +49,17 @@ newtype TestAppT m a = TestAppT
 instance MonadIO m => MonadFail (TestAppT m) where
   fail msg = expectationFailure msg >> error "unreachable"
 
+instance MonadIO m => MonadTelemetry (TestAppT m) where
+  recordDeployment d = do
+    ref <- asks taRecordedDeployments
+    atomicModifyIORef' ref $ \ds -> (ds <> [d], ())
+
 runTestAppT :: MonadUnliftIO m => TestAppT m a -> m a
 runTestAppT f = do
   app <-
     TestApp
       <$> newTestLogger defaultLogSettings
       <*> pure mempty
+      <*> newIORef []
 
   runLoggerLoggingT app $ runReaderT (unTestAppT f) app
