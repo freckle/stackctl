@@ -9,7 +9,12 @@ import Stackctl.Prelude
 
 import Blammo.Logging.Logger (pushLoggerLn)
 import qualified Data.Text as T
-import Data.Time (defaultTimeLocale, formatTime, utcToLocalZonedTime)
+import Data.Time
+  ( defaultTimeLocale
+  , formatTime
+  , getCurrentTime
+  , utcToLocalZonedTime
+  )
 import Options.Applicative
 import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
@@ -25,6 +30,7 @@ import Stackctl.Spec.Changes.Format
 import Stackctl.Spec.Discover
 import Stackctl.StackSpec
 import Stackctl.TagOption
+import Stackctl.Telemetry
 import UnliftIO.Directory (createDirectoryIfMissing)
 
 data DeployOptions = DeployOptions
@@ -73,6 +79,7 @@ runDeploy
      , MonadUnliftIO m
      , MonadAWS m
      , MonadLogger m
+     , MonadTelemetry m
      , MonadReader env m
      , HasLogger env
      , HasAwsScope env
@@ -98,7 +105,10 @@ runDeploy DeployOptions {..} = do
         Left err -> do
           logError $ "Error creating ChangeSet" :# ["error" .= err]
           exitFailure
-        Right Nothing -> logInfo "Stack is up to date"
+        Right Nothing -> do
+          logInfo "Stack is up to date"
+          startedAt <- liftIO getCurrentTime
+          recordDeploymentNoChange startedAt
         Right (Just changeSet) -> do
           let stackName = stackSpecStackName spec
 
@@ -186,6 +196,7 @@ deployChangeSet
   :: ( MonadUnliftIO m
      , MonadAWS m
      , MonadLogger m
+     , MonadTelemetry m
      , MonadReader env m
      , HasLogger env
      )
@@ -201,6 +212,8 @@ deployChangeSet confirmation changeSet = do
     DeployWithConfirmation -> promptContinue
     DeployWithoutConfirmation -> pure ()
 
+  startedAt <- liftIO getCurrentTime
+
   -- It can take a minute to get this batch of events to work out where we're
   -- tailing from, so do that part synchronously
   mLastId <- awsCloudFormationGetMostRecentStackEventId stackName
@@ -214,9 +227,12 @@ deployChangeSet confirmation changeSet = do
   cancel asyncTail
 
   let
-    onSuccess = logInfo $ prettyStackDeployResult result :# []
+    onSuccess = do
+      logInfo $ prettyStackDeployResult result :# []
+      recordDeploymentSucceeded startedAt
     onFailure = do
       logError $ prettyStackDeployResult result :# []
+      recordDeploymentFailed startedAt $ unpack $ prettyStackDeployResult result
       exitFailure
 
   case result of

@@ -19,6 +19,7 @@ import Stackctl.ColorOption
 import Stackctl.Config
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
+import Stackctl.Telemetry
 import Stackctl.VerboseOption
 
 data App options = App
@@ -76,6 +77,9 @@ newtype AppT app m a = AppT
     , MonadMask
     )
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
+
+instance Monad m => MonadTelemetry (AppT (App options) m) where
+  recordDeployment _ = pure () -- TODO: this is just NoTelemetry for now
 
 runAppT
   :: ( MonadMask m

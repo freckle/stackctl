@@ -1,5 +1,10 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module Stackctl.Telemetry
   ( MonadTelemetry (..)
+  , recordDeploymentNoChange
+  , recordDeploymentSucceeded
+  , recordDeploymentFailed
   , Deployment (..)
   , DeploymentResult (..)
   , NoTelemetry (..)
@@ -7,7 +12,7 @@ module Stackctl.Telemetry
 
 import Stackctl.Prelude
 
-import Data.Time (UTCTime)
+import Data.Time (UTCTime, getCurrentTime)
 
 data Deployment = Deployment
   { deploymentStartedAt :: UTCTime
@@ -29,3 +34,30 @@ newtype NoTelemetry m a = NoTelemetry
 
 instance Monad m => MonadTelemetry (NoTelemetry m) where
   recordDeployment _ = pure ()
+
+recordDeploymentNoChange :: MonadTelemetry m => UTCTime -> m ()
+recordDeploymentNoChange deploymentStartedAt =
+  recordDeployment
+    Deployment
+      { deploymentStartedAt
+      , deploymentResult = DeploymentNoChange
+      }
+
+recordDeploymentSucceeded :: (MonadIO m, MonadTelemetry m) => UTCTime -> m ()
+recordDeploymentSucceeded deploymentStartedAt = do
+  now <- liftIO getCurrentTime
+  recordDeployment
+    Deployment
+      { deploymentStartedAt
+      , deploymentResult = DeploymentSucceeded now
+      }
+
+recordDeploymentFailed
+  :: (MonadIO m, MonadTelemetry m) => UTCTime -> String -> m ()
+recordDeploymentFailed deploymentStartedAt err = do
+  now <- liftIO getCurrentTime
+  recordDeployment
+    Deployment
+      { deploymentStartedAt
+      , deploymentResult = DeploymentFailed now err
+      }
