@@ -8,13 +8,10 @@ module Stackctl.Telemetry
 import Stackctl.Prelude
 
 import Data.Time (UTCTime)
-import Data.Version (Version)
 
 data Deployment = Deployment
   { deploymentStartedAt :: UTCTime
   , deploymentResult :: DeploymentResult
-  , deploymentToolName :: Text
-  , deploymentToolVersion :: Version
   }
 
 data DeploymentResult
