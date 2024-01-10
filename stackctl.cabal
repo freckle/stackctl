@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Datadog
       Stackctl.Action
       Stackctl.AutoSSO
       Stackctl.AWS
@@ -118,6 +119,7 @@ library
     , cfn-flip >=0.1.0.3
     , conduit
     , containers
+    , datadog
     , envparse
     , errors
     , exceptions

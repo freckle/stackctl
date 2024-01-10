@@ -12,6 +12,9 @@ import Control.Monad.AWS as AWS
 import Control.Monad.AWS.ViaReader as AWS
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
+import Data.Time (diffUTCTime)
+import Datadog (Datadog, HasDatadog (..))
+import qualified Datadog as DD
 import qualified Stackctl.AWS.Core as AWS
 import Stackctl.AWS.Scope
 import Stackctl.AutoSSO
@@ -28,6 +31,7 @@ data App options = App
   , appOptions :: options
   , appAwsScope :: AwsScope
   , appAwsEnv :: AWS.Env
+  , appDatadog :: Datadog
   }
 
 optionsL :: Lens' (App options) options
@@ -44,6 +48,9 @@ instance HasAwsScope (App options) where
 
 instance AWS.HasEnv (App options) where
   envL = lens appAwsEnv $ \x y -> x {appAwsEnv = y}
+
+instance HasDatadog (App options) where
+  datadogL = lens appDatadog $ \x y -> x {appDatadog = y}
 
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
@@ -78,8 +85,22 @@ newtype AppT app m a = AppT
     )
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
 
-instance Monad m => MonadTelemetry (AppT (App options) m) where
-  recordDeployment _ = pure () -- TODO: this is just NoTelemetry for now
+instance MonadIO m => MonadTelemetry (AppT (App options) m) where
+  recordDeployment Deployment {..} = do
+    tags <- case deploymentResult of
+      DeploymentNoChange -> pure [("conclusion", "no_change")]
+      DeploymentSucceeded finishedAt -> do
+        let
+          tags = [("conclusion", "success")]
+          duration = DD.newDuration @DD.Seconds $ diffUTCTime finishedAt deploymentStartedAt
+        tags <$ DD.duration duration "stackctl.deploy.duration" tags
+      DeploymentFailed finishedAt _ -> do
+        let
+          tags = [("conclusion", "failure")]
+          duration = DD.newDuration @DD.Seconds $ diffUTCTime finishedAt deploymentStartedAt
+        tags <$ DD.duration duration "stackctl.deploy.duration" tags
+
+    DD.increment "stackctl.deploy" tags
 
 runAppT
   :: ( MonadMask m
@@ -105,29 +126,30 @@ runAppT options f = do
         (options ^. verboseOptionL)
         envLogSettings
 
-  app <- runResourceT $ runLoggerLoggingT logger $ do
+  runResourceT $ runLoggerLoggingT logger $ do
     aws <- runReaderT (handleAutoSSO options AWS.discover) logger
 
-    App logger
-      <$> loadConfigOrExit
-      <*> pure options
-      <*> AWS.runEnvT fetchAwsScope aws
-      <*> pure aws
+    DD.withDummyDatadog $ \dd -> do
+      app <-
+        App logger
+          <$> loadConfigOrExit
+          <*> pure options
+          <*> AWS.runEnvT fetchAwsScope aws
+          <*> pure aws
+          <*> pure dd
 
-  let
-    AwsScope {..} = appAwsScope app
+      let
+        AwsScope {..} = appAwsScope app
 
-    context =
-      [ "region" .= awsRegion
-      , "accountId" .= awsAccountId
-      , "accountName" .= awsAccountName
-      ]
+        context =
+          [ "region" .= awsRegion
+          , "accountId" .= awsAccountId
+          , "accountName" .= awsAccountName
+          ]
 
-  runResourceT
-    $ runLoggerLoggingT app
-    $ flip runReaderT app
-    $ withThreadContext context
-    $ unAppT f
+      flip runReaderT app
+        $ withThreadContext context
+        $ unAppT f
 
 adjustLogSettings
   :: Maybe ColorOption -> Verbosity -> LogSettings -> LogSettings
