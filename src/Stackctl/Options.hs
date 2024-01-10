@@ -65,6 +65,7 @@ envParser =
     <*> pure mempty -- use LOG_COLOR
     <*> pure mempty -- use LOG_LEVEL
     <*> optional envAutoSSOOption
+    <*> envTelemetryOption
 
 -- brittany-disable-next-binding
 
@@ -76,3 +77,4 @@ optionsParser =
     <*> optional colorOption
     <*> verboseOption
     <*> optional autoSSOOption
+    <*> telemetryOption
