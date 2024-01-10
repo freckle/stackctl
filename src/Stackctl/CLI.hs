@@ -12,8 +12,7 @@ import Control.Monad.AWS as AWS
 import Control.Monad.AWS.ViaReader as AWS
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
-import Data.Time (diffUTCTime)
-import Datadog (Datadog, HasDatadog (..))
+import Datadog (Datadog, HasDatadog (..), mkWithDatadog)
 import qualified Datadog as DD
 import qualified Stackctl.AWS.Core as AWS
 import Stackctl.AWS.Scope
@@ -90,21 +89,7 @@ newtype AppT app m a = AppT
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
 
 instance MonadIO m => MonadTelemetry (AppT (App options) m) where
-  recordDeployment Deployment {..} = do
-    tags <- case deploymentResult of
-      DeploymentNoChange -> pure [("conclusion", "no_change")]
-      DeploymentSucceeded finishedAt -> do
-        let
-          tags = [("conclusion", "success")]
-          duration = DD.newDuration @DD.Seconds $ diffUTCTime finishedAt deploymentStartedAt
-        tags <$ DD.duration duration "stackctl.deploy.duration" tags
-      DeploymentFailed finishedAt _ -> do
-        let
-          tags = [("conclusion", "failure")]
-          duration = DD.newDuration @DD.Seconds $ diffUTCTime finishedAt deploymentStartedAt
-        tags <$ DD.duration duration "stackctl.deploy.duration" tags
-
-    DD.increment "stackctl.deploy" tags
+  recordDeployment _ = pure ()
 
 runAppT
   :: ( MonadMask m
@@ -135,10 +120,10 @@ runAppT options f = do
     aws <- runReaderT (handleAutoSSO options AWS.discover) logger
 
     withDatadog <- case options ^. telemetryOptionL of
-      TelemetryDisabled -> pure DD.withDummyDatadog
+      TelemetryDisabled -> mkWithDatadog Nothing
       TelemetryEnabled -> do
-        keys <- AWS.runEnvT fetchDatadogKeys aws
-        pure $ DD.withDatadog keys
+        mcreds <- AWS.runEnvT fetchDatadogCredentials aws
+        mkWithDatadog mcreds
 
     withDatadog $ \dd -> do
       app <-
@@ -167,5 +152,5 @@ adjustLogSettings
 adjustLogSettings mco v =
   maybe id (setLogSettingsColor . unColorOption) mco . verbositySetLogLevels v
 
-fetchDatadogKeys :: m DD.Keys
-fetchDatadogKeys = undefined
+fetchDatadogCredentials :: m (Maybe DD.Credentials)
+fetchDatadogCredentials = undefined
