@@ -97,6 +97,7 @@ library:
     - transformers
     - typed-process
     - unliftio >= 0.2.25.0 # UnliftIO.Exception.Lens
+    - unliftio-core
     - unordered-containers
     - uuid
     - yaml

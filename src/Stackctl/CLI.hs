@@ -89,7 +89,7 @@ newtype AppT app m a = AppT
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
 
 instance MonadIO m => MonadTelemetry (AppT (App options) m) where
-  recordDeployment _ = pure ()
+  recordDeployment _ = pure () -- TODO
 
 runAppT
   :: ( MonadMask m
@@ -120,10 +120,10 @@ runAppT options f = do
     aws <- runReaderT (handleAutoSSO options AWS.discover) logger
 
     withDatadog <- case options ^. telemetryOptionL of
-      TelemetryDisabled -> mkWithDatadog Nothing
+      TelemetryDisabled -> pure $ mkWithDatadog Nothing
       TelemetryEnabled -> do
         mcreds <- AWS.runEnvT fetchDatadogCredentials aws
-        mkWithDatadog mcreds
+        pure $ mkWithDatadog mcreds
 
     withDatadog $ \dd -> do
       app <-

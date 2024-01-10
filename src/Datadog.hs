@@ -1,16 +1,18 @@
 module Datadog
   ( Credentials (..)
-  , mkWithDatadog
   , Datadog (..)
   , HasDatadog (..)
+  , mkWithDatadog
   )
 where
 
 import Prelude
 
 import Control.Lens (Lens')
-import Control.Monad.IO.Class (MonadIO (..))
+import Control.Monad.IO.Unlift (MonadUnliftIO (..))
 import Data.Text (Text)
+import Network.Datadog
+import Network.Datadog.Internal (DatadogCredentials)
 import Network.Datadog.Types
 
 data Credentials
@@ -18,11 +20,6 @@ data Credentials
     CredentialsWrite Text
   | -- | API and App Keys
     CredentialsReadWrite Text Text
-
-mkWithDatadog :: MonadIO m => Maybe Credentials -> m ((Datadog -> m a) -> m a)
-mkWithDatadog = \case
-  Nothing -> pure $ \f -> f NullDatadog
-  _ -> undefined
 
 data Datadog
   = NullDatadog
@@ -34,3 +31,20 @@ class HasDatadog env where
 
 instance HasDatadog Datadog where
   datadogL = id
+
+mkWithDatadog
+  :: MonadUnliftIO m => Maybe Credentials -> ((Datadog -> m a) -> m a)
+mkWithDatadog = \case
+  Nothing -> \f -> f NullDatadog
+  Just (CredentialsWrite apiKey) -> \f -> do
+    withDatadog' (writeCredentials apiKey) $ f . DatadogWrite
+  Just (CredentialsReadWrite apiKey appKey) -> \f -> do
+    withDatadog' (readWriteCredentials apiKey appKey) $ f . DatadogReadWrite
+
+withDatadog'
+  :: (MonadUnliftIO m, DatadogCredentials k)
+  => k
+  -> (DatadogClient k -> m a)
+  -> m a
+withDatadog' creds f =
+  withRunInIO $ \runInIO -> withDatadog creds $ runInIO . f

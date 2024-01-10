@@ -140,6 +140,7 @@ library
     , transformers
     , typed-process
     , unliftio >=0.2.25.0
+    , unliftio-core
     , unordered-containers
     , uuid
     , yaml
