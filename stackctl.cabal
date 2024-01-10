@@ -66,6 +66,7 @@ library
       Stackctl.Subcommand
       Stackctl.TagOption
       Stackctl.Telemetry
+      Stackctl.TelemetryOption
       Stackctl.VerboseOption
       Stackctl.Version
   other-modules:

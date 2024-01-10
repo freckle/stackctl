@@ -23,6 +23,7 @@ import Stackctl.Config
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Telemetry
+import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
 data App options = App
@@ -67,6 +68,9 @@ instance HasVerboseOption options => HasVerboseOption (App options) where
 instance HasAutoSSOOption options => HasAutoSSOOption (App options) where
   autoSSOOptionL = optionsL . autoSSOOptionL
 
+instance HasTelemetryOption options => HasTelemetryOption (App options) where
+  telemetryOptionL = optionsL . telemetryOptionL
+
 newtype AppT app m a = AppT
   { unAppT :: ReaderT app (LoggingT (ResourceT m)) a
   }
@@ -108,6 +112,7 @@ runAppT
      , HasColorOption options
      , HasVerboseOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => options
   -> AppT (App options) m a
@@ -129,7 +134,13 @@ runAppT options f = do
   runResourceT $ runLoggerLoggingT logger $ do
     aws <- runReaderT (handleAutoSSO options AWS.discover) logger
 
-    DD.withDummyDatadog $ \dd -> do
+    withDatadog <- case options ^. telemetryOptionL of
+      TelemetryDisabled -> pure DD.withDummyDatadog
+      TelemetryEnabled -> do
+        keys <- AWS.runEnvT fetchDatadogKeys aws
+        pure $ DD.withDatadog keys
+
+    withDatadog $ \dd -> do
       app <-
         App logger
           <$> loadConfigOrExit
@@ -155,3 +166,6 @@ adjustLogSettings
   :: Maybe ColorOption -> Verbosity -> LogSettings -> LogSettings
 adjustLogSettings mco v =
   maybe id (setLogSettingsColor . unColorOption) mco . verbositySetLogLevels v
+
+fetchDatadogKeys :: m DD.Keys
+fetchDatadogKeys = undefined

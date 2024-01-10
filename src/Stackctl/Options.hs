@@ -13,6 +13,7 @@ import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
+import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
 data Options = Options
@@ -21,6 +22,7 @@ data Options = Options
   , oColor :: Maybe ColorOption
   , oVerbose :: Verbosity
   , oAutoSSO :: Maybe AutoSSOOption
+  , oTelemetry :: TelemetryOption
   }
   deriving stock (Generic)
   deriving (Semigroup) via GenericSemigroupMonoid Options
@@ -48,6 +50,9 @@ instance HasVerboseOption Options where
 
 instance HasAutoSSOOption Options where
   autoSSOOptionL = autoSSOL . maybeLens defaultAutoSSOOption
+
+instance HasTelemetryOption Options where
+  telemetryOptionL = lens oTelemetry $ \x y -> x {oTelemetry = y}
 
 -- brittany-disable-next-binding
 

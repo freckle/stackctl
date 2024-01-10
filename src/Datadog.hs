@@ -2,6 +2,8 @@ module Datadog
   ( Datadog (..)
   , HasDatadog (..)
   , withDummyDatadog
+  , Keys (..)
+  , withDatadog
   , increment
   , Duration
   , Seconds
@@ -17,7 +19,7 @@ import Control.Monad.IO.Class (MonadIO (..))
 import Control.Monad.Reader (MonadReader)
 import Data.Text (Text)
 import Data.Time (NominalDiffTime, nominalDiffTimeToSeconds)
-import Network.Datadog (Environment)
+import Network.Datadog (Environment, Keys (..))
 import Network.StatsD.Datadog
   ( MetricName (..)
   , MetricType (..)
@@ -29,12 +31,13 @@ import Network.StatsD.Datadog
   , tags
   )
 
-data Datadog
-  = DummyDatadog
-  | Datadog StatsClient Environment
+data Datadog = DummyDatadog | Datadog StatsClient Environment
 
 withDummyDatadog :: (Datadog -> m a) -> m a
 withDummyDatadog f = f DummyDatadog
+
+withDatadog :: Keys -> (Datadog -> m a) -> m a
+withDatadog = undefined
 
 class HasDatadog env where
   datadogL :: Lens' env Datadog
