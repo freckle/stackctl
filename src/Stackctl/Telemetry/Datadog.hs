@@ -7,7 +7,7 @@ module Stackctl.Telemetry.Datadog
   , DatadogTags
   , datadogTagsFromList
   , HasDatadogTags (..)
-  , ViaDatadog (..)
+  , DatadogEvents (..)
   )
 where
 
@@ -47,7 +47,7 @@ class HasDatadogTags env where
 instance HasDatadogTags DatadogTags where
   datadogTagsL = id
 
-newtype ViaDatadog m a = ViaDatadog
+newtype DatadogEvents m a = DatadogEvents
   { unActualDatadog :: m a
   }
   deriving newtype
@@ -65,7 +65,7 @@ instance
   , HasDatadogCreds env
   , HasDatadogTags env
   )
-  => MonadTelemetry (ViaDatadog m)
+  => MonadTelemetry (DatadogEvents m)
   where
   recordDeployment deployment = do
     ddTags <-

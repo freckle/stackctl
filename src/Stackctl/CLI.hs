@@ -91,7 +91,7 @@ newtype AppT app m a = AppT
     , MonadMask
     )
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
-  deriving (MonadTelemetry) via (ViaDatadog (AppT app m))
+  deriving (MonadTelemetry) via (DatadogEvents (AppT app m))
 
 runAppT
   :: ( MonadMask m
