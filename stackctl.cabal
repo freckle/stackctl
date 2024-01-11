@@ -35,6 +35,7 @@ library
       Stackctl.AWS.Lambda
       Stackctl.AWS.Orphans
       Stackctl.AWS.Scope
+      Stackctl.AWS.SSM
       Stackctl.AWS.STS
       Stackctl.CLI
       Stackctl.ColorOption
@@ -113,6 +114,7 @@ library
     , amazonka-ec2 >=2.0
     , amazonka-lambda >=2.0
     , amazonka-mtl
+    , amazonka-ssm >=2.0
     , amazonka-sso >=2.0
     , amazonka-sts >=2.0
     , base ==4.*

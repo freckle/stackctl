@@ -71,6 +71,7 @@ library:
     - amazonka-ec2 >= 2.0
     - amazonka-lambda >= 2.0
     - amazonka-mtl
+    - amazonka-ssm >= 2.0
     - amazonka-sso >= 2.0
     - amazonka-sts >= 2.0
     - bytestring

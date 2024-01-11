@@ -1,50 +1,57 @@
 module Datadog
   ( Credentials (..)
-  , Datadog (..)
-  , HasDatadog (..)
-  , mkWithDatadog
+  , HasCredentials (..)
+  , ActualDatadog (..)
   )
 where
 
 import Prelude
 
-import Control.Lens (Lens')
+import Control.Lens (Lens', view)
+import Control.Monad (void)
 import Control.Monad.IO.Unlift (MonadUnliftIO (..))
+import Control.Monad.Reader (MonadReader)
 import Data.Text (Text)
 import Network.Datadog
 import Network.Datadog.Internal (DatadogCredentials)
 import Network.Datadog.Types
 
 data Credentials
-  = -- | API Key only
-    CredentialsWrite Text
-  | -- | API and App Keys
-    CredentialsReadWrite Text Text
+  = CredentialsNone
+  | CredentialsWrite Write
+  | CredentialsReadWrite ReadWrite
 
-data Datadog
-  = NullDatadog
-  | DatadogWrite (DatadogClient Write)
-  | DatadogReadWrite (DatadogClient ReadWrite)
+class HasCredentials env where
+  credentialsL :: Lens' env Credentials
 
-class HasDatadog env where
-  datadogL :: Lens' env Datadog
+instance HasCredentials Credentials where
+  credentialsL = id
 
-instance HasDatadog Datadog where
-  datadogL = id
+newtype ActualDatadog m a = ActualDatadog
+  { unActualDatadog :: m a
+  }
+  deriving newtype
+    ( Functor
+    , Applicative
+    , Monad
+    , MonadIO
+    , MonadUnliftIO
+    , MonadReader
+    )
 
-mkWithDatadog
-  :: MonadUnliftIO m => Maybe Credentials -> ((Datadog -> m a) -> m a)
-mkWithDatadog = \case
-  Nothing -> \f -> f NullDatadog
-  Just (CredentialsWrite apiKey) -> \f -> do
-    withDatadog' (writeCredentials apiKey) $ f . DatadogWrite
-  Just (CredentialsReadWrite apiKey appKey) -> \f -> do
-    withDatadog' (readWriteCredentials apiKey appKey) $ f . DatadogReadWrite
+instance MonadTelemetry (ActualDatadog m a) where
+  recordDeployment _ = do
 
 withDatadog'
-  :: (MonadUnliftIO m, DatadogCredentials k)
-  => k
-  -> (DatadogClient k -> m a)
-  -> m a
-withDatadog' creds f =
-  withRunInIO $ \runInIO -> withDatadog creds $ runInIO . f
+  :: (MonadUnliftIO m, MonadReader env m, HasCredentials env)
+  => (forall k. DatadogClient k -> m a)
+  -> m ()
+withDatadog' f = do
+  creds <- view credentialsL
+
+  case creds of
+    CredentialsNone -> pure ()
+    CredentialsWrite w -> withRunInIO $ \runInIO -> do
+      withDatadog w $ runInIO . void . f
+    CredentialsReadWrite rw -> withRunInIO $ \runInIO -> do
+      withDatadog rw $ runInIO . void . f

@@ -15,6 +15,7 @@ import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
 import Datadog (Datadog, HasDatadog (..), mkWithDatadog)
 import qualified Datadog as DD
 import qualified Stackctl.AWS.Core as AWS
+import Stackctl.AWS.SSM
 import Stackctl.AWS.Scope
 import Stackctl.AutoSSO
 import Stackctl.ColorOption
@@ -152,5 +153,13 @@ adjustLogSettings
 adjustLogSettings mco v =
   maybe id (setLogSettingsColor . unColorOption) mco . verbositySetLogLevels v
 
-fetchDatadogCredentials :: m (Maybe DD.Credentials)
-fetchDatadogCredentials = undefined
+fetchDatadogCredentials
+  :: (MonadUnliftIO m, MonadAWS m) => m (Maybe DD.Credentials)
+fetchDatadogCredentials = do
+  mApiKey <- awsGetParameterValue "/datadog-api-key"
+  mAppKey <- awsGetParameterValue "/datadog-app-key"
+
+  pure $ case (mApiKey, mAppKey) of
+    (Nothing, _) -> Nothing
+    (Just apiKey, Nothing) -> Just $ DD.CredentialsWrite apiKey
+    (Just apiKey, Just appKey) -> Just $ DD.CredentialsReadWrite apiKey appKey
