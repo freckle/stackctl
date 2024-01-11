@@ -17,6 +17,7 @@ import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
 import Network.Datadog
 import Network.Datadog.Types
+import Stackctl.AWS.CloudFormation (StackName (..))
 import Stackctl.Telemetry
 import System.Process.Typed
 import UnliftIO.Environment (lookupEnv)
@@ -101,7 +102,7 @@ readWriteToKeys ReadWrite {..} =
 deploymentToEventSpec :: DatadogTags -> Deployment -> EventSpec
 deploymentToEventSpec ddTags Deployment {..} =
   EventSpec
-    { eventSpecTitle = "Stackctl Deployment"
+    { eventSpecTitle = "Stackctl Deployment of " <> stackName
     , eventSpecText =
         case deploymentResult of
           DeploymentNoChange -> "Deployment skipped due to no changes."
@@ -131,9 +132,11 @@ deploymentToEventSpec ddTags Deployment {..} =
     , eventSpecSourceType = Just User
     }
  where
+  stackName = unStackName deploymentStack
   eventTags =
     datadogTagsFromList
-      [
+      [ ("stack", stackName)
+      ,
         ( "conclusion"
         , case deploymentResult of
             DeploymentNoChange -> "no_change"

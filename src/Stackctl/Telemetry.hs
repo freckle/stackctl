@@ -13,9 +13,11 @@ module Stackctl.Telemetry
 import Stackctl.Prelude
 
 import Data.Time (UTCTime, getCurrentTime)
+import Stackctl.AWS.CloudFormation (StackName)
 
 data Deployment = Deployment
-  { deploymentStartedAt :: UTCTime
+  { deploymentStack :: StackName
+  , deploymentStartedAt :: UTCTime
   , deploymentResult :: DeploymentResult
   }
 
@@ -35,29 +37,33 @@ newtype NoTelemetry m a = NoTelemetry
 instance Monad m => MonadTelemetry (NoTelemetry m) where
   recordDeployment _ = pure ()
 
-recordDeploymentNoChange :: MonadTelemetry m => UTCTime -> m ()
-recordDeploymentNoChange deploymentStartedAt =
+recordDeploymentNoChange :: MonadTelemetry m => StackName -> UTCTime -> m ()
+recordDeploymentNoChange deploymentStack deploymentStartedAt =
   recordDeployment
     Deployment
-      { deploymentStartedAt
+      { deploymentStack
+      , deploymentStartedAt
       , deploymentResult = DeploymentNoChange
       }
 
-recordDeploymentSucceeded :: (MonadIO m, MonadTelemetry m) => UTCTime -> m ()
-recordDeploymentSucceeded deploymentStartedAt = do
+recordDeploymentSucceeded
+  :: (MonadIO m, MonadTelemetry m) => StackName -> UTCTime -> m ()
+recordDeploymentSucceeded deploymentStack deploymentStartedAt = do
   now <- liftIO getCurrentTime
   recordDeployment
     Deployment
-      { deploymentStartedAt
+      { deploymentStack
+      , deploymentStartedAt
       , deploymentResult = DeploymentSucceeded now
       }
 
 recordDeploymentFailed
-  :: (MonadIO m, MonadTelemetry m) => UTCTime -> String -> m ()
-recordDeploymentFailed deploymentStartedAt err = do
+  :: (MonadIO m, MonadTelemetry m) => StackName -> UTCTime -> String -> m ()
+recordDeploymentFailed deploymentStack deploymentStartedAt err = do
   now <- liftIO getCurrentTime
   recordDeployment
     Deployment
-      { deploymentStartedAt
+      { deploymentStack
+      , deploymentStartedAt
       , deploymentResult = DeploymentFailed now err
       }

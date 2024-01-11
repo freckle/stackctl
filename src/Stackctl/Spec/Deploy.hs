@@ -95,6 +95,7 @@ runDeploy DeployOptions {..} = do
     traverse_ (deleteRemovedStack sdoDeployConfirmation) removed
 
   forEachSpec_ $ \spec -> do
+    let stackName = stackSpecStackName spec
     withThreadContext ["stackName" .= stackSpecStackName spec] $ do
       checkIfStackRequiresDeletion sdoDeployConfirmation
         $ stackSpecStackName spec
@@ -108,10 +109,8 @@ runDeploy DeployOptions {..} = do
         Right Nothing -> do
           logInfo "Stack is up to date"
           startedAt <- liftIO getCurrentTime
-          recordDeploymentNoChange startedAt
+          recordDeploymentNoChange stackName startedAt
         Right (Just changeSet) -> do
-          let stackName = stackSpecStackName spec
-
           for_ sdoSaveChangeSets $ \dir -> do
             let out = dir </> unpack (unStackName stackName) <.> "json"
             logInfo $ "Recording changeset" :# ["path" .= out]
@@ -229,10 +228,12 @@ deployChangeSet confirmation changeSet = do
   let
     onSuccess = do
       logInfo $ prettyStackDeployResult result :# []
-      recordDeploymentSucceeded startedAt
+      recordDeploymentSucceeded stackName startedAt
     onFailure = do
       logError $ prettyStackDeployResult result :# []
-      recordDeploymentFailed startedAt $ unpack $ prettyStackDeployResult result
+      recordDeploymentFailed stackName startedAt
+        $ unpack
+        $ prettyStackDeployResult result
       exitFailure
 
   case result of

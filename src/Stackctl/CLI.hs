@@ -158,7 +158,7 @@ fetchDatadogCredentials = do
   mAppKey <- awsGetParameterValue "/datadog-app-key"
 
   let
-    readWrite = DD.readWriteCredentials <$> mApiKey <*> mAppKey
+    readWrite = DD.readWriteCredentials <$> mAppKey <*> mApiKey
     writeOnly = DD.writeCredentials <$> mApiKey
 
   pure
