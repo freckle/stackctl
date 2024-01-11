@@ -9,7 +9,7 @@ where
 
 import Stackctl.Prelude
 
-import Data.ByteString.Char8 as BS8
+import qualified Data.ByteString.Char8 as BS8
 import Network.Datadog
 import Network.Datadog.Types
 import Stackctl.Telemetry
@@ -67,8 +67,20 @@ readWriteToKeys ReadWrite {..} =
 deploymentToEventSpec :: Deployment -> EventSpec
 deploymentToEventSpec Deployment {..} =
   EventSpec
-    { eventSpecTitle = "TODO"
-    , eventSpecText = "TODO"
+    { eventSpecTitle = "Stackctl Deployment"
+    , eventSpecText =
+        case deploymentResult of
+          DeploymentNoChange -> "Deployment skipped due to no changes."
+          DeploymentSucceeded finishedAt ->
+            "Deployment succeeded."
+              <> "Succeeded at: "
+              <> pack (show finishedAt)
+          DeploymentFailed finishedAt err ->
+            "Deployment failed."
+              <> "Failed at: "
+              <> pack (show finishedAt)
+              <> "Error: "
+              <> pack err
     , eventSpecDateHappened = deploymentStartedAt
     , eventSpecPriority =
         case deploymentResult of
