@@ -1,4 +1,3 @@
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Stackctl.Telemetry.Datadog
@@ -39,7 +38,10 @@ newtype DatadogTags = DatadogTags
   deriving newtype (Semigroup, Monoid)
 
 datadogTagsFromList :: [(Text, Text)] -> DatadogTags
-datadogTagsFromList = DatadogTags . map (uncurry KeyValueTag)
+datadogTagsFromList = foldMap (uncurry datadogTag)
+
+datadogTag :: Text -> Text -> DatadogTags
+datadogTag k v = DatadogTags [KeyValueTag k v]
 
 class HasDatadogTags env where
   datadogTagsL :: Lens' env DatadogTags
@@ -141,14 +143,15 @@ deploymentToEventSpec ddTags Deployment {..} =
       ]
 
 getSystemTags :: MonadIO m => m DatadogTags
-getSystemTags =
-  datadogTagsFromList
-    . catMaybes
-    <$> sequence
-      [ fmap (("user",) . pack) <$> lookupEnv "USER"
-      , fmap (("current-directory",) . pack) <$> lookupEnv "PWD"
-      , fmap ("hostname",) <$> chompProcessText "hostname" []
+getSystemTags = do
+  ddTags <-
+    sequence
+      [ maybe mempty (datadogTag "user" . pack) <$> lookupEnv "USER"
+      , maybe mempty (datadogTag "path" . pack) <$> lookupEnv "PWD"
+      , maybe mempty (datadogTag "host") <$> chompProcessText "hostname" []
       ]
+
+  pure $ fold ddTags
 
 chompProcessText :: MonadIO m => String -> [String] -> m (Maybe Text)
 chompProcessText cmd args = do
