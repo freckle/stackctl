@@ -59,31 +59,44 @@ newtype DatadogEvents m a = DatadogEvents
     , Monad
     , MonadIO
     , MonadUnliftIO
+    , MonadLogger
     , MonadReader env
     )
 
 instance
   ( MonadIO m
   , MonadReader env m
+  , MonadLogger m
   , HasDatadogCreds env
   , HasDatadogTags env
   )
   => MonadTelemetry (DatadogEvents m)
   where
   recordDeployment deployment = do
-    ddTags <-
-      (<>)
-        <$> view datadogTagsL
-        <*> getSystemTags
+    result <- withEnvironment $ \env -> do
+      ddTags <-
+        (<>)
+          <$> view datadogTagsL
+          <*> getSystemTags
 
-    withEnvironment $ \env -> do
-      liftIO $ createEvent env $ deploymentToEventSpec ddTags deployment
+      liftIO
+        $ tryAny
+        $ createEvent env
+        $ deploymentToEventSpec ddTags deployment
+
+    case result of
+      Nothing -> pure ()
+      Just (Left ex) ->
+        logWarn
+          $ "Unable to record deployment"
+          :# ["error" .= displayException ex]
+      Just (Right {}) -> pure ()
 
 withEnvironment
   :: (MonadIO m, MonadReader env m, HasDatadogCreds env)
   => (Environment -> m a)
-  -> m ()
-withEnvironment f = traverse_ f =<< credsToEnvironment =<< view datadogCredsL
+  -> m (Maybe a)
+withEnvironment f = traverse f =<< credsToEnvironment =<< view datadogCredsL
 
 credsToEnvironment :: MonadIO m => DatadogCreds -> m (Maybe Environment)
 credsToEnvironment = \case

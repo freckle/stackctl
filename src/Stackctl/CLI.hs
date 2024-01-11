@@ -154,8 +154,8 @@ adjustLogSettings mco v =
 fetchDatadogCredentials
   :: (MonadUnliftIO m, MonadAWS m) => m DatadogCreds
 fetchDatadogCredentials = do
-  mApiKey <- awsGetParameterValue "/datadog-api-key"
   mAppKey <- awsGetParameterValue "/datadog-app-key"
+  mApiKey <- awsGetParameterValue "/datadog-api-key"
 
   let
     readWrite = DD.readWriteCredentials <$> mAppKey <*> mApiKey
