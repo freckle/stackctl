@@ -3,6 +3,9 @@
 module Stackctl.Telemetry.Datadog
   ( DatadogCreds (..)
   , HasDatadogCreds (..)
+  , DatadogTags
+  , datadogTagsFromList
+  , HasDatadogTags (..)
   , ViaDatadog (..)
   )
 where
@@ -25,6 +28,20 @@ class HasDatadogCreds env where
 instance HasDatadogCreds DatadogCreds where
   datadogCredsL = id
 
+newtype DatadogTags = DatadogTags
+  { unDatadogTags :: [Tag]
+  }
+  deriving newtype (Semigroup, Monoid)
+
+datadogTagsFromList :: [(Text, Text)] -> DatadogTags
+datadogTagsFromList = DatadogTags . map (uncurry KeyValueTag)
+
+class HasDatadogTags env where
+  datadogTagsL :: Lens' env DatadogTags
+
+instance HasDatadogTags DatadogTags where
+  datadogTagsL = id
+
 newtype ViaDatadog m a = ViaDatadog
   { unActualDatadog :: m a
   }
@@ -38,11 +55,17 @@ newtype ViaDatadog m a = ViaDatadog
     )
 
 instance
-  (MonadIO m, MonadReader env m, HasDatadogCreds env)
+  ( MonadIO m
+  , MonadReader env m
+  , HasDatadogCreds env
+  , HasDatadogTags env
+  )
   => MonadTelemetry (ViaDatadog m)
   where
-  recordDeployment deployment = withEnvironment $ \env -> do
-    void $ liftIO $ createEvent env $ deploymentToEventSpec deployment
+  recordDeployment deployment = do
+    ddTags <- view datadogTagsL
+    withEnvironment $ \env -> do
+      liftIO $ createEvent env $ deploymentToEventSpec ddTags deployment
 
 withEnvironment
   :: (MonadIO m, MonadReader env m, HasDatadogCreds env)
@@ -64,8 +87,8 @@ readWriteToKeys ReadWrite {..} =
     , appKey = BS8.unpack readWriteApplicationKey
     }
 
-deploymentToEventSpec :: Deployment -> EventSpec
-deploymentToEventSpec Deployment {..} =
+deploymentToEventSpec :: DatadogTags -> Deployment -> EventSpec
+deploymentToEventSpec ddTags Deployment {..} =
   EventSpec
     { eventSpecTitle = "Stackctl Deployment"
     , eventSpecText =
@@ -88,7 +111,7 @@ deploymentToEventSpec Deployment {..} =
           DeploymentSucceeded {} -> NormalPriority
           DeploymentFailed {} -> NormalPriority
     , eventSpecHost = Nothing
-    , eventSpecTags = [] -- TODO
+    , eventSpecTags = unDatadogTags $ ddTags <> eventTags
     , eventSpecAlertType =
         case deploymentResult of
           DeploymentNoChange -> Info
@@ -96,3 +119,14 @@ deploymentToEventSpec Deployment {..} =
           DeploymentFailed {} -> Error
     , eventSpecSourceType = Just User
     }
+ where
+  eventTags =
+    datadogTagsFromList
+      [
+        ( "conclusion"
+        , case deploymentResult of
+            DeploymentNoChange -> "no_change"
+            DeploymentSucceeded {} -> "succeeded"
+            DeploymentFailed {} -> "failed"
+        )
+      ]

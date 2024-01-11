@@ -7,12 +7,19 @@ module Stackctl.Options
 import Stackctl.Prelude
 
 import Data.Semigroup.Generic
+import Data.Version
 import qualified Env
 import Options.Applicative
+import qualified Paths_stackctl as Pkg
 import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
+import Stackctl.Telemetry.Datadog
+  ( DatadogTags
+  , HasDatadogTags (..)
+  , datadogTagsFromList
+  )
 import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
@@ -23,6 +30,7 @@ data Options = Options
   , oVerbose :: Verbosity
   , oAutoSSO :: Maybe AutoSSOOption
   , oTelemetry :: TelemetryOption
+  , oDatadogTags :: DatadogTags
   }
   deriving stock (Generic)
   deriving (Semigroup) via GenericSemigroupMonoid Options
@@ -54,7 +62,8 @@ instance HasAutoSSOOption Options where
 instance HasTelemetryOption Options where
   telemetryOptionL = lens oTelemetry $ \x y -> x {oTelemetry = y}
 
--- brittany-disable-next-binding
+instance HasDatadogTags Options where
+  datadogTagsL = lens oDatadogTags $ \x y -> x {oDatadogTags = y}
 
 envParser :: Env.Parser Env.Error Options
 envParser =
@@ -66,8 +75,7 @@ envParser =
     <*> pure mempty -- use LOG_LEVEL
     <*> optional envAutoSSOOption
     <*> envTelemetryOption
-
--- brittany-disable-next-binding
+    <*> pure defaultDatadogTags
 
 optionsParser :: Parser Options
 optionsParser =
@@ -78,3 +86,11 @@ optionsParser =
     <*> verboseOption
     <*> optional autoSSOOption
     <*> telemetryOption
+    <*> pure defaultDatadogTags
+
+defaultDatadogTags :: DatadogTags
+defaultDatadogTags =
+  datadogTagsFromList
+    [ ("tool-name", "Stackctl")
+    , ("tool-version", pack $ showVersion Pkg.version)
+    ]

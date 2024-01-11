@@ -53,6 +53,9 @@ instance AWS.HasEnv (App options) where
 instance HasDatadogCreds (App options) where
   datadogCredsL = lens appDatadogCreds $ \x y -> x {appDatadogCreds = y}
 
+instance HasDatadogTags options => HasDatadogTags (App options) where
+  datadogTagsL = optionsL . datadogTagsL
+
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
 
