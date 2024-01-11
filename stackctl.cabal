@@ -25,7 +25,6 @@ source-repository head
 
 library
   exposed-modules:
-      Datadog
       Stackctl.Action
       Stackctl.AutoSSO
       Stackctl.AWS
@@ -67,6 +66,7 @@ library
       Stackctl.Subcommand
       Stackctl.TagOption
       Stackctl.Telemetry
+      Stackctl.Telemetry.Datadog
       Stackctl.TelemetryOption
       Stackctl.VerboseOption
       Stackctl.Version
@@ -142,7 +142,6 @@ library
     , transformers
     , typed-process
     , unliftio >=0.2.25.0
-    , unliftio-core
     , unordered-containers
     , uuid
     , yaml

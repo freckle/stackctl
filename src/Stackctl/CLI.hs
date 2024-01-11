@@ -12,8 +12,7 @@ import Control.Monad.AWS as AWS
 import Control.Monad.AWS.ViaReader as AWS
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
-import Datadog (Datadog, HasDatadog (..), mkWithDatadog)
-import qualified Datadog as DD
+import qualified Network.Datadog as DD
 import qualified Stackctl.AWS.Core as AWS
 import Stackctl.AWS.SSM
 import Stackctl.AWS.Scope
@@ -23,6 +22,7 @@ import Stackctl.Config
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Telemetry
+import Stackctl.Telemetry.Datadog
 import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
@@ -32,7 +32,7 @@ data App options = App
   , appOptions :: options
   , appAwsScope :: AwsScope
   , appAwsEnv :: AWS.Env
-  , appDatadog :: Datadog
+  , appDatadogCreds :: DatadogCreds
   }
 
 optionsL :: Lens' (App options) options
@@ -50,8 +50,8 @@ instance HasAwsScope (App options) where
 instance AWS.HasEnv (App options) where
   envL = lens appAwsEnv $ \x y -> x {appAwsEnv = y}
 
-instance HasDatadog (App options) where
-  datadogL = lens appDatadog $ \x y -> x {appDatadog = y}
+instance HasDatadogCreds (App options) where
+  datadogCredsL = lens appDatadogCreds $ \x y -> x {appDatadogCreds = y}
 
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
@@ -88,9 +88,7 @@ newtype AppT app m a = AppT
     , MonadMask
     )
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
-
-instance MonadIO m => MonadTelemetry (AppT (App options) m) where
-  recordDeployment _ = pure () -- TODO
+  deriving (MonadTelemetry) via (ViaDatadog (AppT app m))
 
 runAppT
   :: ( MonadMask m
@@ -117,36 +115,33 @@ runAppT options f = do
         (options ^. verboseOptionL)
         envLogSettings
 
-  runResourceT $ runLoggerLoggingT logger $ do
+  app <- runResourceT $ runLoggerLoggingT logger $ do
     aws <- runReaderT (handleAutoSSO options AWS.discover) logger
+    ddcreds <- case options ^. telemetryOptionL of
+      TelemetryDisabled -> pure DatadogCredsNone
+      TelemetryEnabled -> AWS.runEnvT fetchDatadogCredentials aws
 
-    withDatadog <- case options ^. telemetryOptionL of
-      TelemetryDisabled -> pure $ mkWithDatadog Nothing
-      TelemetryEnabled -> do
-        mcreds <- AWS.runEnvT fetchDatadogCredentials aws
-        pure $ mkWithDatadog mcreds
+    App logger
+      <$> loadConfigOrExit
+      <*> pure options
+      <*> AWS.runEnvT fetchAwsScope aws
+      <*> pure aws
+      <*> pure ddcreds
 
-    withDatadog $ \dd -> do
-      app <-
-        App logger
-          <$> loadConfigOrExit
-          <*> pure options
-          <*> AWS.runEnvT fetchAwsScope aws
-          <*> pure aws
-          <*> pure dd
+  let
+    AwsScope {..} = appAwsScope app
 
-      let
-        AwsScope {..} = appAwsScope app
+    context =
+      [ "region" .= awsRegion
+      , "accountId" .= awsAccountId
+      , "accountName" .= awsAccountName
+      ]
 
-        context =
-          [ "region" .= awsRegion
-          , "accountId" .= awsAccountId
-          , "accountName" .= awsAccountName
-          ]
-
-      flip runReaderT app
-        $ withThreadContext context
-        $ unAppT f
+  runResourceT
+    $ runLoggerLoggingT app
+    $ flip runReaderT app
+    $ withThreadContext context
+    $ unAppT f
 
 adjustLogSettings
   :: Maybe ColorOption -> Verbosity -> LogSettings -> LogSettings
@@ -154,12 +149,14 @@ adjustLogSettings mco v =
   maybe id (setLogSettingsColor . unColorOption) mco . verbositySetLogLevels v
 
 fetchDatadogCredentials
-  :: (MonadUnliftIO m, MonadAWS m) => m (Maybe DD.Credentials)
+  :: (MonadUnliftIO m, MonadAWS m) => m DatadogCreds
 fetchDatadogCredentials = do
   mApiKey <- awsGetParameterValue "/datadog-api-key"
   mAppKey <- awsGetParameterValue "/datadog-app-key"
 
-  pure $ case (mApiKey, mAppKey) of
-    (Nothing, _) -> Nothing
-    (Just apiKey, Nothing) -> Just $ DD.CredentialsWrite apiKey
-    (Just apiKey, Just appKey) -> Just $ DD.CredentialsReadWrite apiKey appKey
+  pure
+    $ fromMaybe DatadogCredsNone
+    $ asum
+      [ fmap DatadogCredsReadWrite $ DD.readWriteCredentials <$> mApiKey <*> mAppKey
+      , DatadogCredsWrite . DD.writeCredentials <$> mApiKey
+      ]
