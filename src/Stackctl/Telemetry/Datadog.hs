@@ -85,7 +85,7 @@ withEnvironment f = traverse_ f =<< credsToEnvironment =<< view datadogCredsL
 credsToEnvironment :: MonadIO m => DatadogCreds -> m (Maybe Environment)
 credsToEnvironment = \case
   DatadogCredsNone -> pure Nothing
-  DatadogCredsWriteOnly _r -> pure Nothing -- unsupported
+  DatadogCredsWriteOnly _r -> pure Nothing -- can't create events with this
   DatadogCredsReadWrite rw ->
     fmap Just $ liftIO $ createEnvironment $ readWriteToKeys rw
 
