@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Stackctl.Telemetry.Datadog
@@ -13,9 +14,13 @@ where
 import Stackctl.Prelude
 
 import qualified Data.ByteString.Char8 as BS8
+import qualified Data.ByteString.Lazy as BSL
+import qualified Data.Text as T
 import Network.Datadog
 import Network.Datadog.Types
 import Stackctl.Telemetry
+import System.Process.Typed
+import UnliftIO.Environment (lookupEnv)
 
 data DatadogCreds
   = DatadogCredsNone
@@ -63,7 +68,11 @@ instance
   => MonadTelemetry (ViaDatadog m)
   where
   recordDeployment deployment = do
-    ddTags <- view datadogTagsL
+    ddTags <-
+      (<>)
+        <$> view datadogTagsL
+        <*> getSystemTags
+
     withEnvironment $ \env -> do
       liftIO $ createEvent env $ deploymentToEventSpec ddTags deployment
 
@@ -130,3 +139,18 @@ deploymentToEventSpec ddTags Deployment {..} =
             DeploymentFailed {} -> "failed"
         )
       ]
+
+getSystemTags :: MonadIO m => m DatadogTags
+getSystemTags =
+  datadogTagsFromList
+    . catMaybes
+    <$> sequence
+      [ fmap (("user",) . pack) <$> lookupEnv "USER"
+      , fmap (("current-directory",) . pack) <$> lookupEnv "PWD"
+      , fmap ("hostname",) <$> chompProcessText "hostname" []
+      ]
+
+chompProcessText :: MonadIO m => String -> [String] -> m (Maybe Text)
+chompProcessText cmd args = do
+  (_ec, out, _err) <- readProcess $ proc cmd args
+  pure $ Just $ T.dropWhileEnd (== '\n') $ decodeUtf8 $ BSL.toStrict out
