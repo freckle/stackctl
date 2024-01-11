@@ -16,7 +16,7 @@ import Stackctl.Telemetry
 
 data DatadogCreds
   = DatadogCredsNone
-  | DatadogCredsWrite Write
+  | DatadogCredsWriteOnly Write
   | DatadogCredsReadWrite ReadWrite
 
 class HasDatadogCreds env where
@@ -53,7 +53,7 @@ withEnvironment f = traverse_ f =<< credsToEnvironment =<< view datadogCredsL
 credsToEnvironment :: MonadIO m => DatadogCreds -> m (Maybe Environment)
 credsToEnvironment = \case
   DatadogCredsNone -> pure Nothing
-  DatadogCredsWrite _r -> pure Nothing -- unsupported
+  DatadogCredsWriteOnly _r -> pure Nothing -- unsupported
   DatadogCredsReadWrite rw ->
     fmap Just $ liftIO $ createEnvironment $ readWriteToKeys rw
 
@@ -65,4 +65,22 @@ readWriteToKeys ReadWrite {..} =
     }
 
 deploymentToEventSpec :: Deployment -> EventSpec
-deploymentToEventSpec = undefined
+deploymentToEventSpec Deployment {..} =
+  EventSpec
+    { eventSpecTitle = "TODO"
+    , eventSpecText = "TODO"
+    , eventSpecDateHappened = deploymentStartedAt
+    , eventSpecPriority =
+        case deploymentResult of
+          DeploymentNoChange -> LowPriority
+          DeploymentSucceeded {} -> NormalPriority
+          DeploymentFailed {} -> NormalPriority
+    , eventSpecHost = Nothing
+    , eventSpecTags = [] -- TODO
+    , eventSpecAlertType =
+        case deploymentResult of
+          DeploymentNoChange -> Info
+          DeploymentSucceeded {} -> Success
+          DeploymentFailed {} -> Error
+    , eventSpecSourceType = Just User
+    }

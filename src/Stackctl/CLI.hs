@@ -154,9 +154,13 @@ fetchDatadogCredentials = do
   mApiKey <- awsGetParameterValue "/datadog-api-key"
   mAppKey <- awsGetParameterValue "/datadog-app-key"
 
+  let
+    readWrite = DD.readWriteCredentials <$> mApiKey <*> mAppKey
+    writeOnly = DD.writeCredentials <$> mApiKey
+
   pure
     $ fromMaybe DatadogCredsNone
     $ asum
-      [ fmap DatadogCredsReadWrite $ DD.readWriteCredentials <$> mApiKey <*> mAppKey
-      , DatadogCredsWrite . DD.writeCredentials <$> mApiKey
+      [ DatadogCredsReadWrite <$> readWrite
+      , DatadogCredsWriteOnly <$> writeOnly
       ]
