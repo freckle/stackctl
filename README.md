@@ -76,6 +76,23 @@ Once installed, see:
 The man pages are also available [online](https://freckle.github.io/stackctl/),
 but contain documentation as of `main`, and not your installed version.
 
+## Telemetry
+
+Stackctl can report deployments to a Datadog Events stream. This is useful to
+understand Stackctl usage across your organization, for example to know what
+versions of `stackctl` any given application is deployed with.
+
+Stackctl telemetry is only active if it can find the following Datadog
+credentials as SSM Parameters in the currently-active AWS account and region:
+
+- `/datadog-app-key`
+- `/datadog-api-key`
+
+As this is unlikely to be the case, telemetry is not typically active for most
+users of Stackctl. However, the `--no-telemetry` option or
+`STACKTCL_NO_TELEMETRY=1` environment variable can also be used to explicitly
+disable it.
+
 ## Relationship to CloudGenesis
 
 [CloudGenesis][] is a project that also takes a directory of Stack

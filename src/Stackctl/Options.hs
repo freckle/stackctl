@@ -7,6 +7,7 @@ module Stackctl.Options
 import Stackctl.Prelude
 
 import Data.Semigroup.Generic
+import qualified Data.Text as T
 import Data.Version
 import qualified Env
 import Options.Applicative
@@ -83,7 +84,25 @@ optionsParser =
     <*> verboseOption
     <*> optional autoSSOOption
     <*> telemetryOption
-    <*> pure defaultTelemetryTags
+    <*> ( (defaultTelemetryTags <>)
+            . fold
+            <$> many
+              ( option (eitherReader readTelemetryTag)
+                  $ mconcat
+                    [ long "telemetry-tag"
+                    , help "TODO"
+                    , metavar "KEY=VALUE"
+                    ]
+              )
+        )
+
+readTelemetryTag :: String -> Either String TelemetryTags
+readTelemetryTag s = case T.splitOn "=" $ pack s of
+  [k, v]
+    | not $ T.null k
+    , not $ T.null v ->
+        Right $ TelemetryTags.singleton k v
+  _ -> Left "Invalid telemetry tag, must be KEY=VALUE"
 
 defaultTelemetryTags :: TelemetryTags
 defaultTelemetryTags =
