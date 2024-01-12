@@ -15,11 +15,8 @@ import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
-import Stackctl.Telemetry.Datadog
-  ( DatadogTags
-  , HasDatadogTags (..)
-  , datadogTagsFromList
-  )
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..), TelemetryTags)
+import qualified Stackctl.Telemetry.Tags as TelemetryTags
 import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
@@ -30,7 +27,7 @@ data Options = Options
   , oVerbose :: Verbosity
   , oAutoSSO :: Maybe AutoSSOOption
   , oTelemetry :: TelemetryOption
-  , oDatadogTags :: DatadogTags
+  , oTelemetryTags :: TelemetryTags
   }
   deriving stock (Generic)
   deriving (Semigroup) via GenericSemigroupMonoid Options
@@ -62,8 +59,8 @@ instance HasAutoSSOOption Options where
 instance HasTelemetryOption Options where
   telemetryOptionL = lens oTelemetry $ \x y -> x {oTelemetry = y}
 
-instance HasDatadogTags Options where
-  datadogTagsL = lens oDatadogTags $ \x y -> x {oDatadogTags = y}
+instance HasTelemetryTags Options where
+  telemetryTagsL = lens oTelemetryTags $ \x y -> x {oTelemetryTags = y}
 
 envParser :: Env.Parser Env.Error Options
 envParser =
@@ -75,7 +72,7 @@ envParser =
     <*> pure mempty -- use LOG_LEVEL
     <*> optional envAutoSSOOption
     <*> envTelemetryOption
-    <*> pure defaultDatadogTags
+    <*> pure defaultTelemetryTags
 
 optionsParser :: Parser Options
 optionsParser =
@@ -86,11 +83,11 @@ optionsParser =
     <*> verboseOption
     <*> optional autoSSOOption
     <*> telemetryOption
-    <*> pure defaultDatadogTags
+    <*> pure defaultTelemetryTags
 
-defaultDatadogTags :: DatadogTags
-defaultDatadogTags =
-  datadogTagsFromList
+defaultTelemetryTags :: TelemetryTags
+defaultTelemetryTags =
+  TelemetryTags.fromList
     [ ("tool-name", "Stackctl")
     , ("tool-version", pack $ showVersion Pkg.version)
     ]

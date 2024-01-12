@@ -67,6 +67,7 @@ library
       Stackctl.TagOption
       Stackctl.Telemetry
       Stackctl.Telemetry.Datadog
+      Stackctl.Telemetry.Tags
       Stackctl.TelemetryOption
       Stackctl.VerboseOption
       Stackctl.Version

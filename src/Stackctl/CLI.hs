@@ -23,6 +23,7 @@ import Stackctl.DirectoryOption
 import Stackctl.FilterOption
 import Stackctl.Telemetry
 import Stackctl.Telemetry.Datadog
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..))
 import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
@@ -53,8 +54,8 @@ instance AWS.HasEnv (App options) where
 instance HasDatadogCreds (App options) where
   datadogCredsL = lens appDatadogCreds $ \x y -> x {appDatadogCreds = y}
 
-instance HasDatadogTags options => HasDatadogTags (App options) where
-  datadogTagsL = optionsL . datadogTagsL
+instance HasTelemetryTags options => HasTelemetryTags (App options) where
+  telemetryTagsL = optionsL . telemetryTagsL
 
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL

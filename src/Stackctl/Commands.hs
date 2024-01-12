@@ -14,7 +14,7 @@ import Stackctl.Spec.Changes
 import Stackctl.Spec.Deploy
 import Stackctl.Spec.List
 import Stackctl.Subcommand
-import Stackctl.Telemetry.Datadog
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..))
 import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 import Stackctl.Version
@@ -76,7 +76,7 @@ deploy
      , HasFilterOption options
      , HasAutoSSOOption options
      , HasTelemetryOption options
-     , HasDatadogTags options
+     , HasTelemetryTags options
      )
   => Subcommand options DeployOptions
 deploy =

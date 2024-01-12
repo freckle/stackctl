@@ -3,9 +3,6 @@
 module Stackctl.Telemetry.Datadog
   ( DatadogCreds (..)
   , HasDatadogCreds (..)
-  , DatadogTags
-  , datadogTagsFromList
-  , HasDatadogTags (..)
   , DatadogEvents (..)
   )
 where
@@ -13,14 +10,12 @@ where
 import Stackctl.Prelude
 
 import qualified Data.ByteString.Char8 as BS8
-import qualified Data.ByteString.Lazy as BSL
-import qualified Data.Text as T
 import Network.Datadog
 import Network.Datadog.Types
 import Stackctl.AWS.CloudFormation (StackName (..))
 import Stackctl.Telemetry
-import System.Process.Typed
-import UnliftIO.Environment (lookupEnv)
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..), TelemetryTags)
+import qualified Stackctl.Telemetry.Tags as TelemetryTags
 
 data DatadogCreds
   = DatadogCredsNone
@@ -32,23 +27,6 @@ class HasDatadogCreds env where
 
 instance HasDatadogCreds DatadogCreds where
   datadogCredsL = id
-
-newtype DatadogTags = DatadogTags
-  { unDatadogTags :: [Tag]
-  }
-  deriving newtype (Semigroup, Monoid)
-
-datadogTagsFromList :: [(Text, Text)] -> DatadogTags
-datadogTagsFromList = foldMap (uncurry datadogTag)
-
-datadogTag :: Text -> Text -> DatadogTags
-datadogTag k v = DatadogTags [KeyValueTag k v]
-
-class HasDatadogTags env where
-  datadogTagsL :: Lens' env DatadogTags
-
-instance HasDatadogTags DatadogTags where
-  datadogTagsL = id
 
 newtype DatadogEvents m a = DatadogEvents
   { unActualDatadog :: m a
@@ -67,22 +45,19 @@ instance
   ( MonadIO m
   , MonadReader env m
   , MonadLogger m
+  , HasTelemetryTags env
   , HasDatadogCreds env
-  , HasDatadogTags env
   )
   => MonadTelemetry (DatadogEvents m)
   where
   recordDeployment deployment = do
     result <- withEnvironment $ \env -> do
-      ddTags <-
-        (<>)
-          <$> view datadogTagsL
-          <*> getSystemTags
+      tTags <- view telemetryTagsL
 
       liftIO
         $ tryAny
         $ createEvent env
-        $ deploymentToEventSpec ddTags deployment
+        $ deploymentToEventSpec tTags deployment
 
     case result of
       Nothing -> pure ()
@@ -112,8 +87,8 @@ readWriteToKeys ReadWrite {..} =
     , appKey = BS8.unpack readWriteApplicationKey
     }
 
-deploymentToEventSpec :: DatadogTags -> Deployment -> EventSpec
-deploymentToEventSpec ddTags Deployment {..} =
+deploymentToEventSpec :: TelemetryTags -> Deployment -> EventSpec
+deploymentToEventSpec tTags Deployment {..} =
   EventSpec
     { eventSpecTitle = "Stackctl Deployment of " <> stackName
     , eventSpecText =
@@ -136,7 +111,7 @@ deploymentToEventSpec ddTags Deployment {..} =
           DeploymentSucceeded {} -> NormalPriority
           DeploymentFailed {} -> NormalPriority
     , eventSpecHost = Nothing
-    , eventSpecTags = unDatadogTags $ ddTags <> eventTags
+    , eventSpecTags = TelemetryTags.toDatadog $ tTags <> eventTags
     , eventSpecAlertType =
         case deploymentResult of
           DeploymentNoChange -> Info
@@ -147,7 +122,7 @@ deploymentToEventSpec ddTags Deployment {..} =
  where
   stackName = unStackName deploymentStack
   eventTags =
-    datadogTagsFromList
+    TelemetryTags.fromList
       [ ("stack", stackName)
       ,
         ( "conclusion"
@@ -157,19 +132,3 @@ deploymentToEventSpec ddTags Deployment {..} =
             DeploymentFailed {} -> "failed"
         )
       ]
-
-getSystemTags :: MonadIO m => m DatadogTags
-getSystemTags = do
-  ddTags <-
-    sequence
-      [ maybe mempty (datadogTag "user" . pack) <$> lookupEnv "USER"
-      , maybe mempty (datadogTag "path" . pack) <$> lookupEnv "PWD"
-      , maybe mempty (datadogTag "host") <$> chompProcessText "hostname" []
-      ]
-
-  pure $ fold ddTags
-
-chompProcessText :: MonadIO m => String -> [String] -> m (Maybe Text)
-chompProcessText cmd args = do
-  (_ec, out, _err) <- readProcess $ proc cmd args
-  pure $ Just $ T.dropWhileEnd (== '\n') $ decodeUtf8 $ BSL.toStrict out
