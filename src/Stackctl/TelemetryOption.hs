@@ -20,7 +20,14 @@ class HasTelemetryOption env where
   telemetryOptionL :: Lens' env TelemetryOption
 
 envTelemetryOption :: Env.Parser Env.Error TelemetryOption
-envTelemetryOption = pure TelemetryEnabled -- TODO
+envTelemetryOption =
+  Env.flag TelemetryEnabled TelemetryDisabled "NO_TELEMETRY"
+    $ Env.help "Disable recording telemetry about deployments"
 
 telemetryOption :: Parser TelemetryOption
-telemetryOption = pure TelemetryEnabled -- TODO
+telemetryOption =
+  flag TelemetryEnabled TelemetryDisabled
+    $ mconcat
+      [ long "no-telemetry"
+      , help "Disable recording telemetry about deployments"
+      ]
