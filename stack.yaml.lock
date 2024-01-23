@@ -75,6 +75,13 @@ packages:
   original:
     hackage: amazonka-lambda-2.0
 - completed:
+    hackage: amazonka-ssm-2.0@sha256:10fcda6b828a14d8b8b5e9434057dc0047f09ca4d8b52a8a4cde66fbfe476f74,18834
+    pantry-tree:
+      sha256: 71383437e566c3839c1618f6683c1b46035b53497aee4d045543c992f7e6921b
+      size: 54871
+  original:
+    hackage: amazonka-ssm-2.0
+- completed:
     hackage: amazonka-sso-2.0@sha256:902be13b604e4a3b51a9b8e1adc6a32f42322ae11f738a72a8c737b2d0a91a5e,2995
     pantry-tree:
       sha256: f87dd959a78bf54295bd6f8c7da58f7f8f860251d5548ecb05ab758e03cba50b

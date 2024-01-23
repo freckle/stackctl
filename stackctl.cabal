@@ -34,6 +34,7 @@ library
       Stackctl.AWS.Lambda
       Stackctl.AWS.Orphans
       Stackctl.AWS.Scope
+      Stackctl.AWS.SSM
       Stackctl.AWS.STS
       Stackctl.CLI
       Stackctl.ColorOption
@@ -64,6 +65,10 @@ library
       Stackctl.StackSpecYaml
       Stackctl.Subcommand
       Stackctl.TagOption
+      Stackctl.Telemetry
+      Stackctl.Telemetry.Datadog
+      Stackctl.Telemetry.Tags
+      Stackctl.TelemetryOption
       Stackctl.VerboseOption
       Stackctl.Version
   other-modules:
@@ -110,6 +115,7 @@ library
     , amazonka-ec2 >=2.0
     , amazonka-lambda >=2.0
     , amazonka-mtl
+    , amazonka-ssm >=2.0
     , amazonka-sso >=2.0
     , amazonka-sts >=2.0
     , base ==4.*
@@ -117,6 +123,7 @@ library
     , cfn-flip >=0.1.0.3
     , conduit
     , containers
+    , datadog
     , envparse
     , errors
     , exceptions

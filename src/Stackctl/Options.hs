@@ -7,12 +7,18 @@ module Stackctl.Options
 import Stackctl.Prelude
 
 import Data.Semigroup.Generic
+import qualified Data.Text as T
+import Data.Version
 import qualified Env
 import Options.Applicative
+import qualified Paths_stackctl as Pkg
 import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..), TelemetryTags)
+import qualified Stackctl.Telemetry.Tags as TelemetryTags
+import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
 data Options = Options
@@ -21,6 +27,8 @@ data Options = Options
   , oColor :: Maybe ColorOption
   , oVerbose :: Verbosity
   , oAutoSSO :: Maybe AutoSSOOption
+  , oTelemetry :: TelemetryOption
+  , oTelemetryTags :: TelemetryTags
   }
   deriving stock (Generic)
   deriving (Semigroup) via GenericSemigroupMonoid Options
@@ -49,7 +57,11 @@ instance HasVerboseOption Options where
 instance HasAutoSSOOption Options where
   autoSSOOptionL = autoSSOL . maybeLens defaultAutoSSOOption
 
--- brittany-disable-next-binding
+instance HasTelemetryOption Options where
+  telemetryOptionL = lens oTelemetry $ \x y -> x {oTelemetry = y}
+
+instance HasTelemetryTags Options where
+  telemetryTagsL = lens oTelemetryTags $ \x y -> x {oTelemetryTags = y}
 
 envParser :: Env.Parser Env.Error Options
 envParser =
@@ -60,8 +72,8 @@ envParser =
     <*> pure mempty -- use LOG_COLOR
     <*> pure mempty -- use LOG_LEVEL
     <*> optional envAutoSSOOption
-
--- brittany-disable-next-binding
+    <*> envTelemetryOption
+    <*> pure defaultTelemetryTags
 
 optionsParser :: Parser Options
 optionsParser =
@@ -71,3 +83,30 @@ optionsParser =
     <*> optional colorOption
     <*> verboseOption
     <*> optional autoSSOOption
+    <*> telemetryOption
+    <*> ( (defaultTelemetryTags <>)
+            . fold
+            <$> many
+              ( option (eitherReader readTelemetryTag)
+                  $ mconcat
+                    [ long "telemetry-tag"
+                    , help "TODO"
+                    , metavar "KEY=VALUE"
+                    ]
+              )
+        )
+
+readTelemetryTag :: String -> Either String TelemetryTags
+readTelemetryTag s = case T.splitOn "=" $ pack s of
+  [k, v]
+    | not $ T.null k
+    , not $ T.null v ->
+        Right $ TelemetryTags.singleton k v
+  _ -> Left "Invalid telemetry tag, must be KEY=VALUE"
+
+defaultTelemetryTags :: TelemetryTags
+defaultTelemetryTags =
+  TelemetryTags.fromList
+    [ ("tool-name", "Stackctl")
+    , ("tool-version", pack $ showVersion Pkg.version)
+    ]

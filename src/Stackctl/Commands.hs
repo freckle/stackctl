@@ -14,6 +14,8 @@ import Stackctl.Spec.Changes
 import Stackctl.Spec.Deploy
 import Stackctl.Spec.List
 import Stackctl.Subcommand
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..))
+import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 import Stackctl.Version
 
@@ -23,6 +25,7 @@ cat
      , HasDirectoryOption options
      , HasFilterOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => Subcommand options CatOptions
 cat =
@@ -38,6 +41,7 @@ capture
      , HasVerboseOption options
      , HasDirectoryOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => Subcommand options CaptureOptions
 capture =
@@ -54,6 +58,7 @@ changes
      , HasDirectoryOption options
      , HasFilterOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => Subcommand options ChangesOptions
 changes =
@@ -70,6 +75,8 @@ deploy
      , HasDirectoryOption options
      , HasFilterOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
+     , HasTelemetryTags options
      )
   => Subcommand options DeployOptions
 deploy =
@@ -86,6 +93,7 @@ list
      , HasDirectoryOption options
      , HasFilterOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => Subcommand options ListOptions
 list =

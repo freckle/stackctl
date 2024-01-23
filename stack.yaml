@@ -12,6 +12,7 @@ extra-deps:
   - amazonka-ec2-2.0
   - amazonka-ecr-2.0
   - amazonka-lambda-2.0
+  - amazonka-ssm-2.0
   - amazonka-sso-2.0
   - amazonka-sts-2.0
   - amazonka-mtl-0.1.1.0

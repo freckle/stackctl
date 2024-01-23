@@ -12,13 +12,19 @@ import Control.Monad.AWS as AWS
 import Control.Monad.AWS.ViaReader as AWS
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
+import qualified Network.Datadog as DD
 import qualified Stackctl.AWS.Core as AWS
+import Stackctl.AWS.SSM
 import Stackctl.AWS.Scope
 import Stackctl.AutoSSO
 import Stackctl.ColorOption
 import Stackctl.Config
 import Stackctl.DirectoryOption
 import Stackctl.FilterOption
+import Stackctl.Telemetry
+import Stackctl.Telemetry.Datadog
+import Stackctl.Telemetry.Tags (HasTelemetryTags (..))
+import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
 data App options = App
@@ -27,6 +33,7 @@ data App options = App
   , appOptions :: options
   , appAwsScope :: AwsScope
   , appAwsEnv :: AWS.Env
+  , appDatadogCreds :: DatadogCreds
   }
 
 optionsL :: Lens' (App options) options
@@ -44,6 +51,12 @@ instance HasAwsScope (App options) where
 instance AWS.HasEnv (App options) where
   envL = lens appAwsEnv $ \x y -> x {appAwsEnv = y}
 
+instance HasDatadogCreds (App options) where
+  datadogCredsL = lens appDatadogCreds $ \x y -> x {appDatadogCreds = y}
+
+instance HasTelemetryTags options => HasTelemetryTags (App options) where
+  telemetryTagsL = optionsL . telemetryTagsL
+
 instance HasDirectoryOption options => HasDirectoryOption (App options) where
   directoryOptionL = optionsL . directoryOptionL
 
@@ -58,6 +71,9 @@ instance HasVerboseOption options => HasVerboseOption (App options) where
 
 instance HasAutoSSOOption options => HasAutoSSOOption (App options) where
   autoSSOOptionL = optionsL . autoSSOOptionL
+
+instance HasTelemetryOption options => HasTelemetryOption (App options) where
+  telemetryOptionL = optionsL . telemetryOptionL
 
 newtype AppT app m a = AppT
   { unAppT :: ReaderT app (LoggingT (ResourceT m)) a
@@ -76,6 +92,7 @@ newtype AppT app m a = AppT
     , MonadMask
     )
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
+  deriving (MonadTelemetry) via (DatadogEvents (AppT app m))
 
 runAppT
   :: ( MonadMask m
@@ -83,6 +100,7 @@ runAppT
      , HasColorOption options
      , HasVerboseOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => options
   -> AppT (App options) m a
@@ -103,12 +121,16 @@ runAppT options f = do
 
   app <- runResourceT $ runLoggerLoggingT logger $ do
     aws <- runReaderT (handleAutoSSO options AWS.discover) logger
+    ddcreds <- case options ^. telemetryOptionL of
+      TelemetryDisabled -> pure DatadogCredsNone
+      TelemetryEnabled -> AWS.runEnvT fetchDatadogCredentials aws
 
     App logger
       <$> loadConfigOrExit
       <*> pure options
       <*> AWS.runEnvT fetchAwsScope aws
       <*> pure aws
+      <*> pure ddcreds
 
   let
     AwsScope {..} = appAwsScope app
@@ -129,3 +151,20 @@ adjustLogSettings
   :: Maybe ColorOption -> Verbosity -> LogSettings -> LogSettings
 adjustLogSettings mco v =
   maybe id (setLogSettingsColor . unColorOption) mco . verbositySetLogLevels v
+
+fetchDatadogCredentials
+  :: (MonadUnliftIO m, MonadAWS m) => m DatadogCreds
+fetchDatadogCredentials = do
+  mAppKey <- awsGetParameterValue "/datadog-app-key"
+  mApiKey <- awsGetParameterValue "/datadog-api-key"
+
+  let
+    readWrite = DD.readWriteCredentials <$> mAppKey <*> mApiKey
+    writeOnly = DD.writeCredentials <$> mApiKey
+
+  pure
+    $ fromMaybe DatadogCredsNone
+    $ asum
+      [ DatadogCredsReadWrite <$> readWrite
+      , DatadogCredsWriteOnly <$> writeOnly
+      ]

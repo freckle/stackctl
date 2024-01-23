@@ -2,6 +2,7 @@ module Stackctl.Prelude
   ( module X
   , decodeUtf8
   , maybeLens
+  , constLens
   ) where
 
 import RIO as X hiding
@@ -39,3 +40,6 @@ decodeUtf8 = decodeUtf8With lenientDecode
 
 maybeLens :: a -> Lens' (Maybe a) a
 maybeLens x = lens (fromMaybe x) $ const Just
+
+constLens :: a -> Lens' b a
+constLens x = lens (const x) const

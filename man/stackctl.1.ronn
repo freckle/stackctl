@@ -24,6 +24,16 @@ stackctl(1) - manage CloudFormation Stacks through specifications
     When to automatically run `aws sso login` in response to AWS SSO
     authorization errors. `always`, `ask`, or `never`. Default is to `ask`.
 
+  * `--no-telemetry`:
+    Disable reporting telemetry to Datadog. See the project [`README`][README]
+    for details about what telemetry this refers to.
+
+    [README]: https://github.com/freckle/stackctl#readme
+
+  * `--telemetry-tag`=<KEY=VALUE>:
+    Include the given <KEY> as a tag with <VALUE> when reporting telemetry to
+    Datadog. Can be specified more than once.
+
 ## COMMANDS
 
   * `cat`:
@@ -241,6 +251,9 @@ See stackctl-changes(1) and stackctl-deploy(1).
 
 * `STACKCTL_AUTO_SSO`:
   Environment-based alternative for `--auto-sso`.
+
+* `STACKCTL_NO_TELEMETRY`:
+  Environment-based alternative for `--no-telemetry`.
 
 * `LOG_*`:
   Variables such as *LOG_COLOR* or *LOG_LEVEL* will be respected by the

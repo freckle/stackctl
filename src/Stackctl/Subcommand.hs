@@ -15,6 +15,7 @@ import Stackctl.AutoSSO
 import Stackctl.CLI
 import Stackctl.ColorOption
 import Stackctl.Options
+import Stackctl.TelemetryOption
 import Stackctl.VerboseOption
 
 data Subcommand options subOptions = Subcommand
@@ -67,6 +68,7 @@ runAppSubcommand
   :: ( HasColorOption options
      , HasVerboseOption options
      , HasAutoSSOOption options
+     , HasTelemetryOption options
      )
   => (subOptions -> AppT (App options) IO a)
   -> subOptions
