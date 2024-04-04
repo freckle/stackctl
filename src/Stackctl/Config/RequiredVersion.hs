@@ -24,7 +24,7 @@ data RequiredVersion = RequiredVersion
   { requiredVersionOp :: RequiredVersionOp
   , requiredVersionCompareWith :: Version
   }
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Ord, Show)
 
 instance Arbitrary RequiredVersion where
   arbitrary = RequiredVersion <$> arbitrary <*> arbitrary
@@ -96,7 +96,7 @@ data RequiredVersionOp
   | RequiredVersionGT
   | RequiredVersionGTE
   | RequiredVersionIsh
-  deriving stock (Eq, Show, Bounded, Enum)
+  deriving stock (Eq, Ord, Show, Bounded, Enum)
 
 instance Arbitrary RequiredVersionOp where
   arbitrary = arbitraryBoundedEnum

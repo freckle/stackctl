@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.6.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.6.1.0...main)
+
+## [v1.6.1.0](https://github.com/freckle/stackctl/compare/v1.6.0.0...v1.6.1.0)
+
+- Add `Ord` instance on `RequiredVersion` and `RequiredVersionOp`
 
 ## [v1.6.0.0](https://github.com/freckle/stackctl/compare/v1.5.0.1...v1.6.0.0)
 
