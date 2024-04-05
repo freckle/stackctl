@@ -15,8 +15,10 @@ import Data.Time (UTCTime (..))
 import Data.Time.Calendar (DayOfMonth, MonthOfYear, Year, fromGregorian)
 import Network.HTTP.Types.Status (status400)
 import Stackctl.AWS.CloudFormation
+import Stackctl.DirectoryOption (DirectoryOption (..), directoryOptionL)
 import Stackctl.FilterOption (filterOptionFromText, filterOptionL)
 import Stackctl.RemovedStack
+import UnliftIO.Directory (createDirectoryIfMissing)
 
 spec :: Spec
 spec = do
@@ -45,6 +47,41 @@ spec = do
 
       stacks <- local setup $ withMatchers matchers inferRemovedStacks
       map (^. stack_stackName) stacks `shouldBe` ["stack-exists"]
+
+    -- If we don't check for file existence respecting STACKCTL_DIRECTORY, then
+    -- any non-default value will cause all specs to appear non-existent and be
+    -- flagged for removal. Eek.
+    it "respects STACKCTL_DIRECTORY" $ example $ runTestAppT $ do
+      let
+        dir = "/tmp/stackctl-test"
+        toRemove = "stack-to-remove"
+        toKeep = "stack-to-keep"
+        relativeToRemove = testAppStackFilePath toRemove
+        relativeToKeep = testAppStackFilePath toKeep
+        absoluteToKeep = dir </> relativeToKeep
+        Just filterOption =
+          filterOptionFromText
+            $ pack relativeToRemove
+            <> ","
+            <> pack relativeToKeep
+
+        setup :: TestApp -> TestApp
+        setup app =
+          app
+            & filterOptionL .~ filterOption
+            & directoryOptionL .~ DirectoryOption dir
+
+        matchers =
+          [ describeStackMatcher toRemove $ Just $ someStack toRemove
+          , describeStackMatcher toKeep $ Just $ someStack toKeep
+          ]
+
+      -- Create a spec on disk for toKeep, then we should only find toRemove
+      createDirectoryIfMissing True $ takeDirectory absoluteToKeep
+      writeFileUtf8 absoluteToKeep "{}"
+
+      stacks <- local setup $ withMatchers matchers inferRemovedStacks
+      map (^. stack_stackName) stacks `shouldBe` [toRemove]
 
 describeStackMatcher :: Text -> Maybe Stack -> Matcher
 describeStackMatcher name =
