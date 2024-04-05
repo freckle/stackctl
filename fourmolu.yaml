@@ -12,4 +12,9 @@ in-style: left-align
 single-constraint-parens: never # ignored until v12 / ghc-9.6
 unicode: never # default
 respectful: true # default
-fixities: [] # default
+
+# fourmolu can't figure this out because of the re-exports we use
+fixities:
+  - "infixl 1 &"
+  - "infixr 4 .~"
+  - "infixr 4 ?~"

@@ -120,6 +120,7 @@ tests:
       - Glob
       - QuickCheck
       - aeson
+      - amazonka
       - amazonka-cloudformation
       - amazonka-ec2
       - amazonka-lambda
@@ -129,7 +130,10 @@ tests:
       - hspec
       - hspec-expectations-lifted
       - hspec-golden >= 0.2.1.0
+      - http-types
       - lens
       - mtl
       - stackctl
+      - text
+      - time
       - yaml
