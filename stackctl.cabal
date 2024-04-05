@@ -191,6 +191,7 @@ test-suite spec
       Stackctl.ConfigSpec
       Stackctl.FilterOptionSpec
       Stackctl.OneOrListOfSpec
+      Stackctl.RemovedStackSpec
       Stackctl.Spec.Changes.FormatSpec
       Stackctl.StackDescriptionSpec
       Stackctl.StackSpecSpec
@@ -231,6 +232,7 @@ test-suite spec
     , Glob
     , QuickCheck
     , aeson
+    , amazonka
     , amazonka-cloudformation
     , amazonka-ec2
     , amazonka-lambda
@@ -241,8 +243,11 @@ test-suite spec
     , hspec
     , hspec-expectations-lifted
     , hspec-golden >=0.2.1.0
+    , http-types
     , lens
     , mtl
     , stackctl
+    , text
+    , time
     , yaml
   default-language: Haskell2010
