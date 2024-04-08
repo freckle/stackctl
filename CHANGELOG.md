@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.6.1.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.6.1.1...main)
+
+## [v1.6.1.1](https://github.com/freckle/stackctl/compare/v1.6.1.0...v1.6.1.1)
+
+- Fix: finding removed stacks now respects `STACKCTL_DIRECTORY`
 
 ## [v1.6.1.0](https://github.com/freckle/stackctl/compare/v1.6.0.0...v1.6.1.0)
 
