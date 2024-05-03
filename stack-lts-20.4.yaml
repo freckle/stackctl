@@ -1,7 +1,7 @@
 resolver: lts-20.4
 
 extra-deps:
-  - Blammo-1.1.2.1
+  - Blammo-1.1.2.3
   - cfn-flip-0.1.0.3
   - unliftio-0.2.25.0
 
