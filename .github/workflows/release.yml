@@ -41,6 +41,11 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+      # stack was removed in macOS-14 which is now latest
+      # https://discourse.haskell.org/t/github-hosted-runner-for-macos-aarch64/8717/16
+      - if: ${{ runner.os == 'macOS' }}
+        run: curl -sSL https://get.haskellstack.org/ | sh
+
       - uses: actions/checkout@v4
       - uses: freckle/stack-cache-action@v2
       - run: echo "$HOME/.local/share/gem/ruby/3.0.0/bin" >>"$GITHUB_PATH"
