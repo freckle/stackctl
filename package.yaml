@@ -1,5 +1,5 @@
 name: stackctl
-version: 1.6.1.1
+version: 1.6.1.2
 github: freckle/stackctl
 license: MIT
 author: Freckle Engineering
@@ -59,7 +59,7 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
-    - Blammo >= 1.1.2.1 # getColorsLogger, etc
+    - Blammo >= 1.1.2.3 # flushLogger bugfix
     - Glob
     - QuickCheck
     - aeson
