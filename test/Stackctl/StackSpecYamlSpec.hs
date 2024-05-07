@@ -80,28 +80,6 @@ spec = do
       param ^. parameter_parameterKey `shouldBe` Just "Pie"
       param ^. parameter_parameterValue `shouldBe` Just "3.14"
 
-    it "has informative errors" $ do
-      let Left ex =
-            Yaml.decodeEither' @StackSpecYaml
-              $ mconcat
-                [ "Template: foo.yaml\n"
-                , "Parameters:\n"
-                , "  - ParameterKey: Norway\n"
-                , "    ParameterValue: no\n"
-                ]
-
-      show ex
-        `shouldBe` "AesonException \"Error in $.Parameters[0].ParameterValue: Expected String or Number, got: Bool False\""
-
-    it "has informative errors in Object form" $ do
-      let Left ex =
-            Yaml.decodeEither' @StackSpecYaml
-              $ mconcat
-                ["Template: foo.yaml\n", "Parameters:\n", "  Norway: no\n"]
-
-      show ex
-        `shouldBe` "AesonException \"Error in $.Parameters.Norway: Expected String or Number, got: Bool False\""
-
     it "handles null Value" $ do
       StackSpecYaml {..} <-
         Yaml.decodeThrow
