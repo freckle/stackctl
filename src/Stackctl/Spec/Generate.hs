@@ -9,7 +9,6 @@ import Stackctl.Prelude
 
 import Stackctl.AWS
 import Stackctl.AWS.Scope
-import Stackctl.Action
 import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption
 import Stackctl.Spec.Discover (buildSpecPath)
