@@ -30,7 +30,11 @@ module Stackctl.StackSpecYaml
   , unParametersYaml
   , ParameterYaml
   , parameterYaml
+  , mkParameterYaml
   , unParameterYaml
+  , ParameterValue
+  , parameterValueFromText
+  , parameterValueTemplate
   , TagsYaml
   , tagsYaml
   , unTagsYaml
@@ -45,6 +49,7 @@ import qualified Data.Aeson.Key as Key
 import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Aeson.Types (typeMismatch)
 import qualified Data.HashMap.Strict as HashMap
+import Data.List.Extra (dropSuffix)
 import Data.Monoid (Last (..))
 import qualified Data.Text as T
 import Stackctl.AWS
@@ -123,30 +128,80 @@ instance FromJSON ParameterYaml where
 parameterYamlPair :: KeyValue kv => ParameterYaml -> kv
 parameterYamlPair ParameterYaml {..} = pyKey .= pyValue
 
-mkParameterYaml :: Text -> Maybe ParameterValue -> ParameterYaml
-mkParameterYaml k = ParameterYaml (Key.fromText k) . Last
-
 parameterYaml :: Parameter -> Maybe ParameterYaml
 parameterYaml p = do
   k <- p ^. parameter_parameterKey
   let mv = p ^. parameter_parameterValue
-  pure $ mkParameterYaml k $ ParameterValue <$> mv
+  pure $ mkParameterYaml k $ parameterValueFromText <$> mv
+
+mkParameterYaml :: Text -> Maybe ParameterValue -> ParameterYaml
+mkParameterYaml k = ParameterYaml (Key.fromText k) . Last
 
 unParameterYaml :: ParameterYaml -> Parameter
 unParameterYaml (ParameterYaml k v) =
-  makeParameter (Key.toText k) $ unParameterValue <$> getLast v
+  makeParameter (Key.toText k) $ parameterValueToText <$> getLast v
 
-newtype ParameterValue = ParameterValue
-  { unParameterValue :: Text
-  }
+data ParameterValue
+  = StringParameter Text
+  | NumberParameter Double
+  | -- | Encodes as String True|False
+    BooleanParameter Bool
   deriving stock (Eq, Show)
-  deriving newtype (Semigroup, ToJSON)
 
 instance FromJSON ParameterValue where
   parseJSON = \case
-    String x -> pure $ ParameterValue x
-    Number x -> pure $ ParameterValue $ dropSuffix ".0" $ pack $ show x
-    x -> fail $ "Expected String or Number, got: " <> show x
+    String t -> pure $ StringParameter t
+    Number s -> pure $ NumberParameter $ realToFrac s
+    Bool b -> pure $ BooleanParameter b
+    x -> typeMismatch "String, Number or Bool" x
+
+instance ToJSON ParameterValue where
+  toJSON = \case
+    StringParameter t -> toJSON t
+    NumberParameter d -> toJSON d
+    BooleanParameter b -> toJSON $ pack $ show b
+  toEncoding = \case
+    StringParameter t -> toEncoding t
+    NumberParameter d -> toEncoding d
+    BooleanParameter b -> toEncoding $ pack $ show b
+
+parameterValueToText :: ParameterValue -> Text
+parameterValueToText = \case
+  StringParameter t -> t
+  NumberParameter d -> pack $ dropSuffix ".0" $ show d
+  BooleanParameter b -> pack $ show b
+
+parameterValueFromText :: Text -> ParameterValue
+parameterValueFromText = \case
+  v | T.toLower v == "true" -> BooleanParameter True
+  v | T.toLower v == "false" -> BooleanParameter False
+  v | Just d <- readMaybe (unpack v) -> NumberParameter d
+  v -> StringParameter v
+
+-- | For use as the value in a @Parameters@ object of a CFN Template
+parameterValueTemplate :: ParameterValue -> Value
+parameterValueTemplate v =
+  object
+    $ catMaybes
+      [ Just $ "Type" .= parameterValueType v
+      , Just $ "Default" .= parameterValueDefault v
+      , ("AllowedValues" .=) <$> parameterValueAllowedValues v
+      ]
+
+parameterValueType :: ParameterValue -> Text
+parameterValueType = \case
+  StringParameter {} -> "String"
+  NumberParameter {} -> "Number"
+  BooleanParameter {} -> "String"
+
+parameterValueDefault :: ParameterValue -> Value
+parameterValueDefault = toJSON
+
+parameterValueAllowedValues :: ParameterValue -> Maybe Value
+parameterValueAllowedValues = \case
+  StringParameter {} -> Nothing
+  NumberParameter {} -> Nothing
+  BooleanParameter {} -> Just $ toJSON [String "True", String "False"]
 
 newtype TagsYaml = TagsYaml
   { unTagsYaml :: [TagYaml]
@@ -200,6 +255,3 @@ instance FromJSON TagYaml where
 
 tagYamlPair :: KeyValue kv => TagYaml -> kv
 tagYamlPair (TagYaml t) = Key.fromText (t ^. tag_key) .= (t ^. tag_value)
-
-dropSuffix :: Text -> Text -> Text
-dropSuffix suffix t = fromMaybe t $ T.stripSuffix suffix t

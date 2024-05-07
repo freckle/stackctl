@@ -22,7 +22,7 @@ data Generate = Generate
   { gDescription :: Maybe StackDescription
   , gDepends :: Maybe [StackName]
   , gActions :: Maybe [Action]
-  , gParameters :: Maybe [Parameter]
+  , gParameters :: Maybe ParametersYaml
   , gCapabilities :: Maybe [Capability]
   , gTags :: Maybe [Tag]
   , gSpec :: GenerateSpec
@@ -81,7 +81,7 @@ generate Generate {..} = do
         , ssyTemplate = templatePath
         , ssyDepends = gDepends
         , ssyActions = gActions
-        , ssyParameters = parametersYaml . mapMaybe parameterYaml <$> gParameters
+        , ssyParameters = gParameters
         , ssyCapabilities = gCapabilities
         , ssyTags = tagsYaml . map TagYaml <$> gTags
         }

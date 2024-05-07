@@ -13,6 +13,7 @@ import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.Spec.Generate
 import Stackctl.StackSpec
+import Stackctl.StackSpecYaml (parameterYaml, parametersYaml)
 import System.FilePath.Glob
 
 data CaptureOptions = CaptureOptions
@@ -103,7 +104,8 @@ runCapture CaptureOptions {..} = do
             { gDescription = stackDescription stack
             , gDepends = scoDepends
             , gActions = Nothing
-            , gParameters = parameters stack
+            , gParameters =
+                parametersYaml . mapMaybe parameterYaml <$> parameters stack
             , gCapabilities = capabilities stack
             , gTags = tags stack
             , gSpec = case path of
