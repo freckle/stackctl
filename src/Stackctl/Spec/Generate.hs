@@ -1,6 +1,5 @@
 module Stackctl.Spec.Generate
-  ( Generate (..)
-  , GenerateSpec (..)
+  ( GenerateSpec (..)
   , GenerateTemplate (..)
   , generate
   , TemplateFormat (..)
@@ -17,18 +16,6 @@ import Stackctl.Spec.Discover (buildSpecPath)
 import Stackctl.StackSpec
 import Stackctl.StackSpecPath
 import Stackctl.StackSpecYaml
-
-data Generate = Generate
-  { gDescription :: Maybe StackDescription
-  , gDepends :: Maybe [StackName]
-  , gActions :: Maybe [Action]
-  , gParameters :: Maybe ParametersYaml
-  , gCapabilities :: Maybe [Capability]
-  , gTags :: Maybe [Tag]
-  , gSpec :: GenerateSpec
-  , gTemplate :: GenerateTemplate
-  , gOverwrite :: Bool
-  }
 
 data GenerateSpec
   = -- | Generate at an inferred name
@@ -57,15 +44,18 @@ generate
      , HasAwsScope env
      , HasDirectoryOption env
      )
-  => Generate
+  => Bool
+  -> GenerateSpec
+  -> GenerateTemplate
+  -> (FilePath -> StackSpecYaml)
   -> m FilePath
-generate Generate {..} = do
+generate overwrite spec template toStackSpecYaml = do
   let
-    (stackName, stackPath) = case gSpec of
+    (stackName, stackPath) = case spec of
       GenerateSpec name -> (name, unpack (unStackName name) <> ".yaml")
       GenerateSpecTo name path -> (name, path)
 
-    (mTemplateBody, templatePath) = case gTemplate of
+    (mTemplateBody, templatePath) = case template of
       GenerateTemplate body format ->
         ( Just body
         , case format of
@@ -75,21 +65,12 @@ generate Generate {..} = do
       GenerateTemplateTo body path -> (Just body, path)
       UseExistingTemplate path -> (Nothing, path)
 
-    specYaml =
-      StackSpecYaml
-        { ssyDescription = gDescription
-        , ssyTemplate = templatePath
-        , ssyDepends = gDepends
-        , ssyActions = gActions
-        , ssyParameters = gParameters
-        , ssyCapabilities = gCapabilities
-        , ssyTags = tagsYaml . map TagYaml <$> gTags
-        }
+    specYaml = toStackSpecYaml templatePath
 
   dir <- view $ directoryOptionL . to unDirectoryOption
   specPath <- buildSpecPath stackName stackPath
   stackSpec <- buildStackSpec dir specPath specYaml
 
   withThreadContext ["stackName" .= stackSpecStackName stackSpec] $ do
-    writeStackSpec gOverwrite stackSpec mTemplateBody
+    writeStackSpec overwrite stackSpec mTemplateBody
     pure $ stackSpecPathFilePath specPath
