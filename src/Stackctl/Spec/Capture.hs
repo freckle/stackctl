@@ -13,7 +13,13 @@ import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
 import Stackctl.Spec.Generate
 import Stackctl.StackSpec
-import Stackctl.StackSpecYaml (parameterYaml, parametersYaml)
+import Stackctl.StackSpecYaml
+  ( StackSpecYaml (..)
+  , TagYaml (..)
+  , parameterYaml
+  , parametersYaml
+  , tagsYaml
+  )
 import System.FilePath.Glob
 
 data CaptureOptions = CaptureOptions
@@ -92,7 +98,7 @@ runCapture CaptureOptions {..} = do
     setScopeName scope =
       maybe scope (\name -> scope {awsAccountName = name}) scoAccountName
 
-    generate' stack template path templatePath = do
+    generate' stack template mPath mTemplatePath = do
       let
         stackName = StackName $ stack ^. stack_stackName
         templateBody = templateBodyFromValue template
@@ -100,22 +106,26 @@ runCapture CaptureOptions {..} = do
       void
         $ local (awsScopeL %~ setScopeName)
         $ generate
-          Generate
-            { gDescription = stackDescription stack
-            , gDepends = scoDepends
-            , gActions = Nothing
-            , gParameters =
-                parametersYaml . mapMaybe parameterYaml <$> parameters stack
-            , gCapabilities = capabilities stack
-            , gTags = tags stack
-            , gSpec = case path of
-                Nothing -> GenerateSpec stackName
-                Just sp -> GenerateSpecTo stackName sp
-            , gTemplate = case templatePath of
-                Nothing -> GenerateTemplate templateBody scoTemplateFormat
-                Just tp -> GenerateTemplateTo templateBody tp
-            , gOverwrite = False
-            }
+          False
+          ( case mPath of
+              Nothing -> GenerateSpec stackName
+              Just sp -> GenerateSpecTo stackName sp
+          )
+          ( case mTemplatePath of
+              Nothing -> GenerateTemplate templateBody scoTemplateFormat
+              Just tp -> GenerateTemplateTo templateBody tp
+          )
+          ( \templatePath ->
+              StackSpecYaml
+                { ssyDescription = stackDescription stack
+                , ssyTemplate = templatePath
+                , ssyDepends = scoDepends
+                , ssyActions = Nothing
+                , ssyParameters = parametersYaml . mapMaybe parameterYaml <$> parameters stack
+                , ssyCapabilities = capabilities stack
+                , ssyTags = tagsYaml . map TagYaml <$> tags stack
+                }
+          )
 
   results <- awsCloudFormationGetStackNamesMatching scoStackName
 
