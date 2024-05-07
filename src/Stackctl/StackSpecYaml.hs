@@ -4,18 +4,24 @@
 -- Template: <path>
 --
 -- Depends:
--- - <string>
+--   - <string>
 --
 -- Parameters:
--- - ParameterKey: <string>
---   ParameterValue: <string>
+--   - ParameterKey: <string>
+--     ParameterValue: <string|number|boolean>
+--
+--   # Or
+--   <key>: <string|number|boolean>
 --
 -- Capabilities:
--- - <capability>
+--   - <capability>
 --
 -- Tags:
--- - Key: <string>
---   Value: <string>
+--   - Key: <string>
+--     Value: <string>
+--
+--   # Or
+--   <key>: <string>
 -- @
 module Stackctl.StackSpecYaml
   ( StackSpecYaml (..)
