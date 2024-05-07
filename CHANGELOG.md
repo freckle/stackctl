@@ -5,8 +5,9 @@
 - Retain numeric parameter types, and add boolean parameter handling, in our own
   yaml generation
 
-  This required changing `Generate` to use `ParametersYaml` instead of
-  `[Parameter]`, hence the major version bump.
+  This required changing the `Generate` to use `ParametersYaml` instead of
+  `[Parameter]`, and ultimately led us to removing it, hence the major version
+  bump.
 
 ## [v1.6.1.2](https://github.com/freckle/stackctl/compare/v1.6.1.1...v1.6.1.2)
 
