@@ -1,4 +1,12 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.6.1.2...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.7.0.0...main)
+
+## [v1.7.0.0](https://github.com/freckle/stackctl/compare/v1.6.1.2...v1.7.0.0)
+
+- Retain numeric parameter types, and add boolean parameter handling, in our own
+  yaml generation
+
+  This required changing `Generate` to use `ParametersYaml` instead of
+  `[Parameter]`, hence the major version bump.
 
 ## [v1.6.1.2](https://github.com/freckle/stackctl/compare/v1.6.1.1...v1.6.1.2)
 
