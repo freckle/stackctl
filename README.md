@@ -76,6 +76,33 @@ Once installed, see:
 The man pages are also available [online](https://freckle.github.io/stackctl/),
 but contain documentation as of `main`, and not your installed version.
 
+## Comparison to AWS CloudFormation Git Sync
+
+[AWS CloudFormation Git Sync][aws-git-sync] was recently released by AWS. It
+allows you to link a repository on GitHub to a CloudFormation Stack. The
+repository contains a "deployment file" that defines a `template-file-path`,
+`parameters`, and `tags` -- effectively, a Stack Specification.
+
+When AWS notices updates to the deployment or template file land on a defined
+branch, it updates the configured Stack accordingly, emitting events to SNS as
+it does.
+
+This is great for simple use-cases, and we fully expect they'll improve and
+extend it such that it obviates Stackctl one day. In the meantime, there are
+currently the following limitations when compared to Stackctl:
+
+1. A repository can only target a single account and region
+1. There is no changeset flow amenable to previewing changes via PRs. You update
+   the file(s) on `main` and it syncs, that's it. If you're using a PR, you have
+   only linting and human review as possible pre-deployment steps.
+1. There is no way to specify description, capabilities, or dependencies
+1. As of 12/23, there seemed to be some bugs, and the setup installs a managed
+   event bridge that "phones home", sending events about your updates to some
+   other AWS account ([source][first-look-blog])
+
+[aws-git-sync]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/git-sync.html
+[first-look-blog]: https://medium.com/@mattgillard/first-look-git-sync-for-cloudformation-stacks-9e2f39c311ac
+
 ## Relationship to CloudGenesis
 
 [CloudGenesis][] is a project that also takes a directory of Stack
