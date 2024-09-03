@@ -95,7 +95,7 @@ simple req post = do
 -- | Use 'withAssumedRole' instead
 --
 -- This function is like 'withAssumedRole' except it doesn't spawn a background
--- thread to keep credentials refreshed. You make encounter expired credentials
+-- thread to keep credentials refreshed. You may encounter expired credentials
 -- if the block used under 'assumeRole' goes for long enough.
 assumeRole
   :: (MonadIO m, MonadAWS m)
