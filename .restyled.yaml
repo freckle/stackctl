@@ -2,7 +2,9 @@ restylers_version: dev
 restylers:
   - cabal-fmt:
       enabled: false
-  - fourmolu
+  - fourmolu:
+      image:
+        tag: v14
   - stylish-haskell:
       enabled: false
   - prettier-markdown:
