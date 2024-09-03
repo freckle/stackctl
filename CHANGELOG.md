@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.7.0.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.7.1.0...main)
+
+## [v1.7.1.0](https://github.com/freckle/stackctl/compare/v1.7.0.0...v1.7.1.0)
+
+- Add `withAssumedRole`, deprecate `assumeRole`
 
 ## [v1.7.0.0](https://github.com/freckle/stackctl/compare/v1.6.1.2...v1.7.0.0)
 
