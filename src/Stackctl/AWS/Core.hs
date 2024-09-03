@@ -137,9 +137,9 @@ withAssumedRole roleArn roleSessionName f = do
   keys <- withRunInIO $ \runInIO -> do
     let getCredentials = do
           resp <-
-            runInIO
-              $ send
-              $ newAssumeRole roleArn roleSessionName
+            runInIO $
+              send $
+                newAssumeRole roleArn roleSessionName
           pure $ resp ^. assumeRoleResponse_credentials
 
     fetchAuthInBackground getCredentials
@@ -158,12 +158,12 @@ newtype AccountId = AccountId
 handlingServiceError :: (MonadUnliftIO m, MonadLogger m) => m a -> m a
 handlingServiceError =
   handling _ServiceError $ \e -> do
-    logError
-      $ "Exiting due to AWS Service error"
-      :# [ "code" .= toText (e ^. serviceError_code)
-         , "message" .= fmap toText (e ^. serviceError_message)
-         , "requestId" .= fmap toText (e ^. serviceError_requestId)
-         ]
+    logError $
+      "Exiting due to AWS Service error"
+        :# [ "code" .= toText (e ^. serviceError_code)
+           , "message" .= fmap toText (e ^. serviceError_message)
+           , "requestId" .= fmap toText (e ^. serviceError_requestId)
+           ]
     exitFailure
 
 formatServiceError :: ServiceError -> Text
