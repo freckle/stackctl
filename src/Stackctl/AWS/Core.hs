@@ -9,7 +9,7 @@ module Stackctl.AWS.Core
     -- * "Control.Monad.AWS" extensions
   , simple
   , discover
-  , assumeRole
+  , withAssumedRole
 
     -- * Error-handling
   , handlingServiceError
@@ -22,6 +22,9 @@ module Stackctl.AWS.Core
   , Region (..)
   , FromText (..)
   , ToText (..)
+
+    -- * Deprecated
+  , assumeRole
   ) where
 
 import Stackctl.Prelude
@@ -29,6 +32,7 @@ import Stackctl.Prelude
 import Amazonka
   ( AWSRequest
   , AWSResponse
+  , Env' (auth)
   , Region
   , ServiceError
   , serviceError_code
@@ -38,6 +42,7 @@ import Amazonka
   , _ServiceError
   )
 import qualified Amazonka
+import Amazonka.Auth.Background (fetchAuthInBackground)
 import Amazonka.Auth.Keys (fromSession)
 import Amazonka.Data.Text (FromText (..), ToText (..))
 import qualified Amazonka.Env as Amazonka
@@ -87,6 +92,11 @@ simple req post = do
 
   maybe (throwString err) pure $ post resp
 
+-- | Use 'withAssumedRole' instead
+--
+-- This function is like 'withAssumedRole' except it doesn't spawn a background
+-- thread to keep credentials refreshed. You make encounter expired credentials
+-- if the block used under 'assumeRole' goes for long enough.
 assumeRole
   :: (MonadIO m, MonadAWS m)
   => Text
@@ -111,6 +121,30 @@ assumeRole role sessionName f = do
     pure $ fromSession accessKeyId secretAccessKey sessionToken
 
   localEnv assumeEnv f
+{-# DEPRECATED assumeRole "Use withAssumedRole instead" #-}
+
+-- | Assume a role using the @sts:AssumeRole@ API and run an action
+withAssumedRole
+  :: (MonadUnliftIO m, MonadAWS m)
+  => Text
+  -- ^ Role ARN
+  -> Text
+  -- ^ Role session name
+  -> m a
+  -- ^ Action to run as the assumed role
+  -> m a
+withAssumedRole roleArn roleSessionName f = do
+  keys <- withRunInIO $ \runInIO -> do
+    let getCredentials = do
+          resp <-
+            runInIO
+              $ send
+              $ newAssumeRole roleArn roleSessionName
+          pure $ resp ^. assumeRoleResponse_credentials
+
+    fetchAuthInBackground getCredentials
+
+  localEnv (\env -> env {auth = Identity keys}) f
 
 newtype AccountId = AccountId
   { unAccountId :: Text
