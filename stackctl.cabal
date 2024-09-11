@@ -35,6 +35,7 @@ library
       Stackctl.AWS.Orphans
       Stackctl.AWS.Scope
       Stackctl.AWS.STS
+      Stackctl.CancelHandler
       Stackctl.CLI
       Stackctl.ColorOption
       Stackctl.Colors
@@ -135,6 +136,7 @@ library
     , time
     , transformers
     , typed-process
+    , unix
     , unliftio >=0.2.25.0
     , unordered-containers
     , uuid
@@ -187,6 +189,7 @@ test-suite spec
       Stackctl.AWS.EC2Spec
       Stackctl.AWS.LambdaSpec
       Stackctl.AWS.ScopeSpec
+      Stackctl.CancelHandlerSpec
       Stackctl.Config.RequiredVersionSpec
       Stackctl.ConfigSpec
       Stackctl.FilterOptionSpec
