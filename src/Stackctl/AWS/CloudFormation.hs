@@ -41,6 +41,7 @@ module Stackctl.AWS.CloudFormation
   , awsCloudFormationGetStackNamesMatching
   , awsCloudFormationGetMostRecentStackEventId
   , awsCloudFormationDeleteStack
+  , awsCloudFormationCancelUpdateStack
   , awsCloudFormationWait
   , awsCloudFormationGetTemplate
 
@@ -50,6 +51,7 @@ module Stackctl.AWS.CloudFormation
   , changeSetJSON
   , ChangeSetId (..)
   , ChangeSetName (..)
+  , ChangeSetType (..)
   , Change (..)
   , ResourceChange (..)
   , Replacement (..)
@@ -66,6 +68,7 @@ module Stackctl.AWS.CloudFormation
 
 import Stackctl.Prelude
 
+import Amazonka.CloudFormation.CancelUpdateStack
 import Amazonka.CloudFormation.CreateChangeSet hiding (id)
 import Amazonka.CloudFormation.DeleteChangeSet
 import Amazonka.CloudFormation.DeleteStack
@@ -87,7 +90,7 @@ import Amazonka.Core
   , _ServiceError
   )
 import qualified Amazonka.Env as Amazonka
-import Amazonka.Waiter (Accept (..))
+import Amazonka.Waiter (Accept (..), Wait)
 import Conduit
 import Control.Lens ((?~))
 import Data.Aeson
@@ -211,7 +214,7 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
   let req =
         newDescribeStackEvents
           & describeStackEvents_stackName
-          ?~ unStackName stackName
+            ?~ unStackName stackName
 
   runConduit
     $ AWS.paginate req
@@ -245,7 +248,7 @@ awsCloudFormationGetMostRecentStackEventId stackName = do
     req =
       newDescribeStackEvents
         & describeStackEvents_stackName
-        ?~ unStackName stackName
+          ?~ unStackName stackName
 
     -- Events are returned most-recent first, so "last" is "first" here
     getFirstEventId :: [StackEvent] -> Maybe Text
@@ -264,15 +267,20 @@ awsCloudFormationDeleteStack
   => StackName
   -> m StackDeleteResult
 awsCloudFormationDeleteStack stackName = do
-  let
-    deleteReq = newDeleteStack $ unStackName stackName
-    describeReq =
-      newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
-
-  AWS.simple deleteReq $ const $ pure ()
+  let req = newDeleteStack $ unStackName stackName
+  AWS.simple req $ const $ pure ()
 
   logDebug "Awaiting DeleteStack"
-  stackDeleteResult <$> AWS.await newStackDeleteComplete describeReq
+  stackDeleteResult <$> awaitStack newStackDeleteComplete stackName
+
+awsCloudFormationCancelUpdateStack
+  :: (MonadIO m, MonadLogger m, MonadAWS m) => StackName -> m ()
+awsCloudFormationCancelUpdateStack stackName = do
+  let req = newCancelUpdateStack $ unStackName stackName
+  AWS.simple req $ const $ pure ()
+
+  logDebug "Awaiting CancelUpdateStack"
+  void $ awaitStack newStackRollbackComplete stackName
 
 awsCloudFormationWait
   :: (MonadUnliftIO m, MonadAWS m)
@@ -281,10 +289,8 @@ awsCloudFormationWait
 awsCloudFormationWait stackName = do
   either stackCreateResult stackUpdateResult
     <$> race
-      (AWS.await newStackCreateComplete req)
-      (AWS.await newStackUpdateComplete req)
- where
-  req = newDescribeStacks & describeStacks_stackName ?~ unStackName stackName
+      (awaitStack newStackCreateComplete stackName)
+      (awaitStack newStackUpdateComplete stackName)
 
 awsCloudFormationGetTemplate
   :: (MonadIO m, MonadAWS m) => StackName -> m Value
@@ -293,7 +299,7 @@ awsCloudFormationGetTemplate stackName = do
     req =
       newGetTemplate
         & (getTemplate_stackName ?~ unStackName stackName)
-        . (getTemplate_templateStage ?~ TemplateStage_Original)
+          . (getTemplate_templateStage ?~ TemplateStage_Original)
 
     -- If decodeStrict fails, assume it's a String of Yaml. See writeStackSpec.
     decodeTemplateBody body =
@@ -302,6 +308,13 @@ awsCloudFormationGetTemplate stackName = do
   AWS.simple req $ \resp -> do
     body <- resp ^. getTemplateResponse_templateBody
     pure $ decodeTemplateBody body
+
+awaitStack
+  :: (MonadIO m, MonadAWS m) => Wait DescribeStacks -> StackName -> m Accept
+awaitStack waiter stackName =
+  AWS.await waiter
+    $ newDescribeStacks
+    & describeStacks_stackName ?~ unStackName stackName
 
 makeParameter :: Text -> Maybe Text -> Parameter
 makeParameter k v =
@@ -404,10 +417,10 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
       let req =
             newCreateChangeSet (unStackName stackName) (unChangeSetName name)
               & (createChangeSet_changeSetType ?~ changeSetType)
-              . (createChangeSet_templateBody ?~ templateBody)
-              . (createChangeSet_parameters ?~ parameters)
-              . (createChangeSet_capabilities ?~ capabilities)
-              . (createChangeSet_tags ?~ tags)
+                . (createChangeSet_templateBody ?~ templateBody)
+                . (createChangeSet_parameters ?~ parameters)
+                . (createChangeSet_capabilities ?~ capabilities)
+                . (createChangeSet_tags ?~ tags)
 
       logInfo
         $ "Creating changeset..."

@@ -14,6 +14,7 @@ import Options.Applicative
 import Stackctl.AWS hiding (action)
 import Stackctl.AWS.Scope
 import Stackctl.Action
+import qualified Stackctl.CancelHandler as CancelHandler
 import Stackctl.Colors
 import Stackctl.Config (HasConfig)
 import Stackctl.DirectoryOption (HasDirectoryOption)
@@ -206,8 +207,16 @@ deployChangeSet confirmation changeSet = do
   mLastId <- awsCloudFormationGetMostRecentStackEventId stackName
   asyncTail <- async $ tailStackEventsSince stackName mLastId
 
+  let onCancel = do
+        logInfo "Canceling stack update, press ^C again to abort"
+        case csChangeSetType changeSet of
+          ChangeSetType_UPDATE -> do
+            awsCloudFormationCancelUpdateStack stackName
+            cancel asyncTail
+          t -> logWarn $ "Cannot cancel change-set of this type" :# ["type" .= t]
+
   logInfo $ "Executing ChangeSet" :# ["changeSetId" .= changeSetId]
-  result <- do
+  result <- CancelHandler.with onCancel $ do
     awsCloudFormationExecuteChangeSet changeSetId
     awsCloudFormationWait stackName
 

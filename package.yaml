@@ -95,6 +95,7 @@ library:
     - time
     - transformers
     - typed-process
+    - unix
     - unliftio >= 0.2.25.0 # UnliftIO.Exception.Lens
     - unordered-containers
     - uuid

@@ -5,9 +5,8 @@ where
 
 import Stackctl.Prelude
 
-import Amazonka.CloudFormation.Types (ChangeSetType (..))
 import Data.Aeson
-import Stackctl.AWS.CloudFormation (changeSetFromResponse)
+import Stackctl.AWS.CloudFormation (ChangeSetType (..), changeSetFromResponse)
 import Stackctl.Colors
 import Stackctl.Spec.Changes.Format
 import System.FilePath ((-<.>))
