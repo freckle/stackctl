@@ -11,6 +11,7 @@
 - ignore: {name: "Use join"}  # this often leads to cryptic code when do notation is easier to read
 - ignore: {name: "Redundant ^."}  # commonly broken by esqueleto
 - ignore: {name: "Use ++"}  # less readable for commandline option lists
+- ignore: {name: "Functor law"} # too aggressive
 
 # Custom Warnings
 - warn: {lhs: mapM, rhs: traverse}
