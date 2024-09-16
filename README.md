@@ -13,7 +13,7 @@ to-be-deployed) CloudFormation Stacks including the Template, Parameters, and
 Tags. `stackctl` can be used to pretty-print, diff, and deploy these
 specifications.
 
-[spec]: https://github.com/freckle/stackctl/blob/main/doc/stackctl.1.md#stack-specifications
+[spec]: https://freckle.github.io/stackctl/#STACK-SPECIFICATIONS
 
 This project also contains a Haskell library for doing the same.
 
@@ -32,10 +32,11 @@ This project also contains a Haskell library for doing the same.
 curl -L https://raw.githubusercontent.com/freckle/stackctl/main/install | bash
 ```
 
-**NOTE**: some in the community have expressed [concerns][curlsh-bad] about the
-security of so-called "curl-sh" installations. We think the argument has been
-[pretty well debunked][curlsh-ok], but feel free to use the manual steps
-instead.
+> [!NOTE]
+> Some in the community have expressed [concerns][curlsh-bad] about the
+> security of so-called "curl-sh" installations. We think the argument has been
+> [pretty well debunked][curlsh-ok], but feel free to use the manual steps
+> instead.
 
 [curlsh-bad]: https://0x46.net/thoughts/2019/04/27/piping-curl-to-shell/
 [curlsh-ok]: https://www.arp242.net/curl-to-sh.html
