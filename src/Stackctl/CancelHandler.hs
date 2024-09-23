@@ -11,7 +11,7 @@ import System.Posix.Signals
 
 -- | Install a 'keyboardSignal' handler, run an action, then remove it
 with :: MonadUnliftIO m => m a -> m b -> m b
-with f = bracket (install f) (const remove) . const
+with f = bracket_ (install f) remove
 
 -- | Install a 'keyboardSignal' handler that runs the given action once
 install :: MonadUnliftIO m => m a -> m ()
