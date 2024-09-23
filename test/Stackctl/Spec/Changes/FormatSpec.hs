@@ -5,6 +5,7 @@ where
 
 import Stackctl.Prelude
 
+import Amazonka.CloudFormation.Types (ChangeSetType (..))
 import Data.Aeson
 import Stackctl.AWS.CloudFormation (changeSetFromResponse)
 import Stackctl.Colors
@@ -28,7 +29,7 @@ formatChangeSetGolden :: FilePath -> Format -> IO (Golden Text)
 formatChangeSetGolden path fmt = do
   actual <-
     formatChangeSet noColors OmitFull "some-stack" fmt
-      . (changeSetFromResponse <=< decodeStrict)
+      . (changeSetFromResponse ChangeSetType_UPDATE <=< decodeStrict)
       . encodeUtf8
       <$> readFileUtf8 path
 

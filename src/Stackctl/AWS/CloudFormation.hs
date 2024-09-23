@@ -330,6 +330,7 @@ data ChangeSet = ChangeSet
   { csCreationTime :: UTCTime
   , csChanges :: Maybe [Change]
   , csChangeSetName :: ChangeSetName
+  , csChangeSetType :: ChangeSetType
   , csExecutionStatus :: ExecutionStatus
   , csChangeSetId :: ChangeSetId
   , csParameters :: Maybe [Parameter]
@@ -342,12 +343,14 @@ data ChangeSet = ChangeSet
   , csResponse :: DescribeChangeSetResponse
   }
 
-changeSetFromResponse :: DescribeChangeSetResponse -> Maybe ChangeSet
-changeSetFromResponse resp =
+changeSetFromResponse
+  :: ChangeSetType -> DescribeChangeSetResponse -> Maybe ChangeSet
+changeSetFromResponse changeSetType resp =
   ChangeSet
     <$> (resp ^. describeChangeSetResponse_creationTime)
     <*> pure (fmap sortChanges $ resp ^. describeChangeSetResponse_changes)
     <*> (ChangeSetName <$> resp ^. describeChangeSetResponse_changeSetName)
+    <*> pure changeSetType
     <*> (resp ^. describeChangeSetResponse_executionStatus)
     <*> (ChangeSetId <$> resp ^. describeChangeSetResponse_changeSetId)
     <*> pure (resp ^. describeChangeSetResponse_parameters)
@@ -415,16 +418,17 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
       void $ AWS.await newChangeSetCreateComplete $ newDescribeChangeSet csId
 
       logInfo "Retrieving changeset..."
-      cs <- awsCloudFormationDescribeChangeSet $ ChangeSetId csId
+      cs <- awsCloudFormationDescribeChangeSet changeSetType $ ChangeSetId csId
       pure $ cs <$ guard (not $ changeSetFailed cs)
 
 awsCloudFormationDescribeChangeSet
   :: (MonadIO m, MonadAWS m)
-  => ChangeSetId
+  => ChangeSetType
+  -> ChangeSetId
   -> m ChangeSet
-awsCloudFormationDescribeChangeSet changeSetId = do
+awsCloudFormationDescribeChangeSet changeSetType changeSetId = do
   let req = newDescribeChangeSet $ unChangeSetId changeSetId
-  AWS.simple req changeSetFromResponse
+  AWS.simple req $ changeSetFromResponse changeSetType
 
 sortChanges :: [Change] -> [Change]
 sortChanges = sortByDependencies changeName changeCausedBy
