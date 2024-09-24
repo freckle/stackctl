@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.7.1.0...main)
+## [_Unreleased_](https://github.com/freckle/stackctl/compare/v1.7.2.0...main)
+
+## [v1.7.2.0](https://github.com/freckle/stackctl/compare/v1.7.1.0...v1.7.2.0)
+
+- Automatically cancel any ongoing update-stack operations on `^C`
 
 ## [v1.7.1.0](https://github.com/freckle/stackctl/compare/v1.7.0.0...v1.7.1.0)
 
