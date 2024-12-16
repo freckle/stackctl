@@ -22,7 +22,7 @@ jobs:
     steps:
       - run: echo "$HOME/.local/share/gem/ruby/3.0.0/bin" >>"$GITHUB_PATH"
       - run: gem install --user ronn-ng
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Generate HTML man-pages
         run: ronn --style toc,custom --html man/*.ronn
