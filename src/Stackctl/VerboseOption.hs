@@ -7,6 +7,7 @@ module Stackctl.VerboseOption
 
 import Stackctl.Prelude
 
+import Blammo.Logging.LogSettings
 import Blammo.Logging.LogSettings.LogLevels
 import Options.Applicative
 

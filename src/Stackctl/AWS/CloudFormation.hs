@@ -1,3 +1,5 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+
 module Stackctl.AWS.CloudFormation
   ( Stack (..)
   , stack_stackName

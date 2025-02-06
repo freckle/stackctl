@@ -15,6 +15,7 @@ module Stackctl.Test.App
 
 import Stackctl.Prelude
 
+import Blammo.Logging.LogSettings (defaultLogSettings)
 import Blammo.Logging.Logger (newTestLogger)
 import Control.Lens ((?~))
 import Control.Monad.AWS

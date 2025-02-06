@@ -107,7 +107,7 @@ instance ToJSON ParametersYaml where
   toJSON = object . parametersYamlPairs
   toEncoding = pairs . mconcat . parametersYamlPairs
 
-parametersYamlPairs :: KeyValue kv => ParametersYaml -> [kv]
+parametersYamlPairs :: KeyValue e kv => ParametersYaml -> [kv]
 parametersYamlPairs = map parameterYamlPair . unParametersYaml
 
 parametersYaml :: [ParameterYaml] -> ParametersYaml
@@ -124,7 +124,7 @@ instance FromJSON ParameterYaml where
     (mkParameterYaml <$> o .: "Name" <*> o .:? "Value")
       <|> (mkParameterYaml <$> o .: "ParameterKey" <*> o .:? "ParameterValue")
 
-parameterYamlPair :: KeyValue kv => ParameterYaml -> kv
+parameterYamlPair :: KeyValue e kv => ParameterYaml -> kv
 parameterYamlPair ParameterYaml {..} = pyKey .= pyValue
 
 parameterYaml :: Parameter -> Maybe ParameterYaml
@@ -235,7 +235,7 @@ instance ToJSON TagsYaml where
   toJSON = object . tagsYamlPairs
   toEncoding = pairs . mconcat . tagsYamlPairs
 
-tagsYamlPairs :: KeyValue kv => TagsYaml -> [kv]
+tagsYamlPairs :: KeyValue e kv => TagsYaml -> [kv]
 tagsYamlPairs = map tagYamlPair . unTagsYaml
 
 tagsYaml :: [TagYaml] -> TagsYaml
@@ -251,5 +251,5 @@ instance FromJSON TagYaml where
     t <- newTag <$> o .: "Key" <*> o .: "Value"
     pure $ TagYaml t
 
-tagYamlPair :: KeyValue kv => TagYaml -> kv
+tagYamlPair :: KeyValue e kv => TagYaml -> kv
 tagYamlPair (TagYaml t) = Key.fromText (t ^. tag_key) .= (t ^. tag_value)

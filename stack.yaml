@@ -1,6 +1,17 @@
-resolver: lts-22.6
+resolver: lts-23.7
 
 extra-deps:
-  - Blammo-1.1.2.3
+  - github: brendanhay/amazonka
+    commit: f3a7fca02fdbb832cc348e991983b1465225d50c
+    subdirs:
+    - lib/amazonka
+    - lib/amazonka-core
+    - lib/services/amazonka-cloudformation
+    - lib/services/amazonka-ec2
+    - lib/services/amazonka-lambda
+    - lib/services/amazonka-sso
+    - lib/services/amazonka-sts
+
   - amazonka-mtl-0.1.1.0
   - cfn-flip-0.1.0.3
+  - microlens-pro-0.2.0.2

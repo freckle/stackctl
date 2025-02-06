@@ -7,6 +7,7 @@ module Stackctl.CLI
 
 import Stackctl.Prelude
 
+import Blammo.Logging.LogSettings
 import qualified Blammo.Logging.LogSettings.Env as LoggingEnv
 import Control.Monad.AWS as AWS
 import Control.Monad.AWS.ViaReader as AWS
@@ -60,7 +61,7 @@ instance HasAutoSSOOption options => HasAutoSSOOption (App options) where
   autoSSOOptionL = optionsL . autoSSOOptionL
 
 newtype AppT app m a = AppT
-  { unAppT :: ReaderT app (LoggingT (ResourceT m)) a
+  { unAppT :: ReaderT app (ResourceT m) a
   }
   deriving newtype
     ( Functor
@@ -70,12 +71,13 @@ newtype AppT app m a = AppT
     , MonadUnliftIO
     , MonadResource
     , MonadReader app
-    , MonadLogger
     , MonadThrow
     , MonadCatch
     , MonadMask
     )
   deriving (MonadAWS) via (ReaderAWS (AppT app m))
+  deriving (MonadLogger) via (WithLogger app (ResourceT m))
+  deriving (MonadLoggerIO) via (WithLogger app (ResourceT m))
 
 runAppT
   :: ( MonadMask m
@@ -94,36 +96,33 @@ runAppT options f = do
       . setLogSettingsConcurrency (Just 1)
       $ defaultLogSettings
 
-  logger <-
-    newLogger
-      $ adjustLogSettings
-        (options ^. colorOptionL)
-        (options ^. verboseOptionL)
-        envLogSettings
+  let logSettings =
+        adjustLogSettings
+          (options ^. colorOptionL)
+          (options ^. verboseOptionL)
+          envLogSettings
 
-  app <- runResourceT $ runLoggerLoggingT logger $ do
-    aws <- runReaderT (handleAutoSSO options AWS.discover) logger
+  withLogger logSettings $ \appLogger -> do
+    appAwsEnv <- runWithLogger appLogger $ handleAutoSSO options AWS.discover
+    appConfig <- runWithLogger appLogger loadConfigOrExit
+    appAwsScope <- AWS.runEnvT fetchAwsScope appAwsEnv
 
-    App logger
-      <$> loadConfigOrExit
-      <*> pure options
-      <*> AWS.runEnvT fetchAwsScope aws
-      <*> pure aws
+    let
+      AwsScope {..} = appAwsScope
 
-  let
-    AwsScope {..} = appAwsScope app
+      context =
+        [ "region" .= awsRegion
+        , "accountId" .= awsAccountId
+        , "accountName" .= awsAccountName
+        ]
 
-    context =
-      [ "region" .= awsRegion
-      , "accountId" .= awsAccountId
-      , "accountName" .= awsAccountName
-      ]
+      appOptions = options
+      app = App {..}
 
-  runResourceT
-    $ runLoggerLoggingT app
-    $ flip runReaderT app
-    $ withThreadContext context
-    $ unAppT f
+    runResourceT
+      $ flip runReaderT app
+      $ withThreadContext context
+      $ unAppT f
 
 adjustLogSettings
   :: Maybe ColorOption -> Verbosity -> LogSettings -> LogSettings
