@@ -77,6 +77,19 @@ Once installed, see:
 The man pages are also available [online](https://freckle.github.io/stackctl/),
 but contain documentation as of `main`, and not your installed version.
 
+## Release
+
+To trigger a release in this project, merge a commit to `main` with a
+conventionally-formatted commit message. In short, one that starts with:
+
+1. `fix:` to trigger a patch release,
+1. `feat:` for minor, or
+1. `feat!:` for major
+
+Conventional commits are not required generally for this project, though you're
+free to always use them. They are only required when you want to trigger a
+release.
+
 ## Comparison to AWS CloudFormation Git Sync
 
 [AWS CloudFormation Git Sync][aws-git-sync] was recently released by AWS. It
