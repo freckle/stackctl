@@ -27,12 +27,14 @@ awsScopeSpecPatterns AwsScope {..} =
   [ compile
       $ "stacks"
         </> unpack (unAccountId awsAccountId) <> ".*"
-        </> unpack (fromRegion awsRegion) <> "**"
+        </> unpack (fromRegion awsRegion)
+        </> "**"
         </> "*" <.> "yaml"
   , compile
       $ "stacks"
         </> "*." <> unpack (unAccountId awsAccountId)
-        </> unpack (fromRegion awsRegion) <> "**"
+        </> unpack (fromRegion awsRegion)
+        </> "**"
         </> "*" <.> "yaml"
   ]
 
