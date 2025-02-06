@@ -14,6 +14,9 @@ import Amazonka.CloudFormation.Types
 import Data.Aeson
 import GHC.Generics (Rep)
 
+-- TODO: upstream
+deriving newtype instance MonadUnliftIO m => MonadUnliftIO (WithLogger env m)
+
 -- Makes it syntactally easier to do a bunch of these
 newtype Generically a = Generically {unGenerically :: a}
 

@@ -77,8 +77,6 @@ simple
      , MonadIO m
      , MonadAWS m
      , AWSRequest a
-     , Typeable a
-     , Typeable (AWSResponse a)
      )
   => a
   -> (AWSResponse a -> Maybe b)

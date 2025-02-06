@@ -20,6 +20,8 @@ import RIO as X hiding
   )
 
 import Blammo.Logging as X
+import Blammo.Logging.Setup as X
+import Blammo.Logging.ThreadContext as X
 import Control.Error.Util as X (hush, note)
 import Data.Aeson as X (ToJSON (..), object)
 import Data.Text as X (pack, unpack)
