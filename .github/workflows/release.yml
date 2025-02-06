@@ -19,20 +19,15 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      # stack was removed in macOS-14 which is now latest
-      # https://discourse.haskell.org/t/github-hosted-runner-for-macos-aarch64/8717/16
       - if: ${{ runner.os == 'macOS' }}
-        run: curl -sSL https://get.haskellstack.org/ | sh
-
-      - uses: actions/checkout@v4
-      - uses: freckle/stack-cache-action@v2
+        run: brew install coreutils # need GNU install
       - run: gem install --user ronn-ng
       - run: |
           for bin in "$HOME"/.local/share/gem/ruby/*/bin; do
             echo "$bin"
           done >>"$GITHUB_PATH"
-      - if: ${{ runner.os == 'macOS' }}
-        run: brew install coreutils # need GNU install
+      - uses: actions/checkout@v4
+      - uses: freckle/stack-action@v5
       - run: |
           make install.check # creates dist/stackctl.tar.gz
           cp -v dist/stackctl.tar.gz stackctl-${{ matrix.suffix }}.tar.gz
