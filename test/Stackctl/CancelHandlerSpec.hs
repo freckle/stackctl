@@ -10,7 +10,7 @@ import Test.Hspec
 spec :: Spec
 spec = do
   describe "with" $ do
-    fit "installs a handler for the duration of a block" $ example $ do
+    it "installs a handler for the duration of a block" $ example $ do
       done <- newEmptyMVar
 
       CancelHandler.install $ putMVar done ()
