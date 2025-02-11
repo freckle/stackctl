@@ -27,6 +27,17 @@ jobs:
             echo "$bin"
           done >>"$GITHUB_PATH"
       - uses: actions/checkout@v4
+
+      - id: release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          dry_run: true
+          extra_plugins: |
+            git+https://github.com/pbrisbin/semantic-release-stack-upload.git#pb/prepare-in-verify
+        env:
+          FORCE_COLOR: 1
+          PREPARE_IN_VERIFY: 1
+
       - uses: freckle/stack-action@v5
       - run: |
           make install.check # creates dist/stackctl.tar.gz
@@ -57,7 +68,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v4
         with:
           extra_plugins: |
-            git+https://github.com/pbrisbin/semantic-release-stack-upload.git
+            git+https://github.com/pbrisbin/semantic-release-stack-upload.git#pb/prepare-in-verify
         env:
           FORCE_COLOR: 1
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
