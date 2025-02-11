@@ -38,6 +38,10 @@ jobs:
           FORCE_COLOR: 1
           PREPARE_IN_VERIFY: 1
 
+          # These are unused, but needed for verify to succeed
+          GITHUB_TOKEN: ${{ github.token }}
+          HACKAGE_KEY: ${{ secrets.HACKAGE_UPLOAD_API_KEY }}
+
       - uses: freckle/stack-action@v5
       - run: |
           make install.check # creates dist/stackctl.tar.gz
