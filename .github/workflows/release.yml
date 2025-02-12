@@ -33,7 +33,7 @@ jobs:
         with:
           dry_run: true
           extra_plugins: |
-            git+https://github.com/pbrisbin/semantic-release-stack-upload.git#pb/prepare-in-verify
+            git+https://github.com/pbrisbin/semantic-release-stack-upload.git
         env:
           FORCE_COLOR: 1
           PREPARE_IN_VERIFY: 1
@@ -72,7 +72,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v4
         with:
           extra_plugins: |
-            git+https://github.com/pbrisbin/semantic-release-stack-upload.git#pb/prepare-in-verify
+            git+https://github.com/pbrisbin/semantic-release-stack-upload.git
         env:
           FORCE_COLOR: 1
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
