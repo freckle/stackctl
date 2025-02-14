@@ -85,8 +85,7 @@ instance Semigroup ParametersYaml where
       $ KeyMap.toList
       $ KeyMap.fromListWith (<>)
       $ map (pyKey &&& pyValue)
-      $ bs -- flipped to make sure Last-wins
-      <> as
+      $ bs <> as -- flipped to make sure Last-wins
 
 instance FromJSON ParametersYaml where
   parseJSON = \case
@@ -215,8 +214,7 @@ instance Semigroup TagsYaml where
       $ HashMap.toList
       $ HashMap.fromList
       $ map (toPair . unTagYaml)
-      $ as
-      <> bs
+      $ as <> bs
    where
     toPair :: Tag -> (Text, Text)
     toPair = (^. tag_key) &&& (^. tag_value)

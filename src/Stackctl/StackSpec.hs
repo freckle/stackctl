@@ -81,8 +81,7 @@ stackSpecTemplate :: StackSpec -> StackTemplate
 stackSpecTemplate spec =
   StackTemplate
     $ FilePath.normalise
-    $ ssSpecRoot spec
-    </> stackSpecTemplateFile spec
+    $ ssSpecRoot spec </> stackSpecTemplateFile spec
 
 stackSpecParameters :: StackSpec -> [Parameter]
 stackSpecParameters =
@@ -197,8 +196,7 @@ createChangeSet spec parameters tags =
     (stackSpecStackName spec)
     (stackSpecStackDescription spec)
     (stackSpecTemplate spec)
-    ( nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec
-    )
+    (nubOrdOn (^. parameter_parameterKey) $ parameters <> stackSpecParameters spec)
     (stackSpecCapabilities spec)
     (nubOrdOn (^. tag_key) $ tags <> stackSpecTags spec)
 

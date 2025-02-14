@@ -26,20 +26,14 @@ awsScopeSpecPatterns :: AwsScope -> [Pattern]
 awsScopeSpecPatterns AwsScope {..} =
   [ compile
       $ "stacks"
-      </> unpack (unAccountId awsAccountId)
-      <> ".*"
-      </> unpack (fromRegion awsRegion)
-      <> "**"
-      </> "*"
-      <.> "yaml"
+        </> unpack (unAccountId awsAccountId) <> ".*"
+        </> unpack (fromRegion awsRegion) <> "**"
+        </> "*" <.> "yaml"
   , compile
       $ "stacks"
-      </> "*."
-      <> unpack (unAccountId awsAccountId)
-      </> unpack (fromRegion awsRegion)
-      <> "**"
-      </> "*"
-      <.> "yaml"
+        </> "*." <> unpack (unAccountId awsAccountId)
+        </> unpack (fromRegion awsRegion) <> "**"
+        </> "*" <.> "yaml"
   ]
 
 awsScopeSpecStackName :: AwsScope -> FilePath -> Maybe StackName
@@ -50,13 +44,13 @@ awsScopeSpecStackName scope path = do
   -- pretty fast and loose with the "parsing" step
   pure
     $ path -- stacks/account/region/x/y.yaml
-    & splitPath -- [stacks/, account/, region/, x/, y.yaml]
-    & drop 3 -- [x, y.yaml]
-    & joinPath -- x/y.yaml
-    & dropExtension -- x/y
-    & pack
-    & T.replace "/" "-" -- x-y
-    & StackName
+      & splitPath -- [stacks/, account/, region/, x/, y.yaml]
+      & drop 3 -- [x, y.yaml]
+      & joinPath -- x/y.yaml
+      & dropExtension -- x/y
+      & pack
+      & T.replace "/" "-" -- x-y
+      & StackName
 
 class HasAwsScope env where
   awsScopeL :: Lens' env AwsScope

@@ -132,9 +132,8 @@ runCapture CaptureOptions {..} = do
   case results of
     [] -> do
       logError
-        $ "No Active Stacks match "
-        <> pack (decompile scoStackName)
-        :# []
+        $ "No Active Stacks match " <> pack (decompile scoStackName)
+          :# []
       exitFailure
     [stackName] -> do
       stack <- awsCloudFormationDescribeStack stackName

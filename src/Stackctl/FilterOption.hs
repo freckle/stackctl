@@ -44,8 +44,8 @@ envFilterOption items = var "FILTERS" <|> var "FILTER"
     Env.var (first Env.UnreadError . readFilterOption) name
       $ Env.help
       $ "Filter "
-      <> items
-      <> " by patterns"
+        <> items
+        <> " by patterns"
 
 filterOption :: String -> Parser FilterOption
 filterOption items =

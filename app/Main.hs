@@ -11,8 +11,8 @@ main :: IO ()
 main =
   runSubcommand
     $ subcommand Commands.cat
-    <> subcommand Commands.capture
-    <> subcommand Commands.changes
-    <> subcommand Commands.deploy
-    <> subcommand Commands.list
-    <> subcommand Commands.version
+      <> subcommand Commands.capture
+      <> subcommand Commands.changes
+      <> subcommand Commands.deploy
+      <> subcommand Commands.list
+      <> subcommand Commands.version
