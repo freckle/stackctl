@@ -54,7 +54,7 @@ requiredVersionFromText = fromWords . T.words
     ws ->
       Left
         $ show (unpack $ T.unwords ws)
-        <> " did not parse as optional operator and version string"
+          <> " did not parse as optional operator and version string"
 
   parseRequiredVersion :: Text -> Text -> Either String RequiredVersion
   parseRequiredVersion op w = RequiredVersion <$> parseOp op <*> parseVersion w
@@ -71,8 +71,8 @@ requiredVersionFromText = fromWords . T.words
     op ->
       Left
         $ "Invalid comparison operator ("
-        <> unpack op
-        <> "), may only be =, <, <=, >, >=, or =~"
+          <> unpack op
+          <> "), may only be =, <, <=, >, >=, or =~"
 
   parseVersion :: Text -> Either String Version
   parseVersion t =

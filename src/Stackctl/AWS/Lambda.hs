@@ -93,11 +93,11 @@ awsLambdaInvoke name payload = do
 
   logDebug
     $ "Function result"
-    :# [ "name" .= name
-       , "status" .= status
-       , "error" .= mError
-       , "functionError" .= mFunctionError
-       ]
+      :# [ "name" .= name
+         , "status" .= status
+         , "error" .= mError
+         , "functionError" .= mFunctionError
+         ]
 
   pure
     $ if

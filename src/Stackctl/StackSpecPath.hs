@@ -83,16 +83,16 @@ stackSpecPathFromFilePath awsScope@AwsScope {..} path =
       unless (pathAccountId == awsAccountId)
         $ Left
         $ "Unexpected account: "
-        <> unpack (unAccountId pathAccountId)
-        <> " != "
-        <> unpack (unAccountId awsAccountId)
+          <> unpack (unAccountId pathAccountId)
+          <> " != "
+          <> unpack (unAccountId awsAccountId)
 
       unless (unpack (fromRegion awsRegion) == pathRegion)
         $ Left
         $ "Unexpected region: "
-        <> pathRegion
-        <> " != "
-        <> unpack (fromRegion awsRegion)
+          <> pathRegion
+          <> " != "
+          <> unpack (fromRegion awsRegion)
 
       stackName <-
         maybe (Left "Must end in .yaml") (Right . StackName)
@@ -117,6 +117,6 @@ parseAccountPath path = case second (T.drop 1) $ T.breakOn "." $ pack path of
   _ ->
     Left
       $ "Path matches neither {account-id}.{account-name}, nor {account-name}.{account-id}: "
-      <> path
+        <> path
  where
   isAccountId x = T.length x == 12 && T.all isDigit x

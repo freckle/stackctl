@@ -160,10 +160,10 @@ handlingServiceError =
   handling _ServiceError $ \e -> do
     logError
       $ "Exiting due to AWS Service error"
-      :# [ "code" .= toText (e ^. serviceError_code)
-         , "message" .= fmap toText (e ^. serviceError_message)
-         , "requestId" .= fmap toText (e ^. serviceError_requestId)
-         ]
+        :# [ "code" .= toText (e ^. serviceError_code)
+           , "message" .= fmap toText (e ^. serviceError_message)
+           , "requestId" .= fmap toText (e ^. serviceError_requestId)
+           ]
     exitFailure
 
 formatServiceError :: ServiceError -> Text

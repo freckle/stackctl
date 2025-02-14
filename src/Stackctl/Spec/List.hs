@@ -79,7 +79,7 @@ runList ListOptions {..} = do
   when loLegend
     $ pushLoggerLn
     $ "\nLegend:\n  "
-    <> T.intercalate ", " (map legendItem [minBound .. maxBound])
+      <> T.intercalate ", " (map legendItem [minBound .. maxBound])
 
 data Indicator
   = Deployed

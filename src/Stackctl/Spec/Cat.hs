@@ -138,11 +138,11 @@ prettyPrintStackSpecYaml Colors {..} name StackSpecYaml {..} =
     kvs <- f <$> mA
     pure
       $ [cyan label <> ":"]
-      <> map
-        ( \(k, mV) ->
-            "  " <> cyan k <> ":" <> maybe "" (\v -> " " <> green v) mV
-        )
-        kvs
+        <> map
+          ( \(k, mV) ->
+              "  " <> cyan k <> ":" <> maybe "" (\v -> " " <> green v) mV
+          )
+          kvs
 
   ppList :: Text -> (a -> [Text]) -> Maybe a -> [Text]
   ppList label f = maybe [] (((cyan label <> ":") :) . f)
@@ -186,8 +186,8 @@ prettyPrintTemplate Colors {..} val =
   displayObjectProperty =
     displayPropertyWith @(HashMap Text Value)
       $ map (("  - " <>) . green)
-      . sort
-      . HashMap.keys
+        . sort
+        . HashMap.keys
 
   displayPropertyWith
     :: (FromJSON a, ToJSON a) => (a -> [Text]) -> Text -> [Text]

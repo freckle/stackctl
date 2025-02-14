@@ -32,8 +32,7 @@ spec = do
       case result of
         Left err -> do
           expectationFailure
-            $ "Expected to load a Config, got error: "
-            <> show err
+            $ "Expected to load a Config, got error: " <> show err
         Right config -> do
           configParameters config
             `shouldBe` Just (toParametersYaml [("Some", Just "Parameter")])
@@ -56,9 +55,9 @@ spec = do
         Right config =
           loadConfigFromBytes
             $ "defaults:"
-            <> "\n  tags:"
-            <> "\n    From: Defaults"
-            <> "\n    Keep: \"You?\""
+              <> "\n  tags:"
+              <> "\n    From: Defaults"
+              <> "\n    Keep: \"You?\""
 
         Just tags = ssyTags (applyConfig config specYaml)
 

@@ -266,8 +266,7 @@ formatStackEvent Colors {..} e = do
   timestamp <-
     liftIO
       $ formatTime defaultTimeLocale "%F %T %Z"
-      <$> utcToLocalZonedTime
-        (e ^. stackEvent_timestamp)
+        <$> utcToLocalZonedTime (e ^. stackEvent_timestamp)
 
   pure
     $ mconcat
@@ -276,8 +275,7 @@ formatStackEvent Colors {..} e = do
       , maybe "" colorStatus $ e ^. stackEvent_resourceStatus
       , maybe "" (magenta . (" " <>)) $ e ^. stackEvent_logicalResourceId
       , maybe "" ((\x -> " (" <> x <> ")") . T.strip)
-          $ e
-          ^. stackEvent_resourceStatusReason
+          $ e ^. stackEvent_resourceStatusReason
       ]
  where
   colorStatus = \case

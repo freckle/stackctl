@@ -75,9 +75,10 @@ loadConfigOrExit = either die pure =<< loadConfig
 
 loadConfig :: MonadIO m => m (Either ConfigError Config)
 loadConfig =
-  runExceptT $ getConfigFile >>= \case
-    Nothing -> pure emptyConfig
-    Just cf -> loadConfigFrom cf
+  runExceptT
+    $ getConfigFile >>= \case
+      Nothing -> pure emptyConfig
+      Just cf -> loadConfigFrom cf
 
 loadConfigFrom :: (MonadIO m, MonadError ConfigError m) => FilePath -> m Config
 loadConfigFrom path = loadConfigFromBytes =<< liftIO (readFileBinary path)

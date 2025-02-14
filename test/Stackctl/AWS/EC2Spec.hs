@@ -23,7 +23,7 @@ spec = do
             $ Right
             $ newDescribeAvailabilityZonesResponse 200
             & describeAvailabilityZonesResponse_availabilityZones
-            ?~ zones
+              ?~ zones
 
       withMatcher matcher awsEc2DescribeFirstAvailabilityZoneRegionName
         `shouldReturn` "us-east-1"
