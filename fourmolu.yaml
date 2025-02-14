@@ -1,15 +1,30 @@
 indentation: 2
-column-limit: 80 # ignored until v12 / ghc-9.6
+column-limit: 80 # needs v0.12
 function-arrows: leading
 comma-style: leading # default
 import-export-style: leading
+import-grouping: # needs v0.17
+  - name: "Preludes"
+    rules:
+      - glob: Prelude
+      - glob: "**.Prelude"
+      - glob: RIO
+      - glob: Stackctl.Test.App
+  - name: "Everything else"
+    rules:
+      - match: all
+        priority: 100
 indent-wheres: false # default
 record-brace-space: true
 newlines-between-decls: 1 # default
 haddock-style: single-line
 let-style: mixed
 in-style: left-align
-single-constraint-parens: never # ignored until v12 / ghc-9.6
+single-constraint-parens: never # needs v0.12
+sort-constraints: false # default
+sort-derived-classes: false # default
+sort-derived-clauses: false # default
+trailing-section-operators: false # needs v0.17
 unicode: never # default
 respectful: true # default
 
