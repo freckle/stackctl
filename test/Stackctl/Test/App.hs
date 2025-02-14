@@ -92,5 +92,4 @@ testAppStackFilePath base =
   "stacks"
     </> "0123456789.test"
     </> "us-east-1"
-    </> unpack base
-    <.> "yaml"
+    </> unpack base <.> "yaml"

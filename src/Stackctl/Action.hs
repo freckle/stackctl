@@ -128,10 +128,10 @@ runAction stackName Action {on, run} = do
         Nothing -> do
           logError
             $ "Output not found"
-            :# [ "stackName" .= stackName
-               , "desiredOutput" .= outputName
-               , "availableOutputs" .= map (^. output_outputKey) outputs
-               ]
+              :# [ "stackName" .= stackName
+                 , "desiredOutput" .= outputName
+                 , "availableOutputs" .= map (^. output_outputKey) outputs
+                 ]
           throwIO NoSuchOutput
         Just name -> invoke name
     InvokeLambdaByName name -> invoke name

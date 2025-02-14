@@ -194,7 +194,7 @@ awsCloudFormationDescribeStackMaybe stackName =
   handling_ _ValidationError (pure Nothing)
     $ awsSilently -- don't log said 400
     $ Just
-    <$> awsCloudFormationDescribeStack stackName
+      <$> awsCloudFormationDescribeStack stackName
 
 awsCloudFormationDescribeStackOutputs
   :: (MonadIO m, MonadAWS m)
@@ -218,10 +218,10 @@ awsCloudFormationDescribeStackEvents stackName mLastId = do
 
   runConduit
     $ AWS.paginate req
-    .| mapC (fromMaybe [] . (^. describeStackEventsResponse_stackEvents))
-    .| concatC
-    .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
-    .| sinkList
+      .| mapC (fromMaybe [] . (^. describeStackEventsResponse_stackEvents))
+      .| concatC
+      .| takeWhileC (\e -> Just (e ^. stackEvent_eventId) /= mLastId)
+      .| sinkList
 
 awsCloudFormationGetStackNamesMatching
   :: (MonadIO m, MonadAWS m)
@@ -232,12 +232,12 @@ awsCloudFormationGetStackNamesMatching p = do
 
   runConduit
     $ AWS.paginate req
-    .| concatMapC (^. listStacksResponse_stackSummaries)
-    .| concatC
-    .| mapC (^. stackSummary_stackName)
-    .| filterC ((p `match`) . unpack)
-    .| mapC StackName
-    .| sinkList
+      .| concatMapC (^. listStacksResponse_stackSummaries)
+      .| concatC
+      .| mapC (^. stackSummary_stackName)
+      .| filterC ((p `match`) . unpack)
+      .| mapC StackName
+      .| sinkList
 
 awsCloudFormationGetMostRecentStackEventId
   :: (MonadIO m, MonadAWS m)
@@ -258,9 +258,9 @@ awsCloudFormationGetMostRecentStackEventId stackName = do
 
   AWS.simple req
     $ pure
-    . getFirstEventId
-    . fromMaybe []
-    . (^. describeStackEventsResponse_stackEvents)
+      . getFirstEventId
+      . fromMaybe []
+      . (^. describeStackEventsResponse_stackEvents)
 
 awsCloudFormationDeleteStack
   :: (MonadIO m, MonadLogger m, MonadAWS m)
@@ -314,7 +314,7 @@ awaitStack
 awaitStack waiter stackName =
   AWS.await waiter
     $ newDescribeStacks
-    & describeStacks_stackName ?~ unStackName stackName
+      & describeStacks_stackName ?~ unStackName stackName
 
 makeParameter :: Text -> Maybe Text -> Parameter
 makeParameter k v =
@@ -424,7 +424,7 @@ awsCloudFormationCreateChangeSet stackName mStackDescription stackTemplate param
 
       logInfo
         $ "Creating changeset..."
-        :# ["name" .= name, "type" .= changeSetType]
+          :# ["name" .= name, "type" .= changeSetType]
       csId <- AWS.simple req (^. createChangeSetResponse_id)
 
       logDebug "Awaiting CREATE_COMPLETE"
@@ -471,16 +471,16 @@ awsCloudFormationDeleteAllChangeSets stackName = do
   logInfo "Deleting all changesets"
   runConduit
     $ AWS.paginate (newListChangeSets $ unStackName stackName)
-    .| concatMapC
-      ( \resp -> fromMaybe [] $ do
-          ss <- resp ^. listChangeSetsResponse_summaries
-          pure $ mapMaybe Summary.changeSetId ss
-      )
-    .| mapM_C
-      ( \csId -> do
-          logInfo $ "Enqueing delete" :# ["changeSetId" .= csId]
-          void $ AWS.send $ newDeleteChangeSet csId
-      )
+      .| concatMapC
+        ( \resp -> fromMaybe [] $ do
+            ss <- resp ^. listChangeSetsResponse_summaries
+            pure $ mapMaybe Summary.changeSetId ss
+        )
+      .| mapM_C
+        ( \csId -> do
+            logInfo $ "Enqueing delete" :# ["changeSetId" .= csId]
+            void $ AWS.send $ newDeleteChangeSet csId
+        )
 
 -- | Did we abandoned this Stack's first ever ChangeSet?
 --

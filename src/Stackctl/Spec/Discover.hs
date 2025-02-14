@@ -105,9 +105,9 @@ checkForDuplicateStackNames =
 
       logError
         $ "Multiple specifications produced the same Stack name"
-        :# [ "name" .= stackSpecPathStackName (NE.head specPaths)
-           , "paths" .= collidingPaths
-           ]
+          :# [ "name" .= stackSpecPathStackName (NE.head specPaths)
+             , "paths" .= collidingPaths
+             ]
 
     exitFailure
 
@@ -130,18 +130,17 @@ checkForUnknownDepends known spec =
     for_ depends $ \depend -> do
       let (nearest, _distance) =
             NE.minimumBy1 (comparing snd)
-              $ (id &&& getDistance depend)
-              <$> known
+              $ (id &&& getDistance depend) <$> known
 
       logWarn
         $ "Stack lists dependency that does not exist"
-        :# [ "dependency"
-              .= ( unStackName (stackSpecStackName spec)
-                    <> " -> "
-                    <> unStackName depend
-                 )
-           , "hint" .= ("Did you mean " <> unStackName nearest <> "?")
-           ]
+          :# [ "dependency"
+                 .= ( unStackName (stackSpecStackName spec)
+                        <> " -> "
+                        <> unStackName depend
+                    )
+             , "hint" .= ("Did you mean " <> unStackName nearest <> "?")
+             ]
 
   getDistance = levenshtein `on` unStackName
 

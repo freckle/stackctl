@@ -55,11 +55,11 @@ envParser :: Env.Parser Env.Error Options
 envParser =
   Env.prefixed "STACKCTL_"
     $ Options
-    <$> optional envDirectoryOption
-    <*> optional (envFilterOption "specifications")
-    <*> pure mempty -- use LOG_COLOR
-    <*> pure mempty -- use LOG_LEVEL
-    <*> optional envAutoSSOOption
+      <$> optional envDirectoryOption
+      <*> optional (envFilterOption "specifications")
+      <*> pure mempty -- use LOG_COLOR
+      <*> pure mempty -- use LOG_LEVEL
+      <*> optional envAutoSSOOption
 
 -- brittany-disable-next-binding
 

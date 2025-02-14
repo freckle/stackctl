@@ -76,10 +76,11 @@ formatTTY colors@Colors {..} name mChangeSet = case (mChangeSet, rChanges) of
   (Nothing, _) -> "No changes for " <> name
   (_, Nothing) -> "Metadata only changes (e.g. Tags or Outputs)"
   (_, Just rcs) ->
-    ("\n" <>) $ (<> "\n") $ mconcat $ ("Changes for " <> cyan name <> ":")
-      : map
-        (("\n  " <>) . formatResourceChange)
-        (NE.toList rcs)
+    ("\n" <>)
+      $ (<> "\n")
+      $ mconcat
+      $ ("Changes for " <> cyan name <> ":")
+        : map (("\n  " <>) . formatResourceChange) (NE.toList rcs)
  where
   rChanges = do
     cs <- mChangeSet
@@ -149,20 +150,20 @@ commentBody omitFull cs rcs =
       , "\n| Action | Logical Id | Physical Id | Type | Replacement | Scope | Details |"
       , "\n| ---    | ---        | ---         | ---  | ---         | ---   | ---     |"
       ]
-    <> map commentTableRow (NE.toList rcs)
-    <> case omitFull of
-      OmitFull -> []
-      IncludeFull ->
-        [ "\n"
-        , "\n<details>"
-        , "\n<summary>Full changes</summary>"
-        , "\n"
-        , "\n```json"
-        , "\n" <> changeSetJSON cs
-        , "\n```"
-        , "\n"
-        , "\n</details>"
-        ]
+      <> map commentTableRow (NE.toList rcs)
+      <> case omitFull of
+        OmitFull -> []
+        IncludeFull ->
+          [ "\n"
+          , "\n<details>"
+          , "\n<summary>Full changes</summary>"
+          , "\n"
+          , "\n```json"
+          , "\n" <> changeSetJSON cs
+          , "\n```"
+          , "\n"
+          , "\n</details>"
+          ]
 
 commentTableRow :: ResourceChange -> Text
 commentTableRow ResourceChange' {..} =
@@ -194,10 +195,10 @@ formatDetail Colors {..} ResourceChangeDetail' {..} = do
 
   pure
     $ toText c
-    <> maybe "" ((" in " <>) . toText) attr
-    <> maybe "" (\x -> " (" <> magenta (toText x) <> ")") n
-    <> maybe "" ((", recreation " <>) . formatRR) rr
-    <> maybe "" ((", caused by " <>) . toText) causingEntity
+      <> maybe "" ((" in " <>) . toText) attr
+      <> maybe "" (\x -> " (" <> magenta (toText x) <> ")") n
+      <> maybe "" ((", recreation " <>) . formatRR) rr
+      <> maybe "" ((", caused by " <>) . toText) causingEntity
  where
   formatRR = \case
     x@RequiresRecreation_Always -> red (toText x)

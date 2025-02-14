@@ -33,18 +33,16 @@ spec = do
           [ SendMatcher (isInvocation "lambda-1")
               $ Right
               $ newInvokeResponse 200
-              & invokeResponse_payload
-              ?~ "<response>"
+              & invokeResponse_payload ?~ "<response>"
           , SendMatcher (isInvocation "lambda-2")
               $ Right
               $ newInvokeResponse 200
-              & invokeResponse_payload
-              ?~ BSL.toStrict (encode lambdaError)
+              & invokeResponse_payload ?~ BSL.toStrict (encode lambdaError)
           , SendMatcher (isInvocation "lambda-3")
               $ Right
               $ newInvokeResponse 500
               & (invokeResponse_payload ?~ "<response>")
-              . (invokeResponse_functionError ?~ "<error>")
+                . (invokeResponse_functionError ?~ "<error>")
           ]
 
       withMatchers matchers $ do
