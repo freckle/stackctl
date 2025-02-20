@@ -63,7 +63,7 @@ spec = do
 
       tags
         `shouldBe` toTagsYaml
-          [("From", "Defaults"), ("Hi", "There"), ("Keep", "Me")]
+          [("Hi", "There"), ("From", "Defaults"), ("Keep", "Me")]
 
 loadConfigFromLines :: MonadError ConfigError m => [ByteString] -> m Config
 loadConfigFromLines = loadConfigFromBytes . mconcat . map (<> "\n")
