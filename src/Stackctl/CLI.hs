@@ -103,7 +103,9 @@ runAppT options f = do
           envLogSettings
 
   withLogger logSettings $ \appLogger -> do
-    appAwsEnv <- runWithLogger appLogger $ handleAutoSSO options AWS.discover
+    appAwsEnv <- runWithLogger appLogger $ handleAutoSSO options $ do
+      logDebug "Discovering AWS credentials"
+      AWS.discover
     appConfig <- runWithLogger appLogger loadConfigOrExit
     appAwsScope <- AWS.runEnvT fetchAwsScope appAwsEnv
 
