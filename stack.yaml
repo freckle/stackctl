@@ -2,7 +2,7 @@ resolver: lts-23.7
 
 extra-deps:
   - github: brendanhay/amazonka
-    commit: f3a7fca02fdbb832cc348e991983b1465225d50c
+    commit: cf174ae30fa914439f4d1fa1c3dbd9b69b935141 # main + #1029
     subdirs:
       - lib/amazonka
       - lib/amazonka-core
