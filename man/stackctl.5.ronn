@@ -1,0 +1,50 @@
+stackctl(5) - configuration file for Stackctl
+=============================================
+
+## SYNOPSIS
+
+`.stackctl/config.yaml`<br>
+`.stackctl/config.yml`<br>
+`.stackctl.yaml`<br>
+`.stackctl.yml`<br>
+
+The first path to exist will be used.
+
+## DESCRIPTION
+
+The configuration file is a YAML object with the following keys:
+
+  * `required_version` :: <Text>:
+    A constraint on the version of Stackctl that must be used. The constraint
+    can be an exact version, or use an operator to define a minimum, maximum, or
+    "loose" constraint (see [EXAMPLE](#EXAMPLE)).
+
+  * `defaults.parameters` :: <Object|List<Object>>:
+    Parameters to use for all deploys, in the same format as the `.Parameters`
+    key of a stack specification (see **stackctl(1)**).
+
+  * `defaults.tags` :: <Object|List<Object>>:
+    Tags to use for all deploys, in the same format as the `.Tags` key of a
+    stack specification (see **stackctl(1)**).
+
+All keys are optional.
+
+## EXAMPLE
+
+
+    required_version: "=~ 1.7.1"    # means >= 1.7.1.0 and < 1.7.2.0
+
+    defaults:
+      parameters:                   # list-of-object syntax
+        - Key: Foo
+          Value: Bar
+        - Key: Baz
+          Value: Bat
+
+      tags:                         # object syntax (recommended)
+        Foo: Bar
+        Baz: Bat
+
+## SEE ALSO
+
+**stackctl(1)**

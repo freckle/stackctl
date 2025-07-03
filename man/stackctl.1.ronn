@@ -253,6 +253,11 @@ See stackctl-changes(1) and stackctl-deploy(1).
   If set, will be used as <account name> in commands that create new
   specifications.
 
+## FILES
+
+* `.config/stackctl.yaml`:
+  The configuration file for Stackctl. See stackctl(5) for details.
+
 ## AUTHOR
 
 Freckle Engineering <freckle-engineering@renaissance.com>
