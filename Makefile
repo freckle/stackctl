@@ -6,6 +6,7 @@ ARCHIVE_TARGETS := \
   dist/stackctl/completion/fish \
   dist/stackctl/completion/zsh \
   dist/stackctl/doc/stackctl.1 \
+  dist/stackctl/doc/stackctl.5 \
   dist/stackctl/doc/stackctl-cat.1 \
   dist/stackctl/doc/stackctl-capture.1 \
   dist/stackctl/doc/stackctl-changes.1 \
@@ -56,6 +57,7 @@ install:
 	$(INSTALL) -Dm644 completion/fish $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d/stackctl.fish
 	$(INSTALL) -Dm644 completion/zsh $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_stackctl
 	$(INSTALL) -Dm644 doc/stackctl.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl.1
+	$(INSTALL) -Dm644 doc/stackctl.5 $(DESTDIR)$(MANPREFIX)/man5/stackctl.5
 	$(INSTALL) -Dm644 doc/stackctl-cat.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-cat.1
 	$(INSTALL) -Dm644 doc/stackctl-capture.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-capture.1
 	$(INSTALL) -Dm644 doc/stackctl-changes.1 $(DESTDIR)$(MANPREFIX)/man1/stackctl-changes.1
@@ -69,6 +71,7 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d/stackctl.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_stackctl
 	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl.1
+	$(RM) $(DESTDIR)$(MANPREFIX)/man5/stackctl.5
 	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-cat.1
 	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-capture.1
 	$(RM) $(DESTDIR)$(MANPREFIX)/man1/stackctl-changes.1
