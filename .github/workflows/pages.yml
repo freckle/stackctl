@@ -25,7 +25,7 @@ jobs:
           for bin in "$HOME"/.local/share/gem/ruby/*/bin; do
             echo "$bin"
           done >>"$GITHUB_PATH"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Generate HTML man-pages
         run: ronn --style toc,custom --html man/*.ronn
