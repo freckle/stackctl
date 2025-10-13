@@ -5,3 +5,5 @@ man/*
 !man/index.txt
 !man/*.css
 !man/*.ronn
+.direnv
+.envrc
