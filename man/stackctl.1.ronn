@@ -8,7 +8,8 @@ stackctl(1) - manage CloudFormation Stacks through specifications
 ## OPTIONS
 
   * `-d`, `--directory`=<PATH>:
-    Where to find specifications. Default is `.`.
+    Use the stack collection located at <PATH> (default: current working
+    directory).
 
   * `--filter`=<PATTERN[,PATTERN]>:
     Restrict specifications to those whose paths match any given <PATTERN>.
