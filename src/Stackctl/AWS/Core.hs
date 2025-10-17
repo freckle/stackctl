@@ -12,6 +12,7 @@ module Stackctl.AWS.Core
   , withAssumedRole
 
     -- * Error-handling
+  , handlingAuthError
   , handlingServiceError
   , formatServiceError
 
@@ -38,6 +39,7 @@ import Amazonka
   , serviceError_code
   , serviceError_message
   , serviceError_requestId
+  , _AuthError
   , _Sensitive
   , _ServiceError
   )
@@ -49,6 +51,7 @@ import qualified Amazonka.Env as Amazonka
 import Amazonka.STS.AssumeRole
 import Control.Monad.AWS
 import Control.Monad.Logger (defaultLoc, toLogStr)
+import qualified Data.Text as T
 import Data.Typeable (typeRep)
 import Stackctl.AWS.Orphans ()
 import UnliftIO.Exception.Lens (handling)
@@ -148,6 +151,22 @@ newtype AccountId = AccountId
   { unAccountId :: Text
   }
   deriving newtype (Eq, Ord, Show, ToJSON)
+
+-- | Handle 'AuthError', log it and 'exitFailure'
+handlingAuthError :: (MonadUnliftIO m, MonadLogger m) => m a -> m a
+handlingAuthError =
+  handling _AuthError $ \e -> do
+    logError $ msg :# ["exception" .= displayException e]
+    exitFailure
+ where
+  msg =
+    "No AWS credentials were found in your environment."
+      <> continuation "For details of where stackctl looks for credentials, see:"
+      <> continuation
+        "https://hackage.haskell.org/package/amazonka-2.0/docs/Amazonka-Auth.html#v:discover"
+
+  -- Shift the continuation lines to line up with the first message line
+  continuation x = "\n" <> T.replicate 32 " " <> x
 
 -- | Handle 'ServiceError', log it and 'exitFailure'
 --

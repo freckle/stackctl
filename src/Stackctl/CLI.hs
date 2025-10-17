@@ -13,6 +13,7 @@ import Control.Monad.AWS as AWS
 import Control.Monad.AWS.ViaReader as AWS
 import Control.Monad.Catch (MonadCatch)
 import Control.Monad.Trans.Resource (MonadResource, ResourceT, runResourceT)
+import Stackctl.AWS.Core (handlingAuthError)
 import qualified Stackctl.AWS.Core as AWS
 import Stackctl.AWS.Scope
 import Stackctl.AutoSSO
@@ -103,9 +104,12 @@ runAppT options f = do
           envLogSettings
 
   withLogger logSettings $ \appLogger -> do
-    appAwsEnv <- runWithLogger appLogger $ handleAutoSSO options $ do
-      logDebug "Discovering AWS credentials"
-      AWS.discover
+    appAwsEnv <- runWithLogger appLogger
+      $ handleAutoSSO options
+      $ handlingAuthError
+      $ do
+        logDebug "Discovering AWS credentials"
+        AWS.discover
     appConfig <- runWithLogger appLogger loadConfigOrExit
     appAwsScope <- AWS.runEnvT fetchAwsScope appAwsEnv
 
