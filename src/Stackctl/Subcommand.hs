@@ -10,6 +10,8 @@ import Stackctl.Prelude
 
 import qualified Env
 import Options.Applicative
+import Prettyprinter (pretty, vsep)
+import Prettyprinter.Util (reflow)
 import Stackctl.AWS (handlingServiceError)
 import Stackctl.AutoSSO
 import Stackctl.CLI
@@ -46,7 +48,9 @@ runSubcommand' title parseEnv parseCLI sp = do
   (options, act) <-
     applyEnv
       <$> Env.parse (Env.header $ unpack title) parseEnv
-      <*> execParser (withInfo title $ (,) <$> parseCLI <*> subparser sp)
+      <*> customExecParser
+        (prefs helpShowGlobals)
+        (withInfo title $ (,) <$> parseCLI <*> subparser sp)
 
   act options
  where
@@ -78,4 +82,15 @@ runAppSubcommand f subOptions options =
     $ f subOptions
 
 withInfo :: Text -> Parser a -> ParserInfo a
-withInfo d p = info (p <**> helper) $ progDesc (unpack d) <> fullDesc
+withInfo d p =
+  info (p <**> helper)
+    $ progDescDoc
+    $ Just
+    $ vsep
+      [ pretty d
+      , ""
+      , reflow
+          $ "By default, this will operate on the entire stack collection. To"
+            <> " operate on a specific stack or set of stacks, use the --filter"
+            <> " argument to filter the collection by file path."
+      ]
