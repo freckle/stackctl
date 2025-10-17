@@ -30,7 +30,7 @@ instance HasDirectoryOption DirectoryOption where
 envDirectoryOption :: Env.Parser Env.Error DirectoryOption
 envDirectoryOption =
   Env.var (Env.str <=< Env.nonempty) "DIRECTORY"
-    $ Env.help "Operate on specifications in this directory"
+    $ Env.help directoryHelp
 
 directoryOption :: Parser DirectoryOption
 directoryOption =
@@ -39,6 +39,10 @@ directoryOption =
       [ short 'd'
       , long "directory"
       , metavar "PATH"
-      , help "Operate on specifications in PATH"
+      , help directoryHelp
       , action "directory"
       ]
+
+directoryHelp :: String
+directoryHelp =
+  "Use the stack collection located at PATH (default: current working directory)"
