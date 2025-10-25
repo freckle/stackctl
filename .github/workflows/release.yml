@@ -46,7 +46,7 @@ jobs:
       - run: |
           make install.check # creates dist/stackctl.tar.gz
           cp -v dist/stackctl.tar.gz stackctl-${{ matrix.suffix }}.tar.gz
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.os }}-binaries
           path: "stackctl-*.tar.gz"
@@ -60,7 +60,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
 
       - id: token
         uses: actions/create-github-app-token@v2
