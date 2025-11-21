@@ -26,7 +26,7 @@ jobs:
           for bin in "$HOME"/.local/share/gem/ruby/*/bin; do
             echo "$bin"
           done >>"$GITHUB_PATH"
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - id: release
         uses: cycjimmy/semantic-release-action@v4
@@ -56,7 +56,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
