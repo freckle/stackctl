@@ -14,8 +14,10 @@ jobs:
         include:
           - os: ubuntu-latest
             suffix: x86_64-linux
-          - os: macOS-latest
+          - os: macos-15-intel
             suffix: x86_64-osx
+          - os: macos-latest
+            suffix: arm64-osx
 
     runs-on: ${{ matrix.os }}
     steps:
